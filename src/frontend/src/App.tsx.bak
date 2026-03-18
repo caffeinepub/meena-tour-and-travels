@@ -5,9 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Award,
-  BatteryCharging,
-  Car,
   CheckCircle,
   ChevronRight,
   Clock,
@@ -25,12 +22,8 @@ import {
   Sparkles,
   Star,
   Twitter,
-  UserCheck,
-  Users,
-  Wind,
   X,
   Youtube,
-  Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -50,15 +43,15 @@ const TOUR_PACKAGES = [
   },
   {
     id: 2,
-    name: "Haridwar & Rishikesh Pilgrimage",
-    destination: "Haridwar & Rishikesh, Uttarakhand",
-    duration: 4,
-    price: 8999,
-    rating: 4.9,
-    reviews: 274,
-    badge: "Spiritual",
-    image: "/assets/generated/tour-haridwar-rishikesh.dim_600x400.jpg",
-    description: "Ganga Aarti, Har Ki Pauri, Ram Jhula & yoga retreat",
+    name: "Kerala Backwaters Escape",
+    destination: "Kerala, India",
+    duration: 6,
+    price: 15999,
+    rating: 4.8,
+    reviews: 312,
+    badge: "Popular",
+    image: "/assets/generated/tour-kerala.dim_600x400.jpg",
+    description: "Houseboat cruise, Munnar hills & Kovalam beach",
   },
   {
     id: 3,
@@ -74,42 +67,42 @@ const TOUR_PACKAGES = [
   },
   {
     id: 4,
-    name: "Ayodhya & Vrindavan Darshan",
-    destination: "Ayodhya & Vrindavan, UP",
-    duration: 3,
-    price: 6999,
-    rating: 4.8,
-    reviews: 198,
-    badge: "Devotional",
-    image: "/assets/generated/tour-ayodhya-vrindavan.dim_600x400.jpg",
-    description: "Ram Janmabhoomi, Banke Bihari temple & sacred ghats",
+    name: "Goa Beach Holiday",
+    destination: "Goa, India",
+    duration: 4,
+    price: 9999,
+    rating: 4.7,
+    reviews: 165,
+    badge: "Leisure",
+    image: "/assets/generated/tour-goa.dim_600x400.jpg",
+    description: "Golden beaches, Portuguese heritage & vibrant nightlife",
   },
 ];
 
 const DESTINATIONS = [
   {
     id: 1,
-    name: "Haridwar",
-    country: "Uttarakhand, India",
-    image: "/assets/generated/dest-haridwar.dim_500x500.jpg",
+    name: "Rajasthan",
+    country: "India",
+    image: "/assets/generated/dest-rajasthan2.dim_500x500.jpg",
   },
   {
     id: 2,
-    name: "Rishikesh",
-    country: "Uttarakhand, India",
-    image: "/assets/generated/dest-rishikesh.dim_500x500.jpg",
+    name: "Kerala",
+    country: "India",
+    image: "/assets/generated/dest-kerala.dim_500x500.jpg",
   },
   {
     id: 3,
-    name: "Ayodhya",
-    country: "Uttar Pradesh, India",
-    image: "/assets/generated/dest-ayodhya.dim_500x500.jpg",
+    name: "Varanasi",
+    country: "India",
+    image: "/assets/generated/dest-varanasi.dim_500x500.jpg",
   },
   {
     id: 4,
-    name: "Vrindavan",
-    country: "Uttar Pradesh, India",
-    image: "/assets/generated/dest-vrindavan.dim_500x500.jpg",
+    name: "Goa",
+    country: "India",
+    image: "/assets/generated/dest-goa.dim_500x500.jpg",
   },
 ];
 
@@ -120,7 +113,7 @@ const TESTIMONIALS = [
     location: "Mumbai, India",
     rating: 5,
     review:
-      "Our Haridwar & Rishikesh pilgrimage with Meena Tour and Travels was truly divine! The Ganga Aarti at Har Ki Pauri was breathtaking. Every arrangement was perfect — from the hotel to the guided temple visits. Highly recommended!",
+      "Meena Tour and Travels made our Rajasthan honeymoon absolutely magical. Every detail was perfectly planned — from the heritage hotel stay to the desert safari at sunset. We'll definitely book again!",
     avatar: "PS",
   },
   {
@@ -138,7 +131,7 @@ const TESTIMONIALS = [
     location: "Ahmedabad, India",
     rating: 5,
     review:
-      "Our Ayodhya & Vrindavan darshan trip was a deeply spiritual experience. Meena Tour and Travels arranged everything beautifully — Ram Janmabhoomi, Banke Bihari temple, and the sacred ghats. Our family is truly grateful!",
+      "From booking to return, the entire Kerala experience was seamless. Meena Tour and Travels truly understands what travelers need. Our family vacation was stress-free and memorable.",
     avatar: "AP",
   },
 ];
@@ -204,11 +197,17 @@ export default function App() {
               className="flex items-center gap-2"
               data-ocid="nav.link"
             >
-              <img
-                src="/assets/generated/meena-logo-transparent.dim_400x150.png"
-                alt="Meena Tour and Travels"
-                className="h-12 w-auto object-contain"
-              />
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                <Plane size={16} className="text-white rotate-45" />
+              </div>
+              <div className="leading-tight">
+                <div className="font-display font-bold text-primary text-sm">
+                  Meena Tour
+                </div>
+                <div className="font-display text-xs text-muted-foreground">
+                  & Travels
+                </div>
+              </div>
             </a>
 
             {/* Desktop Nav */}
@@ -309,7 +308,7 @@ export default function App() {
               className="max-w-2xl"
             >
               <Badge className="bg-accent/20 text-accent border-accent/30 mb-4 font-medium">
-                ✈ Trusted Travellers Since 2011 · 15,000+ Happy Passengers
+                ✈ Trusted Travel Partner Since 2005
               </Badge>
               <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide leading-tight mb-4">
                 Discover Your
@@ -344,9 +343,9 @@ export default function App() {
               {/* Stats */}
               <div className="flex gap-8 mt-12">
                 {[
-                  { val: "15,000+", label: "Happy Passengers" },
+                  { val: "5000+", label: "Happy Travelers" },
                   { val: "50+", label: "Destinations" },
-                  { val: "Since 2011", label: "Trusted Travellers" },
+                  { val: "2011", label: "Est. Since" },
                 ].map(({ val, label }) => (
                   <div key={label} className="text-white">
                     <div className="text-2xl font-bold font-display">{val}</div>
@@ -505,7 +504,7 @@ export default function App() {
               <div className="hidden md:block w-px h-5 bg-primary/20" />
               <div className="flex items-center gap-2 text-foreground/70 text-sm">
                 <Heart size={16} className="text-rose-500 fill-rose-500" />
-                <span>15,000+ Happy Passengers</span>
+                <span>5000+ Happy Travelers</span>
               </div>
               <div className="hidden md:block w-px h-5 bg-primary/20" />
               <div className="flex items-center gap-2 text-foreground/70 text-sm">
@@ -534,10 +533,6 @@ export default function App() {
               <p className="text-muted-foreground max-w-xl mx-auto">
                 Handpicked itineraries designed for unforgettable experiences.
                 All-inclusive packages with expert guidance.
-              </p>
-              <p className="text-xs text-muted-foreground italic mt-2">
-                * Package prices vary by destination. State taxes &amp; toll
-                charges applicable as per actuals.
               </p>
             </motion.div>
 
@@ -594,7 +589,7 @@ export default function App() {
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="text-xs text-muted-foreground">
-                            Starting from
+                            From
                           </span>
                           <div className="font-bold text-primary text-lg font-display">
                             ₹{pkg.price.toLocaleString("en-IN")}
@@ -627,153 +622,6 @@ export default function App() {
               >
                 View All Packages <ChevronRight size={16} className="ml-1" />
               </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* PREMIUM FLEET */}
-        <section className="py-16 bg-amber-950/5 border-y border-primary/10">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <Badge className="bg-primary/10 text-primary border-primary/20 mb-3">
-                Our Fleet
-              </Badge>
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-                Premium Vehicles &amp; Expert Drivers
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Every journey with Meena Tour and Travels is in a
-                top-of-the-line vehicle, driven by a seasoned professional.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-              {[
-                {
-                  icon: <Award className="w-8 h-8 text-primary" />,
-                  title: "Premium Vehicles Only",
-                  desc: "All our taxis are latest-model premium cars — fully serviced, sanitized, and travel-ready for every trip.",
-                },
-                {
-                  icon: <Users className="w-8 h-8 text-primary" />,
-                  title: "10–15+ Years Experience",
-                  desc: "Our drivers are handpicked veterans with over a decade behind the wheel, trained in safe driving and hospitality.",
-                },
-                {
-                  icon: <Shield className="w-8 h-8 text-primary" />,
-                  title: "All India Tourist Permit",
-                  desc: "Fully licensed and permitted to operate across all Indian states — no hassle, no boundaries.",
-                },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15 }}
-                  data-ocid={`fleet.item.${i + 1}`}
-                >
-                  <Card className="border-0 shadow-card hover:shadow-hero transition-all text-center p-6 h-full">
-                    <CardContent className="p-0 flex flex-col items-center gap-3">
-                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                        {item.icon}
-                      </div>
-                      <h3 className="font-display font-bold text-lg text-foreground">
-                        {item.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">
-                        {item.desc}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* TRAVEL COMFORTS */}
-        <section className="py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <Badge className="bg-accent/15 text-foreground border-accent/30 mb-3">
-                In-Car Facilities
-              </Badge>
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-                Travel in Comfort &amp; Style
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Our vehicles come equipped with thoughtful amenities so you can
-                sit back, relax, and enjoy the journey.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-              {[
-                {
-                  icon: <BatteryCharging className="w-8 h-8 text-primary" />,
-                  title: "Laptop Charger",
-                  desc: "High-watt capacity charger to keep all your devices powered throughout the journey.",
-                },
-                {
-                  icon: <Zap className="w-8 h-8 text-primary" />,
-                  title: "Medicines & First Aid",
-                  desc: "Emergency medicines and a fully-stocked first aid kit always within reach.",
-                },
-                {
-                  icon: <Wind className="w-8 h-8 text-primary" />,
-                  title: "Air Purifier",
-                  desc: "In-car air purifier ensures fresh, clean air throughout your trip — even on dusty roads.",
-                },
-                {
-                  icon: <Sparkles className="w-8 h-8 text-primary" />,
-                  title: "Water Bottles",
-                  desc: "Complimentary chilled water bottles provided for every passenger on board.",
-                },
-                {
-                  icon: <Car className="w-8 h-8 text-primary" />,
-                  title: "Premium Taxis",
-                  desc: "All our vehicles are top-of-the-line premium cars ensuring a luxurious, comfortable ride.",
-                },
-                {
-                  icon: <UserCheck className="w-8 h-8 text-primary" />,
-                  title: "Expert Drivers",
-                  desc: "Our drivers bring 10–15+ years of road experience, ensuring safe and smooth journeys.",
-                },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  data-ocid={`comforts.item.${i + 1}`}
-                >
-                  <Card className="border border-primary/10 shadow-card hover:shadow-hero hover:-translate-y-1 transition-all text-center p-6 h-full bg-gradient-to-b from-primary/5 to-transparent">
-                    <CardContent className="p-0 flex flex-col items-center gap-3">
-                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-1">
-                        {item.icon}
-                      </div>
-                      <h3 className="font-display font-semibold text-base text-foreground">
-                        {item.title}
-                      </h3>
-                      <p className="text-muted-foreground text-xs leading-relaxed">
-                        {item.desc}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
             </div>
           </div>
         </section>
@@ -1002,7 +850,7 @@ export default function App() {
                       <div className="mt-3 flex items-center gap-2">
                         <StarRating rating={5} size={12} />
                         <span className="text-xs text-muted-foreground font-medium">
-                          15,000+ happy passengers
+                          5000+ happy travelers
                         </span>
                       </div>
                     </div>
