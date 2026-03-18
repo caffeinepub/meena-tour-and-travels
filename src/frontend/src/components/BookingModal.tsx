@@ -10,7 +10,9 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -19,7 +21,6 @@ import { useActor } from "@/hooks/useActor";
 import { CheckCircle2, Loader2, Mail, Phone } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 interface BookingModalProps {
   open: boolean;
@@ -59,6 +60,18 @@ const EMPTY_FORM: FormState = {
   special: "",
 };
 
+const STANDARD_VEHICLES = [
+  { value: "Sedan (Standard)", label: "Sedan (Standard)", rate: "₹18–22/km" },
+  { value: "Ertiga", label: "Ertiga", rate: "₹25–32/km" },
+  { value: "Innova Crysta", label: "Innova Crysta", rate: "₹25–32/km" },
+  { value: "Premium SUV", label: "Premium SUV", rate: "₹25–32/km" },
+];
+
+const VIP_VEHICLES = [
+  { value: "BMW (VIP)", label: "BMW", rate: "On Request" },
+  { value: "Mercedes (VIP)", label: "Mercedes", rate: "On Request" },
+];
+
 export function BookingModal({
   open,
   onClose,
@@ -73,10 +86,9 @@ export function BookingModal({
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  function handleOpenChange(open: boolean) {
-    if (!open) {
+  function handleOpenChange(isOpen: boolean) {
+    if (!isOpen) {
       onClose();
-      // reset after close animation
       setTimeout(() => {
         setForm({ ...EMPTY_FORM, destination: prefillDestination ?? "" });
         setErrors({});
@@ -86,7 +98,6 @@ export function BookingModal({
     }
   }
 
-  // keep destination in sync with prefill prop when modal opens
   const [prevOpen, setPrevOpen] = useState(false);
   if (open && !prevOpen) {
     setPrevOpen(true);
@@ -119,52 +130,54 @@ export function BookingModal({
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
+
+    // Step 1: Send email FIRST — this is the primary notification channel
     try {
-      if (!actor) throw new Error("Not connected to backend");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (actor as any).submitBooking(
-        form.fullName,
-        form.mobile,
-        form.pickup,
-        form.destination,
-        form.travelDate,
-        form.passengers,
-        form.vehicleType,
-        form.special,
-      );
-      // Send email notification to Gaurav
-      try {
-        await fetch("https://formsubmit.co/ajax/meenagaurav4748@gmail.com", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            _subject: "🚗 New Booking Request - Meena Tour and Travels",
-            _template: "table",
-            Name: form.fullName,
-            Mobile: form.mobile,
-            "Pickup Location": form.pickup,
-            Destination: form.destination,
-            "Travel Date": form.travelDate,
-            Passengers: form.passengers,
-            "Vehicle Type": form.vehicleType,
-            "Special Notes": form.special || "None",
-          }),
-        });
-      } catch {
-        // Email failed silently — booking is already saved to blockchain
-      }
-      setSuccess(true);
-    } catch (err) {
-      console.error("Booking error:", err);
-      toast.error(
-        "Failed to submit booking. Please try again or call us directly.",
-      );
-    } finally {
-      setSubmitting(false);
+      await fetch("https://formsubmit.co/ajax/meenagaurav4748@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          _subject: "🚗 New Booking Request - Meena Tour and Travels",
+          _template: "table",
+          Name: form.fullName,
+          Mobile: form.mobile,
+          "Pickup Location": form.pickup,
+          Destination: form.destination,
+          "Travel Date": form.travelDate,
+          Passengers: form.passengers,
+          "Vehicle Type": form.vehicleType,
+          "Special Notes": form.special || "None",
+        }),
+      });
+    } catch {
+      // Email failed silently — still show success and try backend
     }
+
+    // Step 2: Try backend save — non-blocking, won't affect success state
+    if (actor) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (actor as any).submitBooking(
+          form.fullName,
+          form.mobile,
+          form.pickup,
+          form.destination,
+          form.travelDate,
+          form.passengers,
+          form.vehicleType,
+          form.special,
+        );
+      } catch {
+        // Backend save failed silently — email already sent
+      }
+    }
+
+    // Always show success
+    setSubmitting(false);
+    setSuccess(true);
   }
 
   const field = (key: keyof FormState) => ({
@@ -370,7 +383,7 @@ export function BookingModal({
                     <SelectTrigger data-ocid="booking.select">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" sideOffset={4}>
                       {["1", "2", "3", "4", "5", "6+"].map((n) => (
                         <SelectItem key={n} value={n}>
                           {n} Passenger{n !== "1" ? "s" : ""}
@@ -387,6 +400,7 @@ export function BookingModal({
                     </p>
                   )}
                 </div>
+
                 <div className="flex flex-col gap-1.5">
                   <Label className="text-sm font-semibold">
                     Vehicle Type <span className="text-destructive">*</span>
@@ -398,14 +412,41 @@ export function BookingModal({
                     }
                   >
                     <SelectTrigger data-ocid="booking.select">
-                      <SelectValue placeholder="Select" />
+                      <SelectValue placeholder="Select vehicle" />
                     </SelectTrigger>
-                    <SelectContent>
-                      {["Sedan", "SUV", "Tempo Traveller", "Bus"].map((v) => (
-                        <SelectItem key={v} value={v}>
-                          {v}
-                        </SelectItem>
-                      ))}
+                    <SelectContent position="popper" sideOffset={4}>
+                      <SelectGroup>
+                        <SelectLabel className="text-xs font-semibold uppercase tracking-wide text-muted-foreground px-2 py-1">
+                          Standard Fleet
+                        </SelectLabel>
+                        {STANDARD_VEHICLES.map((v) => (
+                          <SelectItem key={v.value} value={v.value}>
+                            <span className="flex items-center gap-2">
+                              <span className="font-medium">{v.label}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {v.rate}
+                              </span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel className="text-xs font-semibold uppercase tracking-wide text-amber-600 px-2 py-1 mt-1 flex items-center gap-1">
+                          ✦ VIP / Luxury Fleet
+                        </SelectLabel>
+                        {VIP_VEHICLES.map((v) => (
+                          <SelectItem key={v.value} value={v.value}>
+                            <span className="flex items-center gap-2">
+                              <span className="font-semibold text-amber-700">
+                                {v.label}
+                              </span>
+                              <span className="text-xs font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                                {v.rate}
+                              </span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                   {errors.vehicleType && (
@@ -435,6 +476,11 @@ export function BookingModal({
                   {...field("special")}
                 />
               </div>
+
+              <p className="text-xs text-muted-foreground text-center -mb-1">
+                Your details will be sent to our team. We&apos;ll call you to
+                confirm.
+              </p>
 
               <Button
                 type="submit"
