@@ -36,6 +36,19 @@ export interface TourPackage {
   'rating' : number,
   'price' : number,
 }
+export type BookingId = bigint;
+export interface BookingRequest {
+  'id' : BookingId,
+  'fullName' : string,
+  'mobile' : string,
+  'pickup' : string,
+  'destination' : string,
+  'travelDate' : string,
+  'passengers' : string,
+  'vehicleType' : string,
+  'special' : string,
+  'submittedAt' : bigint,
+}
 export interface _SERVICE {
   'addDestination' : ActorMethod<[string, string, string], Destination>,
   'addTestimonial' : ActorMethod<[string, string, number, string], Testimonial>,
@@ -73,6 +86,11 @@ export interface _SERVICE {
     ],
     TourPackage
   >,
+  'submitBooking' : ActorMethod<
+    [string, string, string, string, string, string, string, string],
+    BookingRequest
+  >,
+  'getAllBookings' : ActorMethod<[], Array<BookingRequest>>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

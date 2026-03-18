@@ -3,10 +3,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { AdminBookings } from "@/pages/AdminBookings";
 import {
   Award,
   BatteryCharging,
+  Briefcase,
+  Calendar,
   Car,
   CheckCircle,
   ChevronRight,
@@ -18,6 +27,7 @@ import {
   Mail,
   MapPin,
   Menu,
+  Navigation2,
   Phone,
   Plane,
   Search,
@@ -35,111 +45,270 @@ import {
 import { motion } from "motion/react";
 import { useState } from "react";
 
-const TOUR_PACKAGES = [
+const TRIPS = [
   {
     id: 1,
-    name: "Royal Rajasthan Tour",
-    destination: "Rajasthan, India",
-    duration: 7,
-    price: 18999,
-    rating: 4.9,
-    reviews: 248,
-    badge: "Best Seller",
-    image: "/assets/generated/tour-rajasthan.dim_600x400.jpg",
-    description: "Amber Fort, City Palace, Hawa Mahal & Desert Safari",
+    name: "Mathura & Vrindavan",
+    state: "Uttar Pradesh",
+    type: "Pilgrimage",
+    emoji: "🛕",
+    description:
+      "The birthplace of Lord Krishna. Visit Banke Bihari temple, ISKCON, Prem Mandir and the sacred ghats of Vrindavan.",
+    highlights: [
+      "Banke Bihari Temple",
+      "ISKCON Temple",
+      "Prem Mandir",
+      "Yamuna Ghat",
+    ],
+    bestTime: "October – March",
+    approxKm: "180 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1609694989823-53f7ef0e0b23?w=600&q=80",
   },
   {
     id: 2,
-    name: "Haridwar & Rishikesh Pilgrimage",
-    destination: "Haridwar & Rishikesh, Uttarakhand",
-    duration: 4,
-    price: 8999,
-    rating: 4.9,
-    reviews: 274,
-    badge: "Spiritual",
-    image: "/assets/generated/tour-haridwar-rishikesh.dim_600x400.jpg",
-    description: "Ganga Aarti, Har Ki Pauri, Ram Jhula & yoga retreat",
+    name: "Kashi / Varanasi",
+    state: "Uttar Pradesh",
+    type: "Pilgrimage",
+    emoji: "🪔",
+    description:
+      "One of India's oldest and holiest cities. Witness the Ganga Aarti, ancient ghats, and the sacred Kashi Vishwanath temple.",
+    highlights: [
+      "Ganga Aarti",
+      "Kashi Vishwanath Temple",
+      "Dashashwamedh Ghat",
+      "Sarnath",
+    ],
+    bestTime: "October – March",
+    approxKm: "800 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1561361058-c24e31f34f4a?w=600&q=80",
   },
   {
     id: 3,
-    name: "Himalayan Manali Adventure",
-    destination: "Manali, Himachal Pradesh",
-    duration: 5,
-    price: 12999,
-    rating: 5.0,
-    reviews: 186,
-    badge: "Adventure",
-    image: "/assets/generated/tour-manali.dim_600x400.jpg",
-    description: "Rohtang Pass, Solang Valley & snow-capped peaks",
+    name: "Haridwar & Rishikesh",
+    state: "Uttarakhand",
+    type: "Pilgrimage & Adventure",
+    emoji: "🏔️",
+    description:
+      "Gateway to the Himalayas. Har Ki Pauri aarti, Laxman Jhula, yoga retreats and the holy Ganges.",
+    highlights: [
+      "Har Ki Pauri",
+      "Laxman Jhula",
+      "Triveni Ghat Aarti",
+      "Neelkanth Mahadev",
+    ],
+    bestTime: "September – June",
+    approxKm: "220 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
   },
   {
     id: 4,
-    name: "Ayodhya & Vrindavan Darshan",
-    destination: "Ayodhya & Vrindavan, UP",
-    duration: 3,
-    price: 6999,
-    rating: 4.8,
-    reviews: 198,
-    badge: "Devotional",
-    image: "/assets/generated/tour-ayodhya-vrindavan.dim_600x400.jpg",
-    description: "Ram Janmabhoomi, Banke Bihari temple & sacred ghats",
-  },
-];
-
-const DESTINATIONS = [
-  {
-    id: 1,
-    name: "Haridwar",
-    country: "Uttarakhand, India",
-    image: "/assets/generated/dest-haridwar.dim_500x500.jpg",
-  },
-  {
-    id: 2,
-    name: "Rishikesh",
-    country: "Uttarakhand, India",
-    image: "/assets/generated/dest-rishikesh.dim_500x500.jpg",
-  },
-  {
-    id: 3,
     name: "Ayodhya",
-    country: "Uttar Pradesh, India",
-    image: "/assets/generated/dest-ayodhya.dim_500x500.jpg",
+    state: "Uttar Pradesh",
+    type: "Pilgrimage",
+    emoji: "🕌",
+    description:
+      "The sacred birthplace of Lord Ram. Visit the grand Ram Mandir, Hanuman Garhi, and ancient temples along the Saryu river.",
+    highlights: ["Ram Mandir", "Hanuman Garhi", "Kanak Bhawan", "Saryu Ghat"],
+    bestTime: "October – March",
+    approxKm: "630 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1627894005813-d5f7dc6b7fbb?w=600&q=80",
   },
   {
-    id: 4,
-    name: "Vrindavan",
-    country: "Uttar Pradesh, India",
-    image: "/assets/generated/dest-vrindavan.dim_500x500.jpg",
+    id: 5,
+    name: "Salasar Balaji",
+    state: "Rajasthan",
+    type: "Pilgrimage",
+    emoji: "🙏",
+    description:
+      "Famous Hanuman temple in Rajasthan attracting millions of devotees. A deeply spiritual journey through the heart of Rajasthan.",
+    highlights: [
+      "Salasar Balaji Temple",
+      "Shaktipeeth Darshan",
+      "Rajasthani Culture",
+    ],
+    bestTime: "Year Round",
+    approxKm: "470 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1566831695454-c3b386df1de6?w=600&q=80",
+  },
+  {
+    id: 6,
+    name: "Khatu Shyam",
+    state: "Rajasthan",
+    type: "Pilgrimage",
+    emoji: "🔱",
+    description:
+      "Home to the famous Khatu Shyamji temple, one of the most visited temples in Rajasthan. Special fairs during Phalgun Mela.",
+    highlights: [
+      "Khatu Shyam Temple",
+      "Shyam Kund",
+      "Gopinath Temple",
+      "Phalgun Mela",
+    ],
+    bestTime: "October – March",
+    approxKm: "310 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80",
+  },
+  {
+    id: 7,
+    name: "Jaipur – Rajasthan",
+    state: "Rajasthan",
+    type: "Heritage & Culture",
+    emoji: "🏯",
+    description:
+      "The Pink City of India. Amber Fort, Hawa Mahal, City Palace and vibrant bazaars make it a must-visit heritage destination.",
+    highlights: ["Amber Fort", "Hawa Mahal", "City Palace", "Jantar Mantar"],
+    bestTime: "October – March",
+    approxKm: "270 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1477587458883-47145ed31f1b?w=600&q=80",
+  },
+  {
+    id: 8,
+    name: "Manali",
+    state: "Himachal Pradesh",
+    type: "Hill Station",
+    emoji: "❄️",
+    description:
+      "A Himalayan retreat with snow-capped mountains, adventure sports, Rohtang Pass, and the serene Solang Valley.",
+    highlights: [
+      "Rohtang Pass",
+      "Solang Valley",
+      "Hadimba Temple",
+      "Old Manali",
+    ],
+    bestTime: "October – June",
+    approxKm: "550 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80",
+  },
+  {
+    id: 9,
+    name: "Dehradun & Mussoorie",
+    state: "Uttarakhand",
+    type: "Hill Station",
+    emoji: "🌿",
+    description:
+      "Queen of the Hills. Kempty Falls, Gun Hill, Lal Tibba viewpoint and the pleasant hill air of Mussoorie.",
+    highlights: ["Kempty Falls", "Gun Hill", "Lal Tibba", "Mall Road"],
+    bestTime: "March – June, Sep – Nov",
+    approxKm: "290 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1593181629936-11c609b8db9b?w=600&q=80",
+  },
+  {
+    id: 10,
+    name: "Agra – Taj Mahal",
+    state: "Uttar Pradesh",
+    type: "Heritage",
+    emoji: "🕌",
+    description:
+      "One of the Seven Wonders of the World. The Taj Mahal, Agra Fort, and Fatehpur Sikri are unmissable landmarks.",
+    highlights: ["Taj Mahal", "Agra Fort", "Fatehpur Sikri", "Mehtab Bagh"],
+    bestTime: "October – March",
+    approxKm: "230 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80",
+  },
+  {
+    id: 11,
+    name: "Nainital",
+    state: "Uttarakhand",
+    type: "Hill Station",
+    emoji: "🏞️",
+    description:
+      "The Lake District of India. Naini Lake, Snow View Point, and pleasant weather make it a perfect getaway.",
+    highlights: [
+      "Naini Lake",
+      "Snow View Point",
+      "Naina Devi Temple",
+      "Mall Road",
+    ],
+    bestTime: "March – June, Sep – Nov",
+    approxKm: "310 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
+  },
+  {
+    id: 12,
+    name: "Shimla",
+    state: "Himachal Pradesh",
+    type: "Hill Station",
+    emoji: "🏔️",
+    description:
+      "The former summer capital of British India. Ridge, Christ Church, Jakhu Temple and scenic toy train ride.",
+    highlights: [
+      "The Ridge",
+      "Jakhu Temple",
+      "Christ Church",
+      "Toy Train Ride",
+    ],
+    bestTime: "March – June, Dec – Jan (snow)",
+    approxKm: "340 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80",
   },
 ];
 
 const TESTIMONIALS = [
   {
     id: 1,
-    name: "Priya Sharma",
-    location: "Mumbai, India",
+    name: "Rajesh Agarwal",
+    role: "Managing Director, Kolkata",
     rating: 5,
     review:
-      "Our Haridwar & Rishikesh pilgrimage with Meena Tour and Travels was truly divine! The Ganga Aarti at Har Ki Pauri was breathtaking. Every arrangement was perfect — from the hotel to the guided temple visits. Highly recommended!",
-    avatar: "PS",
+      "We have been using Meena Tour and Travels for our executive travel requirements for the past 9 years. Whether it is airport transfers or outstation trips, Gaurav's team has never let us down. Highly recommended for any corporate requirement.",
+    initials: "RA",
   },
   {
     id: 2,
-    name: "Rahul Mehta",
-    location: "Delhi, India",
+    name: "Sunita Verma",
+    role: "Senior Manager, Bangalore",
     rating: 5,
     review:
-      "Exceptional service and amazing itinerary! The Manali trip exceeded all our expectations. The guides were knowledgeable and the accommodations were top-notch. Highly recommended!",
-    avatar: "RM",
+      "I was referred by a colleague and I am glad I made that call. Their drivers are experienced, the cars are always clean and well-maintained, and the per-km pricing is completely transparent. No hidden charges, ever.",
+    initials: "SV",
   },
   {
     id: 3,
-    name: "Anjali Patel",
-    location: "Ahmedabad, India",
+    name: "Amit Bhardwaj",
+    role: "Business Owner, Delhi",
     rating: 5,
     review:
-      "Our Ayodhya & Vrindavan darshan trip was a deeply spiritual experience. Meena Tour and Travels arranged everything beautifully — Ram Janmabhoomi, Banke Bihari temple, and the sacred ghats. Our family is truly grateful!",
-    avatar: "AP",
+      "Trusted them for a Haridwar pilgrimage trip with my family of 6. The car had everything — water bottles, charger, first aid. Driver was respectful and knowledgeable about the route. Will book again for Ayodhya next.",
+    initials: "AB",
+  },
+  {
+    id: 4,
+    name: "Priya Mehta",
+    role: "Director, Mumbai",
+    rating: 5,
+    review:
+      "Our company switched to Meena Tour and Travels for all employee travel after one of our MDs recommended them. They handle last-minute bookings professionally and the monthly billing is always accurate.",
+    initials: "PM",
+  },
+  {
+    id: 5,
+    name: "Suresh Gupta",
+    role: "Entrepreneur, UP",
+    rating: 5,
+    review:
+      "I have referred Meena Tour and Travels to at least 20 of my friends and business associates. In 8 years, there has not been a single bad experience. That says everything about their commitment.",
+    initials: "SG",
+  },
+  {
+    id: 6,
+    name: "Kavita Sharma",
+    role: "HR Head, Noida",
+    rating: 5,
+    review:
+      "We manage travel for over 50 employees monthly through Meena Tour and Travels. The coordination is smooth, drivers are always on time, and Gaurav is always reachable. A truly reliable partner.",
+    initials: "KS",
   },
 ];
 
@@ -183,6 +352,9 @@ export default function App() {
   const [searchGuests, setSearchGuests] = useState("");
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingDestination, setBookingDestination] = useState("");
+  const [selectedTrip, setSelectedTrip] = useState<(typeof TRIPS)[0] | null>(
+    null,
+  );
   const currentYear = new Date().getFullYear();
 
   function handleFormSubmit(e: React.FormEvent) {
@@ -190,6 +362,10 @@ export default function App() {
     setFormSubmitted(true);
     setFormData({ name: "", email: "", phone: "", message: "" });
     setTimeout(() => setFormSubmitted(false), 4000);
+  }
+
+  if (window.location.pathname === "/admin") {
+    return <AdminBookings />;
   }
 
   return (
@@ -205,9 +381,15 @@ export default function App() {
               data-ocid="nav.link"
             >
               <img
-                src="/assets/generated/meena-logo-transparent.dim_400x150.png"
+                src="/assets/generated/meena-logo.dim_400x120.png"
                 alt="Meena Tour and Travels"
-                className="h-12 w-auto object-contain"
+                style={{
+                  height: "56px",
+                  width: "auto",
+                  objectFit: "contain",
+                  objectPosition: "left center",
+                }}
+                className="md:h-14 h-11"
               />
             </a>
 
@@ -294,7 +476,7 @@ export default function App() {
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage:
-                "url('/assets/generated/hero-travel.dim_1400x600.jpg')",
+                "url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=85')",
             }}
           />
           {/* Gradient overlay */}
@@ -312,12 +494,12 @@ export default function App() {
                 ✈ Trusted Travellers Since 2011 · 15,000+ Happy Passengers
               </Badge>
               <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide leading-tight mb-4">
-                Discover Your
-                <span className="block text-accent">Dream Destination</span>
+                Your Trusted Cab Partner
+                <span className="block text-accent">Across India</span>
               </h1>
               <p className="text-white/85 text-lg md:text-xl mb-8 font-light max-w-lg">
-                Crafting unforgettable journeys with Meena Tour and Travels —
-                where every trip becomes a treasured memory.
+                Premium cab services for individuals, families &amp; corporates.
+                Serving since 2011 with 15,000+ happy passengers across India.
               </p>
               <div className="flex gap-3 flex-wrap">
                 <Button
@@ -336,6 +518,11 @@ export default function App() {
                   variant="outline"
                   className="border-white text-white hover:bg-white/15 bg-white/10 backdrop-blur-sm font-semibold"
                   data-ocid="hero.secondary_button"
+                  onClick={() =>
+                    document
+                      .querySelector("#about")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
                 >
                   Learn More
                 </Button>
@@ -345,7 +532,7 @@ export default function App() {
               <div className="flex gap-8 mt-12">
                 {[
                   { val: "15,000+", label: "Happy Passengers" },
-                  { val: "50+", label: "Destinations" },
+                  { val: "1000+", label: "Destinations" },
                   { val: "Since 2011", label: "Trusted Travellers" },
                 ].map(({ val, label }) => (
                   <div key={label} className="text-white">
@@ -516,7 +703,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* TOUR PACKAGES */}
+        {/* PRICING */}
         <section id="tours" className="py-16 bg-background">
           <div className="container mx-auto px-4">
             <motion.div
@@ -526,106 +713,98 @@ export default function App() {
               className="text-center mb-12"
             >
               <Badge className="bg-primary/10 text-primary border-primary/20 mb-3">
-                Featured Packages
+                Pricing
               </Badge>
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-                Popular Tour Packages
+                Simple, Transparent Pricing
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Handpicked itineraries designed for unforgettable experiences.
-                All-inclusive packages with expert guidance.
-              </p>
-              <p className="text-xs text-muted-foreground italic mt-2">
-                * Package prices vary by destination. State taxes &amp; toll
-                charges applicable as per actuals.
+                No fixed packages. You pay only for the kilometers you travel.
               </p>
             </motion.div>
 
-            <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-              data-ocid="tours.list"
-            >
-              {TOUR_PACKAGES.map((pkg, i) => (
-                <motion.div
-                  key={pkg.id}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  data-ocid={`tours.item.${i + 1}`}
-                >
-                  <Card className="overflow-hidden border-0 shadow-card hover:shadow-hero transition-all hover:-translate-y-1 group">
-                    <div className="relative overflow-hidden h-48">
-                      <img
-                        src={pkg.image}
-                        alt={pkg.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                      <Badge className="absolute top-3 left-3 bg-primary text-white border-0 text-xs font-semibold">
-                        {pkg.badge}
-                      </Badge>
-                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
-                        <Clock size={11} className="text-muted-foreground" />
-                        <span className="text-xs font-medium">
-                          {pkg.duration}D
-                        </span>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-10">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                data-ocid="pricing.item.1"
+              >
+                <Card className="border-2 border-primary/20 shadow-card hover:shadow-hero transition-all h-full">
+                  <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-1">
+                      <Car className="w-7 h-7 text-primary" />
                     </div>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-1">
-                        <h3 className="font-display font-semibold text-sm leading-tight">
-                          {pkg.name}
-                        </h3>
-                      </div>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                        <MapPin size={11} />
-                        {pkg.destination}
-                      </p>
-                      <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
-                        {pkg.description}
-                      </p>
-                      <div className="flex items-center gap-1 mb-3">
-                        <StarRating rating={pkg.rating} size={12} />
-                        <span className="text-xs text-muted-foreground ml-1">
-                          ({pkg.reviews})
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-xs text-muted-foreground">
-                            Starting from
-                          </span>
-                          <div className="font-bold text-primary text-lg font-display">
-                            ₹{pkg.price.toLocaleString("en-IN")}
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          className="bg-primary hover:bg-primary/90 text-white text-xs"
-                          data-ocid={`tours.edit_button.${i + 1}`}
-                          onClick={() => {
-                            setBookingDestination(pkg.destination);
-                            setBookingOpen(true);
-                          }}
-                        >
-                          Book Now
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+                    <h3 className="font-display font-bold text-xl text-foreground">
+                      Standard Sedan
+                    </h3>
+                    <div className="text-3xl font-display font-bold text-primary">
+                      ₹18–22
+                      <span className="text-base font-normal text-muted-foreground">
+                        {" "}
+                        / km
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Swift Dzire, Honda Amaze & similar comfortable sedans for
+                      everyday travel.
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                data-ocid="pricing.item.2"
+              >
+                <Card className="border-2 border-primary shadow-hero h-full relative overflow-hidden">
+                  <div className="absolute top-3 right-3">
+                    <Badge className="bg-primary text-white border-0 text-xs font-semibold">
+                      Popular
+                    </Badge>
+                  </div>
+                  <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-1">
+                      <Sparkles className="w-7 h-7 text-primary" />
+                    </div>
+                    <h3 className="font-display font-bold text-xl text-foreground">
+                      Premium SUV
+                    </h3>
+                    <div className="text-3xl font-display font-bold text-primary">
+                      ₹25–32
+                      <span className="text-base font-normal text-muted-foreground">
+                        {" "}
+                        / km
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Innova Crysta, Ertiga & premium SUVs with extra space and
+                      5-star comfort.
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
 
-            <div className="text-center mt-10">
+            <div className="max-w-2xl mx-auto bg-amber-50 border border-primary/20 rounded-xl p-4 text-center text-sm text-muted-foreground mb-8">
+              <span className="font-semibold text-foreground">
+                Final fare = Kilometers × Rate.
+              </span>{" "}
+              State taxes &amp; toll charges applied as per actuals.
+            </div>
+
+            <div className="text-center">
               <Button
-                variant="outline"
                 size="lg"
-                className="border-primary text-primary hover:bg-primary/5 font-semibold px-10"
-                data-ocid="tours.secondary_button"
+                className="bg-primary hover:bg-primary/90 text-white font-semibold px-10 shadow-hero"
+                data-ocid="pricing.primary_button"
+                onClick={() => {
+                  setBookingDestination("");
+                  setBookingOpen(true);
+                }}
               >
-                View All Packages <ChevronRight size={16} className="ml-1" />
+                Get a Custom Quote
               </Button>
             </div>
           </div>
@@ -778,7 +957,105 @@ export default function App() {
           </div>
         </section>
 
-        {/* DESTINATIONS */}
+        {/* CORPORATE SERVICES */}
+        <section
+          id="corporate"
+          className="py-16"
+          style={{ backgroundColor: "oklch(0.97 0.015 75)" }}
+        >
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <Badge className="bg-primary/10 text-primary border-primary/20 mb-3">
+                Corporate Services
+              </Badge>
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
+                Trusted by India&apos;s Business Elite
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                From Fortune 500 executives to entrepreneurs — we&apos;ve been
+                the preferred cab partner for India&apos;s top professionals for
+                over a decade.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              {[
+                {
+                  icon: <Briefcase className="w-8 h-8 text-primary" />,
+                  title: "Corporate Monthly Packages",
+                  desc: "Dedicated cab services for companies on a monthly retainer. Perfect for employee commutes, client pickups, and executive travel.",
+                },
+                {
+                  icon: <MapPin className="w-8 h-8 text-primary" />,
+                  title: "Pan-India Executive Travel",
+                  desc: "We serve MDs, CEOs and business leaders travelling between Delhi, Mumbai, Kolkata, Bangalore, Haridwar and across India.",
+                },
+                {
+                  icon: <Shield className="w-8 h-8 text-primary" />,
+                  title: "Discreet & Professional",
+                  desc: "Experienced drivers with 10–15+ years on the road. Punctual, professional, and trusted even by celebrities.",
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15 }}
+                  data-ocid={`corporate.item.${i + 1}`}
+                >
+                  <Card className="border-0 shadow-card hover:shadow-hero transition-all text-center p-6 h-full bg-white">
+                    <CardContent className="p-0 flex flex-col items-center gap-3">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                        {item.icon}
+                      </div>
+                      <h3 className="font-display font-bold text-lg text-foreground">
+                        {item.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-primary/8 border border-primary/20 rounded-xl p-5 mb-8 text-center"
+            >
+              <p className="text-foreground/80 text-sm md:text-base italic">
+                &ldquo;Our corporate clients include managing directors and
+                senior executives from leading companies across India. We also
+                handle VIP and celebrity travel with complete discretion.&rdquo;
+              </p>
+            </motion.div>
+
+            <div className="text-center">
+              <Button
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-white font-semibold px-10 shadow-hero"
+                data-ocid="corporate.primary_button"
+                onClick={() => {
+                  setBookingDestination("");
+                  setBookingOpen(true);
+                }}
+              >
+                Enquire for Corporate Rates
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* POPULAR TRIPS */}
         <section id="destinations" className="py-16 bg-secondary/30">
           <div className="container mx-auto px-4">
             <motion.div
@@ -788,121 +1065,339 @@ export default function App() {
               className="text-center mb-12"
             >
               <Badge className="bg-primary/10 text-primary border-primary/20 mb-3">
-                Explore The World
+                Popular Trips
               </Badge>
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-                Popular Destinations
+                Where Would You Like to Go?
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                From ancient temples to modern cities, discover the world's most
-                captivating destinations.
+                From sacred pilgrimage sites to Himalayan hill stations — tap
+                any destination to explore and book your ride.
               </p>
             </motion.div>
 
             <div
-              className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
               data-ocid="destinations.list"
             >
-              {DESTINATIONS.map((dest, i) => (
+              {TRIPS.map((trip, i) => (
                 <motion.div
-                  key={dest.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  key={trip.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                  transition={{ delay: (i % 4) * 0.08, duration: 0.5 }}
                   data-ocid={`destinations.item.${i + 1}`}
                   className="group cursor-pointer"
+                  onClick={() => setSelectedTrip(trip)}
                 >
-                  <div className="relative rounded-xl overflow-hidden aspect-square shadow-card hover:shadow-hero transition-all hover:-translate-y-1">
-                    <img
-                      src={dest.image}
-                      alt={dest.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h3 className="text-white font-display font-bold text-lg leading-tight">
-                        {dest.name}
-                      </h3>
-                      <p className="text-white/75 text-sm flex items-center gap-1">
-                        <MapPin size={12} />
-                        {dest.country}
+                  <div className="relative rounded-xl overflow-hidden shadow-card hover:shadow-hero transition-all hover:-translate-y-1 hover:scale-[1.02]">
+                    <div className="aspect-[4/3] overflow-hidden">
+                      <img
+                        src={trip.image}
+                        alt={trip.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute top-3 left-3">
+                      <Badge className="bg-primary/90 text-white border-0 text-xs font-semibold backdrop-blur-sm">
+                        {trip.type}
+                      </Badge>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <p className="text-white/70 text-xs mb-0.5">
+                        {trip.emoji} {trip.state}
                       </p>
+                      <h3 className="text-white font-display font-bold text-sm leading-tight mb-1">
+                        {trip.name}
+                      </h3>
+                      <div className="flex items-center justify-between">
+                        <p className="text-white/60 text-xs flex items-center gap-1">
+                          <Navigation2 size={10} />
+                          {trip.approxKm}
+                        </p>
+                        <span className="text-primary text-xs font-semibold bg-white/10 backdrop-blur-sm rounded-full px-2 py-0.5">
+                          Explore →
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
               ))}
             </div>
-
-            <div className="text-center mt-10">
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-white font-semibold px-10"
-                data-ocid="destinations.primary_button"
-              >
-                Explore All Destinations
-              </Button>
-            </div>
           </div>
         </section>
 
+        {/* TRIP DETAIL SHEET */}
+        <Sheet
+          open={!!selectedTrip}
+          onOpenChange={(open) => !open && setSelectedTrip(null)}
+        >
+          <SheetContent
+            side="right"
+            className="w-full sm:max-w-lg p-0 overflow-y-auto"
+            data-ocid="destinations.sheet"
+          >
+            {selectedTrip && (
+              <>
+                <div className="relative h-60 overflow-hidden">
+                  <img
+                    src={selectedTrip.image}
+                    alt={selectedTrip.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <Badge className="bg-primary text-white border-0 text-xs">
+                        {selectedTrip.type}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="bg-white/20 text-white border-white/30 text-xs backdrop-blur-sm"
+                      >
+                        {selectedTrip.state}
+                      </Badge>
+                    </div>
+                    <h2 className="text-white font-display font-bold text-2xl leading-tight">
+                      {selectedTrip.emoji} {selectedTrip.name}
+                    </h2>
+                  </div>
+                </div>
+                <SheetHeader className="px-5 pt-5 pb-2">
+                  <SheetTitle className="sr-only">
+                    {selectedTrip.name}
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="px-5 pb-24 space-y-5">
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {selectedTrip.description}
+                  </p>
+
+                  <div>
+                    <h3 className="font-display font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <Sparkles size={15} className="text-primary" /> Key
+                      Highlights
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTrip.highlights.map((h) => (
+                        <span
+                          key={h}
+                          className="bg-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full border border-primary/20"
+                        >
+                          {h}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-secondary/50 rounded-xl p-3">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                        <Calendar size={13} className="text-primary" />
+                        Best Time to Visit
+                      </div>
+                      <p className="text-foreground font-medium text-sm">
+                        {selectedTrip.bestTime}
+                      </p>
+                    </div>
+                    <div className="bg-secondary/50 rounded-xl p-3">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                        <MapPin size={13} className="text-primary" />
+                        Distance
+                      </div>
+                      <p className="text-foreground font-medium text-sm">
+                        {selectedTrip.approxKm}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-amber-50 border border-primary/20 rounded-xl p-3 text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">
+                      Per-km pricing:
+                    </span>{" "}
+                    ₹18–22/km (Sedan) · ₹25–32/km (SUV). State taxes &amp; tolls
+                    extra.
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-border p-4">
+                  <Button
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-5 text-base shadow-hero"
+                    data-ocid="destinations.primary_button"
+                    onClick={() => {
+                      setSelectedTrip(null);
+                      setBookingDestination(selectedTrip.name);
+                      setBookingOpen(true);
+                    }}
+                  >
+                    Book a Cab to {selectedTrip.name} →
+                  </Button>
+                </div>
+              </>
+            )}
+          </SheetContent>
+        </Sheet>
+
         {/* TESTIMONIALS */}
-        <section id="about" className="py-16 bg-background">
+        <section
+          id="about"
+          className="py-20 bg-gradient-to-br from-primary/5 via-background to-accent/5"
+        >
+          {/* Trust Banner */}
+          <div className="bg-primary text-white py-3 mb-12">
+            <div className="container mx-auto px-4 flex flex-wrap justify-center gap-8 text-sm font-semibold text-center">
+              <span>✅ GSTIN Registered</span>
+              <span>🚗 All India Tourist Permit</span>
+              <span>⭐ Trusted Since 2011</span>
+              <span>👥 15,000+ Happy Passengers</span>
+            </div>
+          </div>
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="text-center mb-14"
             >
-              <Badge className="bg-accent/15 text-foreground border-accent/30 mb-3">
-                Traveler Stories
+              <Badge className="bg-primary/10 text-primary border-primary/20 mb-3">
+                Why Choose Us
               </Badge>
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-                What Our Travelers Say
+              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
+                Why 15,000+ Passengers{" "}
+                <span className="text-primary">Trust Us</span>
               </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Real experiences from real travelers who trusted Meena Tour and
-                Travels with their dream vacations.
+              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+                From corporate executives to family pilgrims — Meena Tour and
+                Travels has been the preferred choice for premium road travel
+                across India since 2011.
               </p>
             </motion.div>
 
+            {/* Trust Points */}
             <div
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
-              data-ocid="testimonials.list"
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14"
+              data-ocid="about.list"
             >
-              {TESTIMONIALS.map((t, i) => (
+              {[
+                {
+                  icon: "🏛️",
+                  title: "Government Registered & Verified",
+                  desc: "GSTIN: 07BQXPG8115J1ZB — officially registered travel agency with All India Tourist Permit. Your safety and trust is our priority.",
+                  color: "bg-blue-50 border-blue-200",
+                },
+                {
+                  icon: "📅",
+                  title: "Serving Since 2011 — 14+ Years of Trust",
+                  desc: "Over a decade of experience delivering premium travel experiences across India. We've grown through word-of-mouth — our passengers recommend us to everyone.",
+                  color: "bg-amber-50 border-amber-200",
+                },
+                {
+                  icon: "🏢",
+                  title: "Trusted by Corporates & Elites",
+                  desc: "Serving Managing Directors, entrepreneurs, and corporate teams from companies like EY, MNCs in Bangalore, Mumbai & Kolkata. We offer monthly corporate packages too.",
+                  color: "bg-green-50 border-green-200",
+                },
+                {
+                  icon: "🚗",
+                  title: "Premium Fleet, Expert Drivers",
+                  desc: "All vehicles are premium SUVs & sedans. Our drivers carry 10–15+ years of experience on Indian roads. Facilities include laptop charger, air purifier & first aid.",
+                  color: "bg-purple-50 border-purple-200",
+                },
+              ].map((point, i) => (
                 <motion.div
-                  key={t.id}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  key={point.title}
+                  initial={{ opacity: 0, x: i % 2 === 0 ? -24 : 24 }}
+                  whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  data-ocid={`testimonials.item.${i + 1}`}
+                  data-ocid={`about.item.${i + 1}`}
                 >
-                  <Card className="border-0 shadow-card hover:shadow-hero transition-shadow h-full">
-                    <CardContent className="p-6">
-                      <StarRating rating={t.rating} size={16} />
-                      <p className="text-foreground/80 mt-4 mb-6 text-sm leading-relaxed italic">
-                        &ldquo;{t.review}&rdquo;
-                      </p>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
-                          {t.avatar}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm">{t.name}</div>
-                          <div className="text-xs text-muted-foreground flex items-center gap-1">
-                            <MapPin size={10} />
-                            {t.location}
-                          </div>
-                        </div>
+                  <Card className={`border ${point.color} shadow-card h-full`}>
+                    <CardContent className="p-6 flex gap-4">
+                      <div className="text-4xl flex-shrink-0">{point.icon}</div>
+                      <div>
+                        <h3 className="font-display font-bold text-lg text-foreground mb-2">
+                          {point.title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {point.desc}
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
                 </motion.div>
               ))}
+            </div>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-10 text-center text-white shadow-hero"
+              data-ocid="about.panel"
+            >
+              <h3 className="font-display text-2xl md:text-3xl font-bold mb-3">
+                Ready to Plan Your Perfect Trip?
+              </h3>
+              <p className="text-white/80 max-w-lg mx-auto mb-6 text-base">
+                Get a free quote tailored to your destination, group size, and
+                preferences. No obligations — just a conversation.
+              </p>
+              <Button
+                size="lg"
+                className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-6 text-base shadow-lg rounded-xl"
+                data-ocid="about.primary_button"
+                onClick={() => setBookingOpen(true)}
+              >
+                Request a Free Quote 🚀
+              </Button>
+            </motion.div>
+
+            {/* Testimonials */}
+            <div className="mt-16">
+              <h3 className="font-display text-2xl font-bold text-center text-foreground mb-8">
+                What Our Travelers Say
+              </h3>
+              <div
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                data-ocid="testimonials.list"
+              >
+                {TESTIMONIALS.map((t, i) => (
+                  <motion.div
+                    key={t.id}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                    data-ocid={`testimonials.item.${i + 1}`}
+                  >
+                    <Card className="border-0 shadow-card hover:shadow-hero transition-shadow h-full">
+                      <CardContent className="p-6">
+                        <StarRating rating={t.rating} size={16} />
+                        <p className="text-foreground/80 mt-4 mb-6 text-sm leading-relaxed italic">
+                          &ldquo;{t.review}&rdquo;
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
+                            {t.initials}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-sm">
+                              {t.name}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {t.role}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -1342,7 +1837,7 @@ export default function App() {
                 <Card className="border-0 shadow-card overflow-hidden h-full min-h-[300px]">
                   <CardContent className="p-0 h-full">
                     <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3504.5!2d77.20481!3d28.53572!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce1c3e4e4e4e5%3A0xabcdef1234567890!2sMeena+Tour+and+Travels+Panchsheel+Vihar!5e0!3m2!1sen!2sin!4v1700000000000"
+                      src="https://maps.google.com/maps?q=Meena+Tour+and+Travels,+C-41+UGF+Khirki+Ext,+Panchsheel+Vihar,+Malviya+Nagar,+New+Delhi+110017&output=embed"
                       width="100%"
                       height="100%"
                       style={{ border: 0, minHeight: "300px" }}

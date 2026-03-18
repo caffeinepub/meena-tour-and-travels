@@ -15,9 +15,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useActor } from "@/hooks/useActor";
 import { CheckCircle2, Loader2, Mail, Phone } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface BookingModalProps {
   open: boolean;
@@ -62,6 +64,7 @@ export function BookingModal({
   onClose,
   prefillDestination,
 }: BookingModalProps) {
+  const { actor } = useActor();
   const [form, setForm] = useState<FormState>(() => ({
     ...EMPTY_FORM,
     destination: prefillDestination ?? "",
@@ -116,9 +119,52 @@ export function BookingModal({
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setSubmitting(false);
-    setSuccess(true);
+    try {
+      if (!actor) throw new Error("Not connected to backend");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (actor as any).submitBooking(
+        form.fullName,
+        form.mobile,
+        form.pickup,
+        form.destination,
+        form.travelDate,
+        form.passengers,
+        form.vehicleType,
+        form.special,
+      );
+      // Send email notification to Gaurav
+      try {
+        await fetch("https://formsubmit.co/ajax/meenagaurav4748@gmail.com", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            _subject: "🚗 New Booking Request - Meena Tour and Travels",
+            _template: "table",
+            Name: form.fullName,
+            Mobile: form.mobile,
+            "Pickup Location": form.pickup,
+            Destination: form.destination,
+            "Travel Date": form.travelDate,
+            Passengers: form.passengers,
+            "Vehicle Type": form.vehicleType,
+            "Special Notes": form.special || "None",
+          }),
+        });
+      } catch {
+        // Email failed silently — booking is already saved to blockchain
+      }
+      setSuccess(true);
+    } catch (err) {
+      console.error("Booking error:", err);
+      toast.error(
+        "Failed to submit booking. Please try again or call us directly.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const field = (key: keyof FormState) => ({
@@ -163,6 +209,13 @@ export function BookingModal({
                 </h3>
                 <p className="text-muted-foreground text-sm">
                   Our team will call you shortly to confirm your booking.
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  We will contact you on{" "}
+                  <span className="font-semibold text-foreground">
+                    {form.mobile}
+                  </span>{" "}
+                  within 2 hours to confirm.
                 </p>
               </div>
               <div className="w-full bg-muted rounded-xl p-4 flex flex-col gap-2 text-sm">

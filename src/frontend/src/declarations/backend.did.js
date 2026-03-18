@@ -34,6 +34,19 @@ export const TourPackage = IDL.Record({
   'rating' : IDL.Float64,
   'price' : IDL.Float64,
 });
+export const BookingId = IDL.Nat;
+export const BookingRequest = IDL.Record({
+  'id' : BookingId,
+  'fullName' : IDL.Text,
+  'mobile' : IDL.Text,
+  'pickup' : IDL.Text,
+  'destination' : IDL.Text,
+  'travelDate' : IDL.Text,
+  'passengers' : IDL.Text,
+  'vehicleType' : IDL.Text,
+  'special' : IDL.Text,
+  'submittedAt' : IDL.Int,
+});
 
 export const idlService = IDL.Service({
   'addDestination' : IDL.Func(
@@ -92,6 +105,12 @@ export const idlService = IDL.Service({
       [TourPackage],
       [],
     ),
+  'submitBooking' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [BookingRequest],
+      [],
+    ),
+  'getAllBookings' : IDL.Func([], [IDL.Vec(BookingRequest)], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -122,6 +141,19 @@ export const idlFactory = ({ IDL }) => {
     'destinations' : IDL.Vec(DestinationId),
     'rating' : IDL.Float64,
     'price' : IDL.Float64,
+  });
+  const BookingId = IDL.Nat;
+  const BookingRequest = IDL.Record({
+    'id' : BookingId,
+    'fullName' : IDL.Text,
+    'mobile' : IDL.Text,
+    'pickup' : IDL.Text,
+    'destination' : IDL.Text,
+    'travelDate' : IDL.Text,
+    'passengers' : IDL.Text,
+    'vehicleType' : IDL.Text,
+    'special' : IDL.Text,
+    'submittedAt' : IDL.Int,
   });
   
   return IDL.Service({
@@ -181,6 +213,12 @@ export const idlFactory = ({ IDL }) => {
         [TourPackage],
         [],
       ),
+    'submitBooking' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [BookingRequest],
+        [],
+      ),
+    'getAllBookings' : IDL.Func([], [IDL.Vec(BookingRequest)], ['query']),
   });
 };
 

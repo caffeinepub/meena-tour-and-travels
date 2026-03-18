@@ -1,16 +1,16 @@
 import Map "mo:core/Map";
 import Text "mo:core/Text";
 import Order "mo:core/Order";
-import Array "mo:core/Array";
-import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 import Nat "mo:core/Nat";
+import Int "mo:core/Int";
+import Time "mo:core/Time";
 
 actor {
-  // Types
   type PackageId = Nat;
   type DestinationId = Nat;
   type TestimonialId = Nat;
+  type BookingId = Nat;
 
   type TourPackage = {
     id : PackageId;
@@ -38,6 +38,19 @@ actor {
     review : Text;
   };
 
+  type BookingRequest = {
+    id : BookingId;
+    fullName : Text;
+    mobile : Text;
+    pickup : Text;
+    destination : Text;
+    travelDate : Text;
+    passengers : Text;
+    vehicleType : Text;
+    special : Text;
+    submittedAt : Int;
+  };
+
   module TourPackage {
     public func compare(pkg1 : TourPackage, pkg2 : TourPackage) : Order.Order {
       Nat.compare(pkg1.id, pkg2.id);
@@ -56,16 +69,53 @@ actor {
     };
   };
 
-  // Storage
+  module BookingRequest {
+    public func compare(b1 : BookingRequest, b2 : BookingRequest) : Order.Order {
+      Nat.compare(b2.id, b1.id);
+    };
+  };
+
   var nextPackageId : PackageId = 1;
   var nextDestinationId : DestinationId = 1;
   var nextTestimonialId : TestimonialId = 1;
+  var nextBookingId : BookingId = 1;
 
   let packages = Map.empty<PackageId, TourPackage>();
   let destinations = Map.empty<DestinationId, Destination>();
   let testimonials = Map.empty<TestimonialId, Testimonial>();
+  let bookings = Map.empty<BookingId, BookingRequest>();
 
-  // Admin (CRUD)
+  public func submitBooking(
+    fullName : Text,
+    mobile : Text,
+    pickup : Text,
+    destination : Text,
+    travelDate : Text,
+    passengers : Text,
+    vehicleType : Text,
+    special : Text,
+  ) : async BookingRequest {
+    let booking : BookingRequest = {
+      id = nextBookingId;
+      fullName;
+      mobile;
+      pickup;
+      destination;
+      travelDate;
+      passengers;
+      vehicleType;
+      special;
+      submittedAt = Time.now();
+    };
+    bookings.add(nextBookingId, booking);
+    nextBookingId += 1;
+    booking;
+  };
+
+  public query func getAllBookings() : async [BookingRequest] {
+    bookings.values().toArray().sort();
+  };
+
   public shared ({ caller }) func addTourPackage(
     name : Text,
     description : Text,
@@ -77,12 +127,7 @@ actor {
   ) : async TourPackage {
     let newPackage : TourPackage = {
       id = nextPackageId;
-      name;
-      description;
-      duration;
-      price;
-      rating;
-      imageUrl;
+      name; description; duration; price; rating; imageUrl;
       destinations = destinationIds;
     };
     packages.add(nextPackageId, newPackage);
@@ -101,15 +146,8 @@ actor {
     destinationIds : [DestinationId],
   ) : async TourPackage {
     if (not packages.containsKey(id)) { Runtime.trap("Tour Package with id " # id.toText() # " does not exist") };
-
     let updatedPackage : TourPackage = {
-      id;
-      name;
-      description;
-      duration;
-      price;
-      rating;
-      imageUrl;
+      id; name; description; duration; price; rating; imageUrl;
       destinations = destinationIds;
     };
     packages.add(id, updatedPackage);
@@ -128,9 +166,7 @@ actor {
   ) : async Destination {
     let newDestination : Destination = {
       id = nextDestinationId;
-      name;
-      imageUrl;
-      country;
+      name; imageUrl; country;
     };
     destinations.add(nextDestinationId, newDestination);
     nextDestinationId += 1;
@@ -144,13 +180,7 @@ actor {
     country : Text,
   ) : async Destination {
     if (not destinations.containsKey(id)) { Runtime.trap("Destination with id " # id.toText() # " does not exist") };
-
-    let updatedDestination : Destination = {
-      id;
-      name;
-      imageUrl;
-      country;
-    };
+    let updatedDestination : Destination = { id; name; imageUrl; country; };
     destinations.add(id, updatedDestination);
     updatedDestination;
   };
@@ -168,10 +198,7 @@ actor {
   ) : async Testimonial {
     let newTestimonial : Testimonial = {
       id = nextTestimonialId;
-      name;
-      avatarUrl;
-      rating;
-      review;
+      name; avatarUrl; rating; review;
     };
     testimonials.add(nextTestimonialId, newTestimonial);
     nextTestimonialId += 1;
@@ -186,14 +213,7 @@ actor {
     review : Text,
   ) : async Testimonial {
     if (not testimonials.containsKey(id)) { Runtime.trap("Testimonial with id " # id.toText() # " does not exist") };
-
-    let updatedTestimonial : Testimonial = {
-      id;
-      name;
-      avatarUrl;
-      rating;
-      review;
-    };
+    let updatedTestimonial : Testimonial = { id; name; avatarUrl; rating; review; };
     testimonials.add(id, updatedTestimonial);
     updatedTestimonial;
   };
@@ -203,7 +223,6 @@ actor {
     testimonials.remove(id);
   };
 
-  // Public Queries
   public query ({ caller }) func getAllTourPackages() : async [TourPackage] {
     packages.values().toArray().sort();
   };
