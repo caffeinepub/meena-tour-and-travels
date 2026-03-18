@@ -43,7 +43,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const TRIPS = [
   {
@@ -339,6 +339,31 @@ function StarRating({ rating, size = 14 }: { rating: number; size?: number }) {
 }
 
 export default function App() {
+  const HERO_SLIDES = [
+    {
+      image: "/assets/generated/hero-tajmahal.dim_1920x1080.jpg",
+      location: "Taj Mahal, Agra",
+    },
+    {
+      image: "/assets/generated/hero-haridwar.dim_1920x1080.jpg",
+      location: "Haridwar, Uttarakhand",
+    },
+    {
+      image: "/assets/generated/hero-manali.dim_1920x1080.jpg",
+      location: "Manali, Himachal Pradesh",
+    },
+    {
+      image: "/assets/generated/hero-jaipur.dim_1920x1080.jpg",
+      location: "Amber Fort, Jaipur",
+    },
+  ];
+  const [heroIndex, setHeroIndex] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -352,6 +377,16 @@ export default function App() {
   const [searchGuests, setSearchGuests] = useState("");
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingDestination, setBookingDestination] = useState("");
+  const [calcKm, setCalcKm] = useState<string>("");
+  const [calcNights, setCalcNights] = useState<string>("");
+  const [calcQueryData, setCalcQueryData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    destination: "",
+    km: "",
+    message: "",
+  });
   const [selectedTrip, setSelectedTrip] = useState<(typeof TRIPS)[0] | null>(
     null,
   );
@@ -472,16 +507,38 @@ export default function App() {
           id="home"
           className="relative min-h-[600px] flex items-center pt-16"
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=85')",
-            }}
-          />
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          {/* Slideshow */}
+          {HERO_SLIDES.map((slide, i) => (
+            <div
+              key={slide.image}
+              className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+              style={{
+                backgroundImage: `url('${slide.image}')`,
+                opacity: i === heroIndex ? 1 : 0,
+              }}
+            />
+          ))}
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+          {/* Location badge */}
+          <div className="absolute bottom-24 right-6 z-10">
+            <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full border border-white/20 font-medium">
+              📍 {HERO_SLIDES[heroIndex].location}
+            </span>
+          </div>
+          {/* Slide dots */}
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+            {HERO_SLIDES.map((slide, i) => (
+              <button
+                type="button"
+                key={slide.location}
+                onClick={() => setHeroIndex(i)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === heroIndex ? "bg-white w-6" : "bg-white/50"}`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
 
           <div className="container mx-auto px-4 relative z-10 py-24">
             <motion.div
@@ -873,6 +930,68 @@ export default function App() {
                 </motion.div>
               ))}
             </div>
+
+            {/* Car Models */}
+            <div className="mt-8">
+              <h3 className="font-display text-xl font-bold text-center text-foreground mb-6">
+                Our Fleet
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {[
+                  {
+                    model: "Innova Crysta",
+                    tag: "Premium MPV",
+                    desc: "Spacious and comfortable for long journeys. Our own car — competitive rates, top comfort.",
+                    badge: "Own Car",
+                    badgeColor: "bg-primary/10 text-primary border-primary/20",
+                    emoji: "🚗",
+                  },
+                  {
+                    model: "Ertiga",
+                    tag: "Smart Choice",
+                    desc: "Perfect for small groups and family trips. Own car with rates more competitive than regular Innova.",
+                    badge: "Own Car",
+                    badgeColor: "bg-green-100 text-green-800 border-green-200",
+                    emoji: "🚙",
+                  },
+                  {
+                    model: "Premium SUVs",
+                    tag: "Multiple Options",
+                    desc: "A range of premium SUVs available for all group sizes and travel needs across India.",
+                    badge: "Available",
+                    badgeColor: "bg-teal-100 text-teal-800 border-teal-200",
+                    emoji: "🚐",
+                  },
+                ].map((car, i) => (
+                  <motion.div
+                    key={car.model}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    data-ocid={`fleet.item.${i + 4}`}
+                  >
+                    <Card className="border border-primary/10 shadow-card hover:shadow-hero transition-all h-full">
+                      <CardContent className="p-5 flex flex-col gap-2">
+                        <div className="text-3xl mb-1">{car.emoji}</div>
+                        <Badge className={`${car.badgeColor} text-xs w-fit`}>
+                          {car.badge}
+                        </Badge>
+                        <h4 className="font-display font-bold text-foreground text-base">
+                          {car.model}
+                        </h4>
+                        <p className="text-xs text-primary font-medium">
+                          {car.tag}
+                        </p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {car.desc}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -993,7 +1112,7 @@ export default function App() {
                 {
                   icon: <MapPin className="w-8 h-8 text-primary" />,
                   title: "Pan-India Executive Travel",
-                  desc: "We serve MDs, CEOs and business leaders travelling between Delhi, Mumbai, Kolkata, Bangalore, Haridwar and across India.",
+                  desc: "We serve MDs, CEOs and business leaders travelling between Delhi, Mumbai, Kolkata, Bangalore and across India.",
                 },
                 {
                   icon: <Shield className="w-8 h-8 text-primary" />,
@@ -1402,6 +1521,248 @@ export default function App() {
           </div>
         </section>
 
+        {/* RATE CALCULATOR */}
+        <section className="py-16 bg-amber-950/5 border-y border-primary/10">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-10"
+            >
+              <Badge className="bg-primary/10 text-primary border-primary/20 mb-3">
+                Trip Cost Estimator
+              </Badge>
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
+                Estimate Your Trip Cost
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto text-sm">
+                Get an instant estimate based on distance. Final rates vary
+                between ₹25–₹32/km. State taxes, toll charges, and extra as per
+                actuals.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-5xl mx-auto">
+              {/* Calculator */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <Card className="border-0 shadow-hero overflow-hidden">
+                  <div className="h-1.5 bg-gradient-to-r from-primary via-primary/70 to-accent" />
+                  <CardContent className="p-6 md:p-8">
+                    <h3 className="font-display font-bold text-xl mb-6 text-foreground">
+                      Quick Fare Calculator
+                    </h3>
+                    <div className="space-y-5">
+                      <div>
+                        <label
+                          htmlFor="calc-km"
+                          className="text-sm font-semibold text-foreground mb-1.5 block"
+                        >
+                          Distance (km)
+                        </label>
+                        <Input
+                          id="calc-km"
+                          type="number"
+                          placeholder="e.g. 300"
+                          value={calcKm}
+                          onChange={(e) => setCalcKm(e.target.value)}
+                          className="text-base"
+                          data-ocid="calculator.input"
+                          min="0"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="calc-nights"
+                          className="text-sm font-semibold text-foreground mb-1.5 block"
+                        >
+                          Driver Night Stays
+                        </label>
+                        <Input
+                          id="calc-nights"
+                          type="number"
+                          placeholder="e.g. 2"
+                          value={calcNights}
+                          onChange={(e) => setCalcNights(e.target.value)}
+                          className="text-base"
+                          data-ocid="calculator.input"
+                          min="0"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          ₹300 per night for driver stay
+                        </p>
+                      </div>
+                    </div>
+
+                    {calcKm && Number(calcKm) > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-6 bg-gradient-to-br from-primary/5 to-teal-50 border border-primary/15 rounded-xl p-5 space-y-3"
+                        data-ocid="calculator.success_state"
+                      >
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-muted-foreground">
+                            Base Fare (avg ₹28/km)
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            ₹{(Number(calcKm) * 28).toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs text-muted-foreground">
+                          <span>Range (₹25–₹32/km)</span>
+                          <span>
+                            ₹{(Number(calcKm) * 25).toLocaleString("en-IN")} – ₹
+                            {(Number(calcKm) * 32).toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        {calcNights && Number(calcNights) > 0 && (
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-muted-foreground">
+                              Driver Night Charges ({calcNights} night
+                              {Number(calcNights) > 1 ? "s" : ""})
+                            </span>
+                            <span className="font-semibold text-foreground">
+                              ₹
+                              {(Number(calcNights) * 300).toLocaleString(
+                                "en-IN",
+                              )}
+                            </span>
+                          </div>
+                        )}
+                        <div className="border-t border-primary/15 pt-3 flex justify-between items-center">
+                          <span className="font-bold text-foreground">
+                            Estimated Total
+                          </span>
+                          <span className="font-bold text-primary text-lg">
+                            ₹
+                            {(
+                              Number(calcKm) * 28 +
+                              (Number(calcNights) || 0) * 300
+                            ).toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                          ⚠️ State taxes, toll charges, and driver night charges
+                          are extra as per actuals. Final rate may vary between
+                          ₹25–₹32 per km.
+                        </p>
+                      </motion.div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Rate Query Form */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <Card className="border-0 shadow-hero overflow-hidden">
+                  <div className="h-1.5 bg-gradient-to-r from-accent via-accent/70 to-primary" />
+                  <CardContent className="p-6 md:p-8">
+                    <h3 className="font-display font-bold text-xl mb-2 text-foreground">
+                      Get a Rate Quote
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      Fill in your details and we&apos;ll send you a
+                      personalized rate estimate.
+                    </p>
+                    <div className="space-y-3">
+                      <Input
+                        placeholder="Your Name"
+                        value={calcQueryData.name}
+                        onChange={(e) =>
+                          setCalcQueryData((p) => ({
+                            ...p,
+                            name: e.target.value,
+                          }))
+                        }
+                        data-ocid="calculator.input"
+                      />
+                      <Input
+                        type="email"
+                        placeholder="Your Email"
+                        value={calcQueryData.email}
+                        onChange={(e) =>
+                          setCalcQueryData((p) => ({
+                            ...p,
+                            email: e.target.value,
+                          }))
+                        }
+                        data-ocid="calculator.input"
+                      />
+                      <Input
+                        placeholder="Phone Number"
+                        value={calcQueryData.phone}
+                        onChange={(e) =>
+                          setCalcQueryData((p) => ({
+                            ...p,
+                            phone: e.target.value,
+                          }))
+                        }
+                        data-ocid="calculator.input"
+                      />
+                      <Input
+                        placeholder="Destination (e.g. Manali, Haridwar)"
+                        value={calcQueryData.destination}
+                        onChange={(e) =>
+                          setCalcQueryData((p) => ({
+                            ...p,
+                            destination: e.target.value,
+                          }))
+                        }
+                        data-ocid="calculator.input"
+                      />
+                      <Input
+                        placeholder="Estimated Distance (km)"
+                        value={calcQueryData.km}
+                        onChange={(e) =>
+                          setCalcQueryData((p) => ({
+                            ...p,
+                            km: e.target.value,
+                          }))
+                        }
+                        data-ocid="calculator.input"
+                      />
+                      <Textarea
+                        placeholder="Any additional details or questions..."
+                        value={calcQueryData.message}
+                        onChange={(e) =>
+                          setCalcQueryData((p) => ({
+                            ...p,
+                            message: e.target.value,
+                          }))
+                        }
+                        rows={3}
+                        data-ocid="calculator.textarea"
+                      />
+                      <Button
+                        className="w-full bg-primary hover:bg-primary/90 text-white font-semibold"
+                        data-ocid="calculator.submit_button"
+                        onClick={() => {
+                          const body = encodeURIComponent(
+                            `Rate Query from ${calcQueryData.name}\n\nName: ${calcQueryData.name}\nEmail: ${calcQueryData.email}\nPhone: ${calcQueryData.phone}\nDestination: ${calcQueryData.destination}\nEstimated KM: ${calcQueryData.km}\n\nMessage: ${calcQueryData.message}\n\n---\nEstimated Fare (avg ₹28/km): ₹${calcQueryData.km ? (Number(calcQueryData.km) * 28).toLocaleString("en-IN") : "N/A"}\nNote: State taxes, toll charges, and driver night charges (₹300/night) extra as per actuals.`,
+                          );
+                          window.location.href = `mailto:meenagaurav4748@gmail.com?subject=${encodeURIComponent("Rate Query - Meena Tour and Travels")}&body=${body}`;
+                        }}
+                      >
+                        <Mail size={15} className="mr-2" />
+                        Send Rate Query
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
         {/* CONTACT */}
         <section
           id="contact"
@@ -1452,17 +1813,20 @@ export default function App() {
                   <div className="flex-1 text-center md:text-left">
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                       <Badge className="bg-accent/30 text-foreground border-accent/40 text-xs font-semibold">
-                        Your Travel Expert
+                        Co-Founder & Managing Director
                       </Badge>
                     </div>
                     <h3 className="font-display text-2xl font-bold text-primary mt-1 mb-2">
                       Hi, I'm Gaurav! 👋
                     </h3>
                     <p className="text-foreground/75 leading-relaxed max-w-lg">
-                      Serving travelers since 2011 with a passion for travel, I
-                      personally curate every itinerary to make your journey
-                      extraordinary. From hidden gems to iconic landmarks —
-                      let's plan your perfect trip together!
+                      The Driving Force. As Co-Founder and Managing Director,
+                      Gaurav leads every aspect of Meena Tour and Travels — from
+                      fleet management to on-ground operations and client
+                      satisfaction. His hands-on approach, deep industry
+                      knowledge, and unwavering commitment to excellence are the
+                      reason clients return, refer, and trust Meena Tour and
+                      Travels completely.
                     </p>
                     <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
                       <a
@@ -1506,7 +1870,7 @@ export default function App() {
               </div>
             </motion.div>
 
-            {/* Shyam Lal Meena — Head of Managing Team */}
+            {/* Shyam Lal Meena — Co-Founder & Director, Corporate Relations */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1530,16 +1894,19 @@ export default function App() {
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                     <Badge className="bg-teal-100 text-teal-800 border-teal-200 text-xs font-semibold">
-                      Head of Managing Team
+                      Co-Founder & Director, Corporate Relations
                     </Badge>
                   </div>
                   <h3 className="font-display text-xl font-bold text-teal-700 mt-1 mb-2">
                     Shyam Lal Meena
                   </h3>
                   <p className="text-foreground/70 leading-relaxed max-w-lg text-sm">
-                    The backbone of our operations. Shyam Lal ji personally
-                    handles every client interaction, ensuring each traveler
-                    gets the best service and a smooth, hassle-free journey.
+                    The Deal Maker. Shyamlal Meena is the visionary who started
+                    it all. He connects directly with companies, Managing
+                    Directors, and key decision-makers across India — building
+                    lasting partnerships and closing deals that bring our most
+                    valued corporate clients on board. His network spans Delhi,
+                    Mumbai, Kolkata, Bangalore, and beyond.
                   </p>
                   <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
                     <a
@@ -1562,6 +1929,22 @@ export default function App() {
               </div>
             </motion.div>
 
+            {/* Founding Story */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-8 text-center"
+            >
+              <div className="inline-block bg-gradient-to-r from-primary/10 via-teal-50 to-primary/10 border border-primary/15 rounded-2xl px-8 py-4 max-w-2xl">
+                <span className="text-primary text-lg mr-2">🤝</span>
+                <span className="text-foreground/80 italic text-sm leading-relaxed">
+                  Together, uncle and nephew built Meena Tour and Travels from a
+                  shared vision — and today it stands as Delhi&apos;s most
+                  trusted travel partner since 2011.
+                </span>
+              </div>
+            </motion.div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Contact Form */}
               <div className="lg:col-span-1">
@@ -1877,7 +2260,8 @@ export default function App() {
                   journeys and creating lifelong memories worldwide.
                 </p>
                 <p className="text-white/80 text-sm font-medium mb-5">
-                  Owner: <span className="text-white font-bold">Gaurav</span>
+                  Co-Founder & Managing Director:{" "}
+                  <span className="text-white font-bold">Gaurav</span>
                 </p>
                 <div className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-xs font-semibold text-white mb-4">
                   <Shield size={13} className="fill-white/30" />
@@ -2008,7 +2392,7 @@ export default function App() {
                     WE ACCEPT
                   </p>
                   <div className="flex gap-2">
-                    {["VISA", "MC", "PayPal", "UPI"].map((pay) => (
+                    {["UPI", "Bank Transfer", "Cash"].map((pay) => (
                       <div
                         key={pay}
                         className="bg-white/10 rounded px-2 py-1 text-xs text-white/80 font-medium"
@@ -2016,6 +2400,9 @@ export default function App() {
                         {pay}
                       </div>
                     ))}
+                    <p className="text-white/50 text-xs mt-2">
+                      Visa, MasterCard &amp; PayPal not accepted.
+                    </p>
                   </div>
                 </div>
               </div>
