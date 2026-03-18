@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.625rem;
+
+    /* Pale icy blue background #EAF4F7 -> oklch(0.951 0.022 214) */
+    --background: 0.951 0.022 214;
+    /* Dark slate #1F2937 -> oklch(0.278 0.025 243) */
+    --foreground: 0.278 0.025 243;
+    /* White cards */
+    --card: 1 0 0;
+    --card-foreground: 0.278 0.025 243;
+    --popover: 1 0 0;
+    --popover-foreground: 0.278 0.025 243;
+    /* Deep teal-blue #1F5E74 -> oklch(0.44 0.075 214) */
+    --primary: 0.44 0.075 214;
+    --primary-foreground: 1 0 0;
+    /* Secondary lighter teal */
+    --secondary: 0.88 0.035 214;
+    --secondary-foreground: 0.44 0.075 214;
+    /* Muted #6B7280 -> oklch(0.556 0.012 265) */
+    --muted: 0.93 0.015 214;
+    --muted-foreground: 0.556 0.012 265;
+    /* Gold accent #F6C453 -> oklch(0.83 0.135 82) */
+    --accent: 0.83 0.135 82;
+    --accent-foreground: 0.278 0.025 243;
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 1 0 0;
+    --border: 0.88 0.025 214;
+    --input: 0.88 0.025 214;
+    --ring: 0.44 0.075 214;
+    --chart-1: 0.44 0.075 214;
+    --chart-2: 0.6 0.118 184.704;
+    --chart-3: 0.83 0.135 82;
+    --chart-4: 0.828 0.189 84.429;
+    --chart-5: 0.769 0.188 70.08;
+    --sidebar: 0.951 0.022 214;
+    --sidebar-foreground: 0.278 0.025 243;
+    --sidebar-primary: 0.44 0.075 214;
+    --sidebar-primary-foreground: 1 0 0;
+    --sidebar-accent: 0.88 0.035 214;
+    --sidebar-accent-foreground: 0.44 0.075 214;
+    --sidebar-border: 0.88 0.025 214;
+    --sidebar-ring: 0.44 0.075 214;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "DM Sans", sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
