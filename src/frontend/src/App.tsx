@@ -356,6 +356,38 @@ export default function App() {
       image: "/assets/generated/hero-jaipur.dim_1920x1080.jpg",
       location: "Amber Fort, Jaipur",
     },
+    {
+      image: "/assets/generated/india-gate-delhi.dim_1200x700.jpg",
+      location: "India Gate, New Delhi",
+    },
+    {
+      image: "/assets/generated/red-fort-delhi.dim_1200x700.jpg",
+      location: "Red Fort, Old Delhi",
+    },
+    {
+      image: "/assets/generated/lotus-temple-delhi.dim_1200x700.jpg",
+      location: "Lotus Temple, New Delhi",
+    },
+    {
+      image: "/assets/generated/mehrangarh-fort-jodhpur.dim_1200x700.jpg",
+      location: "Mehrangarh Fort, Jodhpur",
+    },
+    {
+      image: "/assets/generated/hawa-mahal-jaipur.dim_1200x700.jpg",
+      location: "Hawa Mahal, Jaipur",
+    },
+    {
+      image: "/assets/generated/jaisalmer-fort-rajasthan.dim_1200x700.jpg",
+      location: "Jaisalmer Fort, Rajasthan",
+    },
+    {
+      image: "/assets/generated/raigad-fort-maharashtra.dim_1200x700.jpg",
+      location: "Raigad Fort, Maharashtra",
+    },
+    {
+      image: "/assets/generated/ajanta-caves-maharashtra.dim_1200x700.jpg",
+      location: "Ajanta Caves, Maharashtra",
+    },
   ];
   const [heroIndex, setHeroIndex] = useState(0);
   useEffect(() => {
@@ -390,6 +422,8 @@ export default function App() {
   const [selectedTrip, setSelectedTrip] = useState<(typeof TRIPS)[0] | null>(
     null,
   );
+  const [routeOrigin, setRouteOrigin] = useState<string>("");
+  const [routeDest, setRouteDest] = useState<string>("");
   const currentYear = new Date().getFullYear();
 
   function handleFormSubmit(e: React.FormEvent) {
@@ -416,7 +450,7 @@ export default function App() {
               data-ocid="nav.link"
             >
               <img
-                src="/assets/generated/meena-logo.dim_400x120.png"
+                src="/assets/uploads/duty-slip-3-1.jpeg"
                 alt="Meena Tour and Travels"
                 style={{
                   height: "56px",
@@ -829,7 +863,7 @@ export default function App() {
                       Premium SUV
                     </h3>
                     <div className="text-3xl font-display font-bold text-primary">
-                      ₹25–32
+                      ₹28–35
                       <span className="text-base font-normal text-muted-foreground">
                         {" "}
                         / km
@@ -932,64 +966,140 @@ export default function App() {
             </div>
 
             {/* Car Models */}
-            <div className="mt-8">
-              <h3 className="font-display text-xl font-bold text-center text-foreground mb-6">
-                Our Fleet
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {[
-                  {
-                    model: "Innova Crysta",
-                    tag: "Premium MPV",
-                    desc: "Spacious and comfortable for long journeys. Our own car — competitive rates, top comfort.",
-                    badge: "Own Car",
-                    badgeColor: "bg-primary/10 text-primary border-primary/20",
-                    emoji: "🚗",
-                  },
-                  {
-                    model: "Ertiga",
-                    tag: "Smart Choice",
-                    desc: "Perfect for small groups and family trips. Own car with rates more competitive than regular Innova.",
-                    badge: "Own Car",
-                    badgeColor: "bg-green-100 text-green-800 border-green-200",
-                    emoji: "🚙",
-                  },
-                  {
-                    model: "Premium SUVs",
-                    tag: "Multiple Options",
-                    desc: "A range of premium SUVs available for all group sizes and travel needs across India.",
-                    badge: "Available",
-                    badgeColor: "bg-teal-100 text-teal-800 border-teal-200",
-                    emoji: "🚐",
-                  },
-                ].map((car, i) => (
-                  <motion.div
-                    key={car.model}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    data-ocid={`fleet.item.${i + 4}`}
-                  >
-                    <Card className="border border-primary/10 shadow-card hover:shadow-hero transition-all h-full">
-                      <CardContent className="p-5 flex flex-col gap-2">
-                        <div className="text-3xl mb-1">{car.emoji}</div>
-                        <Badge className={`${car.badgeColor} text-xs w-fit`}>
-                          {car.badge}
-                        </Badge>
-                        <h4 className="font-display font-bold text-foreground text-base">
-                          {car.model}
-                        </h4>
-                        <p className="text-xs text-primary font-medium">
-                          {car.tag}
-                        </p>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {car.desc}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+            <div className="mt-8 space-y-10">
+              {/* Standard Fleet */}
+              <div>
+                <div className="flex items-center gap-3 mb-5">
+                  <h3 className="font-display text-xl font-bold text-foreground">
+                    Standard Fleet
+                  </h3>
+                  <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
+                    Our Own Vehicles
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  {[
+                    {
+                      model: "Swift Dzire / Honda City / Toyota Aura",
+                      tag: "Comfortable Sedan",
+                      desc: "Smooth, fuel-efficient sedans ideal for city trips and short journeys. Our own vehicles — ₹18–22/km",
+                      badge: "Own Car",
+                      badgeColor:
+                        "bg-green-100 text-green-800 border-green-200",
+                      emoji: "🚗",
+                    },
+                    {
+                      model: "Ertiga",
+                      tag: "Smart Choice",
+                      desc: "Perfect for small groups and family trips. Our own car with competitive rates.",
+                      badge: "Own Car",
+                      badgeColor:
+                        "bg-green-100 text-green-800 border-green-200",
+                      emoji: "🚙",
+                    },
+                    {
+                      model: "Innova Crysta",
+                      tag: "Premium MPV",
+                      desc: "Spacious and comfortable for long journeys. Our own car — top comfort at ₹35/km",
+                      badge: "Own Car",
+                      badgeColor:
+                        "bg-primary/10 text-primary border-primary/20",
+                      emoji: "🚐",
+                    },
+                    {
+                      model: "Premium SUVs",
+                      tag: "Multiple Options",
+                      desc: "Range of premium SUVs for all group sizes. All India Tourist Permit, fully owned.",
+                      badge: "Available",
+                      badgeColor: "bg-teal-100 text-teal-800 border-teal-200",
+                      emoji: "🛻",
+                    },
+                  ].map((car, i) => (
+                    <motion.div
+                      key={car.model}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      data-ocid={`fleet.item.${i + 4}`}
+                    >
+                      <Card className="border border-primary/10 shadow-card hover:shadow-hero transition-all h-full">
+                        <CardContent className="p-5 flex flex-col gap-2">
+                          <div className="text-3xl mb-1">{car.emoji}</div>
+                          <Badge className={`${car.badgeColor} text-xs w-fit`}>
+                            {car.badge}
+                          </Badge>
+                          <h4 className="font-display font-bold text-foreground text-base">
+                            {car.model}
+                          </h4>
+                          <p className="text-xs text-primary font-medium">
+                            {car.tag}
+                          </p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {car.desc}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* VIP / Luxury Fleet */}
+              <div>
+                <div className="flex items-center gap-3 mb-5">
+                  <h3 className="font-display text-xl font-bold text-foreground">
+                    VIP / Luxury Fleet
+                  </h3>
+                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
+                    ✨ Premium Service
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
+                  {[
+                    {
+                      model: "BMW",
+                      tag: "Luxury Sedan",
+                      desc: "Executive travel in ultimate comfort. Ideal for corporate clients, celebrities, and VIP guests.",
+                      badge: "VIP",
+                      emoji: "🏎️",
+                    },
+                    {
+                      model: "Mercedes",
+                      tag: "Elite Class",
+                      desc: "The pinnacle of luxury travel. For those who demand the very best on every journey.",
+                      badge: "VIP",
+                      emoji: "🚘",
+                    },
+                  ].map((car, i) => (
+                    <motion.div
+                      key={car.model}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.15 }}
+                      data-ocid={`fleet.item.${i + 8}`}
+                    >
+                      <Card className="border border-yellow-400/40 shadow-card hover:shadow-hero transition-all h-full bg-gradient-to-br from-yellow-50 to-amber-50">
+                        <CardContent className="p-5 flex flex-col gap-2">
+                          <div className="text-3xl mb-1">{car.emoji}</div>
+                          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs w-fit">
+                            {car.badge}
+                          </Badge>
+                          <h4 className="font-display font-bold text-foreground text-base">
+                            {car.model}
+                          </h4>
+                          <p className="text-xs text-amber-700 font-medium">
+                            {car.tag}
+                          </p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {car.desc}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -1337,7 +1447,7 @@ export default function App() {
                     <span className="font-semibold text-foreground">
                       Per-km pricing:
                     </span>{" "}
-                    ₹18–22/km (Sedan) · ₹25–32/km (SUV). State taxes &amp; tolls
+                    ₹18–22/km (Sedan) · ₹28–35/km (SUV). State taxes &amp; tolls
                     extra.
                   </div>
                 </div>
@@ -1538,12 +1648,12 @@ export default function App() {
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto text-sm">
                 Get an instant estimate based on distance. Final rates vary
-                between ₹25–₹32/km. State taxes, toll charges, and extra as per
+                between ₹28–₹35/km. State taxes, toll charges, and extra as per
                 actuals.
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Calculator */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -1614,7 +1724,7 @@ export default function App() {
                           </span>
                         </div>
                         <div className="flex justify-between items-center text-xs text-muted-foreground">
-                          <span>Range (₹25–₹32/km)</span>
+                          <span>Range (₹28–₹35/km)</span>
                           <span>
                             ₹{(Number(calcKm) * 25).toLocaleString("en-IN")} – ₹
                             {(Number(calcKm) * 32).toLocaleString("en-IN")}
@@ -1649,7 +1759,7 @@ export default function App() {
                         <p className="text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                           ⚠️ State taxes, toll charges, and driver night charges
                           are extra as per actuals. Final rate may vary between
-                          ₹25–₹32 per km.
+                          ₹28–₹35 per km.
                         </p>
                       </motion.div>
                     )}
@@ -1759,6 +1869,326 @@ export default function App() {
                   </CardContent>
                 </Card>
               </motion.div>
+
+              {/* Trip Route Guide */}
+              {(() => {
+                const routeData: Record<
+                  string,
+                  { distance: number; highway: string; note?: string }
+                > = {
+                  "Delhi-Agra": {
+                    distance: 233,
+                    highway: "NH 19 (Yamuna Expressway)",
+                  },
+                  "Delhi-Jaipur": {
+                    distance: 282,
+                    highway: "NH 48 (Delhi–Jaipur Expressway)",
+                  },
+                  "Delhi-Haridwar": {
+                    distance: 220,
+                    highway: "NH 334 via Meerut–Muzaffarnagar",
+                  },
+                  "Delhi-Rishikesh": {
+                    distance: 245,
+                    highway: "NH 334 & NH 7",
+                  },
+                  "Delhi-Manali": {
+                    distance: 540,
+                    highway: "NH 44 via Chandigarh & Kullu",
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Shimla": {
+                    distance: 370,
+                    highway: "NH 44 & NH 5 via Chandigarh",
+                  },
+                  "Delhi-Chandigarh": {
+                    distance: 260,
+                    highway: "NH 44 (Delhi–Chandigarh Expressway)",
+                  },
+                  "Delhi-Mathura": {
+                    distance: 183,
+                    highway: "NH 19 (Yamuna Expressway)",
+                  },
+                  "Delhi-Vrindavan": {
+                    distance: 187,
+                    highway: "NH 19 (Yamuna Expressway)",
+                  },
+                  "Delhi-Varanasi": {
+                    distance: 820,
+                    highway: "NH 19 via Agra & Allahabad",
+                    note: "Overnight trip",
+                  },
+                  "Delhi-Ayodhya": {
+                    distance: 690,
+                    highway: "NH 27 via Lucknow",
+                  },
+                  "Delhi-Amritsar": {
+                    distance: 452,
+                    highway: "NH 44 via Ludhiana",
+                  },
+                  "Delhi-Dehradun": {
+                    distance: 300,
+                    highway: "NH 334 & NH 72A",
+                  },
+                  "Delhi-Nainital": {
+                    distance: 310,
+                    highway: "NH 9 via Moradabad",
+                  },
+                  "Delhi-Mussoorie": {
+                    distance: 295,
+                    highway: "NH 334 via Dehradun",
+                  },
+                  "Delhi-Salasar Balaji": {
+                    distance: 395,
+                    highway: "NH 48 & SH 8 (Rajasthan)",
+                  },
+                  "Delhi-Khatu Shyam": {
+                    distance: 375,
+                    highway: "NH 48 via Sikar",
+                  },
+                  "Delhi-Pushkar": {
+                    distance: 410,
+                    highway: "NH 48 via Ajmer",
+                  },
+                  "Delhi-Bikaner": {
+                    distance: 490,
+                    highway: "NH 62 via Hanumangarh",
+                  },
+                  "Delhi-Ajmer": { distance: 390, highway: "NH 48" },
+                  "Delhi-Kota": { distance: 490, highway: "NH 52 via Dausa" },
+                  "Jaipur-Agra": {
+                    distance: 238,
+                    highway: "NH 21 (Agra–Jaipur Expressway)",
+                  },
+                  "Jaipur-Udaipur": {
+                    distance: 397,
+                    highway: "NH 48 via Ajmer",
+                  },
+                  "Jaipur-Jodhpur": { distance: 340, highway: "NH 62" },
+                  "Delhi-Mumbai": {
+                    distance: 1450,
+                    highway: "NH 48 (Delhi–Mumbai Expressway)",
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Kolkata": {
+                    distance: 1530,
+                    highway: "NH 19 via Varanasi",
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Bangalore": {
+                    distance: 2150,
+                    highway: "NH 44 via Nagpur",
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Goa": {
+                    distance: 1900,
+                    highway: "NH 48 via Mumbai",
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Pune": {
+                    distance: 1490,
+                    highway: "NH 48 via Jaipur & Mumbai",
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Hyderabad": {
+                    distance: 1650,
+                    highway: "NH 44 via Nagpur",
+                    note: "Multi-day trip",
+                  },
+                };
+                const cities = [
+                  "Delhi",
+                  "Agra",
+                  "Jaipur",
+                  "Haridwar",
+                  "Rishikesh",
+                  "Manali",
+                  "Shimla",
+                  "Chandigarh",
+                  "Mathura",
+                  "Vrindavan",
+                  "Varanasi",
+                  "Ayodhya",
+                  "Amritsar",
+                  "Dehradun",
+                  "Nainital",
+                  "Mussoorie",
+                  "Salasar Balaji",
+                  "Khatu Shyam",
+                  "Pushkar",
+                  "Bikaner",
+                  "Ajmer",
+                  "Kota",
+                  "Udaipur",
+                  "Jodhpur",
+                  "Mumbai",
+                  "Kolkata",
+                  "Bangalore",
+                  "Goa",
+                  "Pune",
+                  "Hyderabad",
+                ];
+                const key1 =
+                  routeOrigin && routeDest ? `${routeOrigin}-${routeDest}` : "";
+                const key2 =
+                  routeOrigin && routeDest ? `${routeDest}-${routeOrigin}` : "";
+                const route = routeData[key1] || routeData[key2] || null;
+                const noRoute =
+                  routeOrigin &&
+                  routeDest &&
+                  routeOrigin !== routeDest &&
+                  !route;
+                const sameCity =
+                  routeOrigin && routeDest && routeOrigin === routeDest;
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                  >
+                    <Card className="border-0 shadow-hero overflow-hidden h-full">
+                      <div className="h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500" />
+                      <CardContent className="p-6 md:p-8 flex flex-col h-full">
+                        <h3 className="font-display font-bold text-xl mb-2 text-foreground">
+                          🗺️ Trip Route Guide
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-5">
+                          Select origin &amp; destination to see the highway
+                          route and estimated fare.
+                        </p>
+                        <div className="space-y-3 mb-4">
+                          <div>
+                            <label
+                              htmlFor="route-origin"
+                              className="text-sm font-semibold text-foreground mb-1.5 block"
+                            >
+                              From (Origin)
+                            </label>
+                            <select
+                              id="route-origin"
+                              value={routeOrigin}
+                              onChange={(e) => setRouteOrigin(e.target.value)}
+                              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                              data-ocid="route.select"
+                            >
+                              <option value="">Select city...</option>
+                              {cities.map((c) => (
+                                <option key={c} value={c}>
+                                  {c}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label
+                              htmlFor="route-dest"
+                              className="text-sm font-semibold text-foreground mb-1.5 block"
+                            >
+                              To (Destination)
+                            </label>
+                            <select
+                              id="route-dest"
+                              value={routeDest}
+                              onChange={(e) => setRouteDest(e.target.value)}
+                              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                              data-ocid="route.select"
+                            >
+                              <option value="">Select city...</option>
+                              {cities.map((c) => (
+                                <option key={c} value={c}>
+                                  {c}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        {route && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-gradient-to-br from-primary/5 to-teal-50 border border-primary/15 rounded-xl p-4 space-y-3 flex-1"
+                            data-ocid="route.success_state"
+                          >
+                            <div className="space-y-1.5">
+                              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                                Highway Route
+                              </p>
+                              <p className="font-bold text-foreground text-sm">
+                                🛣️ {route.highway}
+                              </p>
+                            </div>
+                            <div className="flex justify-between items-center text-sm border-t border-primary/10 pt-3">
+                              <span className="text-muted-foreground">
+                                Approx Distance
+                              </span>
+                              <span className="font-semibold text-foreground">
+                                {route.distance} km
+                              </span>
+                            </div>
+                            <div className="space-y-1 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">
+                                  Avg Fare (₹28/km)
+                                </span>
+                                <span className="font-bold text-primary">
+                                  ₹
+                                  {(route.distance * 28).toLocaleString(
+                                    "en-IN",
+                                  )}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-xs text-muted-foreground">
+                                <span>Fare Range</span>
+                                <span>
+                                  ₹
+                                  {(route.distance * 25).toLocaleString(
+                                    "en-IN",
+                                  )}{" "}
+                                  – ₹
+                                  {(route.distance * 35).toLocaleString(
+                                    "en-IN",
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+                            {route.distance > 500 && (
+                              <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
+                                🌙 Long trip — driver night charges ₹300/night
+                                will apply
+                              </div>
+                            )}
+                            {route.note && (
+                              <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-xs text-blue-800">
+                                📌 {route.note}
+                              </div>
+                            )}
+                            <p className="text-xs text-muted-foreground italic">
+                              ⚠️ Tolls &amp; state taxes extra as per actuals.
+                            </p>
+                          </motion.div>
+                        )}
+
+                        {(noRoute || sameCity) && (
+                          <div
+                            className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground flex-1"
+                            data-ocid="route.error_state"
+                          >
+                            Route info not available. Please call us for a
+                            custom quote.
+                          </div>
+                        )}
+
+                        {!routeOrigin && !routeDest && (
+                          <div className="bg-secondary/30 border border-border/50 rounded-xl p-4 text-sm text-muted-foreground text-center flex-1 flex items-center justify-center">
+                            Select origin &amp; destination to see route info
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })()}
             </div>
           </div>
         </section>
@@ -2261,7 +2691,7 @@ export default function App() {
                 </p>
                 <p className="text-white/80 text-sm font-medium mb-5">
                   Co-Founder & Managing Director:{" "}
-                  <span className="text-white font-bold">Gaurav</span>
+                  <span className="text-white font-bold">GAURAV</span>
                 </p>
                 <div className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-xs font-semibold text-white mb-4">
                   <Shield size={13} className="fill-white/30" />
