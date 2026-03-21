@@ -337,15 +337,6 @@ const TESTIMONIALS: {
   },
   {
     id: 5,
-    name: "Kavita Sharma",
-    role: "HR Head, Noida",
-    rating: 5,
-    review:
-      "We manage travel for over 50 employees monthly through Meena Tour and Travels. The coordination is smooth, drivers are always on time, and Gaurav is always reachable. A truly reliable partner.",
-    initials: "KS",
-  },
-  {
-    id: 6,
     name: "Reliance Industries",
     role: "Corporate Client, Mumbai",
     rating: 5,
@@ -354,6 +345,16 @@ const TESTIMONIALS: {
     initials: "RI",
     photo:
       "/assets/generated/reliance-industries-logo-transparent.dim_200x200.png",
+  },
+  {
+    id: 7,
+    name: "Manoj Daggar",
+    role: "Owner, Thar Arts — Peetal Murti Factory, Harigarh (Aligarh), Uttar Pradesh",
+    rating: 5,
+    review:
+      "I have been using Meena Tour and Travels for the past 5 years for all my business travel. I run Thar Arts, a brass idol manufacturing factory in Harigarh, Aligarh, UP. Whenever I need to travel to Delhi or other cities for work, Gaurav's team is always ready and on time. The cars are clean, drivers are polite and experienced, and there are no hidden charges. Very honest and reliable service. Highly recommend to anyone looking for trustworthy travel.",
+    initials: "MD",
+    photo: "/assets/generated/manoj-daggar-portrait.dim_200x200.jpg",
   },
 ];
 
@@ -513,7 +514,7 @@ export default function App() {
               data-ocid="nav.link"
             >
               <img
-                src="/assets/generated/meena-tour-travels-logo-transparent.dim_600x200.png"
+                src="/assets/generated/MTT-logo-cropped.dim_500x150.png"
                 alt="Meena Tour and Travels"
                 style={{
                   height: "52px",
