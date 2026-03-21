@@ -352,6 +352,8 @@ const TESTIMONIALS: {
     review:
       "Meena Tour and Travels has been our trusted travel partner for over 8 years. Their professionalism, punctuality, and premium fleet have made them our go-to choice for all executive travel needs across India. Gaurav and his team consistently deliver excellence.",
     initials: "RI",
+    photo:
+      "/assets/generated/reliance-industries-logo-transparent.dim_200x200.png",
   },
 ];
 
