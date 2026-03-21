@@ -24,6 +24,7 @@ import {
   Globe,
   Heart,
   Instagram,
+  Landmark,
   Mail,
   MapPin,
   Menu,
@@ -62,8 +63,7 @@ const TRIPS = [
     ],
     bestTime: "October – March",
     approxKm: "180 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1609694989823-53f7ef0e0b23?w=600&q=80",
+    image: "/assets/generated/trip-mathura-vrindavan.dim_800x500.jpg",
   },
   {
     id: 2,
@@ -81,8 +81,7 @@ const TRIPS = [
     ],
     bestTime: "October – March",
     approxKm: "800 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1561361058-c24e31f34f4a?w=600&q=80",
+    image: "/assets/generated/trip-varanasi-kashi.dim_800x500.jpg",
   },
   {
     id: 3,
@@ -100,8 +99,7 @@ const TRIPS = [
     ],
     bestTime: "September – June",
     approxKm: "220 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
+    image: "/assets/generated/trip-haridwar-rishikesh.dim_800x500.jpg",
   },
   {
     id: 4,
@@ -114,8 +112,7 @@ const TRIPS = [
     highlights: ["Ram Mandir", "Hanuman Garhi", "Kanak Bhawan", "Saryu Ghat"],
     bestTime: "October – March",
     approxKm: "630 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1627894005813-d5f7dc6b7fbb?w=600&q=80",
+    image: "/assets/generated/trip-ayodhya.dim_800x500.jpg",
   },
   {
     id: 5,
@@ -132,8 +129,7 @@ const TRIPS = [
     ],
     bestTime: "Year Round",
     approxKm: "470 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1566831695454-c3b386df1de6?w=600&q=80",
+    image: "/assets/generated/trip-salasar-balaji.dim_800x500.jpg",
   },
   {
     id: 6,
@@ -151,8 +147,7 @@ const TRIPS = [
     ],
     bestTime: "October – March",
     approxKm: "310 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80",
+    image: "/assets/generated/trip-khatu-shyam.dim_800x500.jpg",
   },
   {
     id: 7,
@@ -165,8 +160,7 @@ const TRIPS = [
     highlights: ["Amber Fort", "Hawa Mahal", "City Palace", "Jantar Mantar"],
     bestTime: "October – March",
     approxKm: "270 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1477587458883-47145ed31f1b?w=600&q=80",
+    image: "/assets/generated/trip-jaipur.dim_800x500.jpg",
   },
   {
     id: 8,
@@ -184,8 +178,7 @@ const TRIPS = [
     ],
     bestTime: "October – June",
     approxKm: "550 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80",
+    image: "/assets/generated/trip-manali.dim_800x500.jpg",
   },
   {
     id: 9,
@@ -198,8 +191,7 @@ const TRIPS = [
     highlights: ["Kempty Falls", "Gun Hill", "Lal Tibba", "Mall Road"],
     bestTime: "March – June, Sep – Nov",
     approxKm: "290 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1593181629936-11c609b8db9b?w=600&q=80",
+    image: "/assets/generated/trip-dehradun-mussoorie.dim_800x500.jpg",
   },
   {
     id: 10,
@@ -212,8 +204,7 @@ const TRIPS = [
     highlights: ["Taj Mahal", "Agra Fort", "Fatehpur Sikri", "Mehtab Bagh"],
     bestTime: "October – March",
     approxKm: "230 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80",
+    image: "/assets/generated/trip-agra-tajmahal.dim_800x500.jpg",
   },
   {
     id: 11,
@@ -231,8 +222,7 @@ const TRIPS = [
     ],
     bestTime: "March – June, Sep – Nov",
     approxKm: "310 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
+    image: "/assets/generated/trip-nainital.dim_800x500.jpg",
   },
   {
     id: 12,
@@ -250,8 +240,7 @@ const TRIPS = [
     ],
     bestTime: "March – June, Dec – Jan (snow)",
     approxKm: "340 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80",
+    image: "/assets/generated/trip-shimla.dim_800x500.jpg",
   },
   {
     id: 13,
@@ -269,8 +258,7 @@ const TRIPS = [
     ],
     bestTime: "October – June",
     approxKm: "380 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=600&q=80",
+    image: "/assets/generated/trip-ranthambore.dim_800x500.jpg",
   },
   {
     id: 14,
@@ -288,8 +276,7 @@ const TRIPS = [
     ],
     bestTime: "October – March",
     approxKm: "770 km from Delhi",
-    image:
-      "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80",
+    image: "/assets/generated/trip-jaisalmer.dim_800x500.jpg",
   },
 ];
 
@@ -426,6 +413,30 @@ export default function App() {
       image: "/assets/generated/ajanta-caves-maharashtra.dim_1200x700.jpg",
       location: "Ajanta Caves, Maharashtra",
     },
+    {
+      image: "/assets/generated/hero-varanasi-ghats.dim_1920x1080.jpg",
+      location: "Varanasi Ghats, Uttar Pradesh",
+    },
+    {
+      image: "/assets/generated/hero-rishikesh.dim_1920x1080.jpg",
+      location: "Rishikesh, Uttarakhand",
+    },
+    {
+      image: "/assets/generated/hero-golden-temple-amritsar.dim_1920x1080.jpg",
+      location: "Golden Temple, Amritsar",
+    },
+    {
+      image: "/assets/generated/hero-shimla.dim_1920x1080.jpg",
+      location: "Shimla, Himachal Pradesh",
+    },
+    {
+      image: "/assets/generated/hero-pushkar.dim_1920x1080.jpg",
+      location: "Pushkar, Rajasthan",
+    },
+    {
+      image: "/assets/generated/hero-ranthambore.dim_1920x1080.jpg",
+      location: "Ranthambore, Rajasthan",
+    },
   ];
   const [heroIndex, setHeroIndex] = useState(0);
   useEffect(() => {
@@ -449,14 +460,6 @@ export default function App() {
   const [bookingDestination, setBookingDestination] = useState("");
   const [calcKm, setCalcKm] = useState<string>("");
   const [calcNights, setCalcNights] = useState<string>("");
-  const [calcQueryData, setCalcQueryData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    destination: "",
-    km: "",
-    message: "",
-  });
   const [selectedTrip, setSelectedTrip] = useState<(typeof TRIPS)[0] | null>(
     null,
   );
@@ -486,7 +489,7 @@ export default function App() {
             {/* Logo */}
             <a
               href="#home"
-              className="flex items-center gap-2"
+              className="flex flex-col items-start gap-0"
               data-ocid="nav.link"
             >
               <img
@@ -501,6 +504,12 @@ export default function App() {
                 }}
                 className="md:h-14 h-10"
               />
+              <span
+                className="text-xs font-semibold tracking-wide text-orange-600 hidden md:block"
+                style={{ marginTop: "-2px", letterSpacing: "0.04em" }}
+              >
+                Every Destination, One Trusted Name
+              </span>
             </a>
 
             {/* Desktop Nav */}
@@ -740,6 +749,10 @@ export default function App() {
                     <Button
                       className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 h-10"
                       data-ocid="search.primary_button"
+                      onClick={() => {
+                        setBookingDestination(searchDestination);
+                        setBookingOpen(true);
+                      }}
                     >
                       <Search size={16} className="mr-2" />
                       Search
@@ -855,7 +868,7 @@ export default function App() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -901,7 +914,7 @@ export default function App() {
                       <Sparkles className="w-7 h-7 text-primary" />
                     </div>
                     <h3 className="font-display font-bold text-xl text-foreground">
-                      Premium SUV
+                      SUV &amp; Innova Crysta
                     </h3>
                     <div className="text-3xl font-display font-bold text-primary">
                       ₹28–35
@@ -911,13 +924,42 @@ export default function App() {
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Innova Crysta, Ertiga & premium SUVs with extra space and
-                      5-star comfort.
+                      Innova Crysta, Ertiga &amp; Premium SUVs. Our own vehicles
+                      — spacious, comfortable, and reliable for long journeys.
                     </p>
                   </CardContent>
                 </Card>
               </motion.div>
             </div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              data-ocid="pricing.item.3"
+            >
+              <Card className="border-2 border-amber-500 shadow-hero h-full relative overflow-hidden">
+                <div className="absolute top-3 right-3">
+                  <Badge className="bg-amber-500 text-white border-0 text-xs font-semibold">
+                    VIP
+                  </Badge>
+                </div>
+                <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-1">
+                    <Star className="w-7 h-7 text-amber-500" />
+                  </div>
+                  <h3 className="font-display font-bold text-xl text-foreground">
+                    VIP / Luxury Fleet
+                  </h3>
+                  <div className="text-3xl font-display font-bold text-amber-600">
+                    On Request
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    BMW &amp; Mercedes for corporate executives, celebrities,
+                    and VIP guests requiring premium comfort.
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
 
             <div className="max-w-2xl mx-auto bg-amber-50 border border-primary/20 rounded-xl p-4 text-center text-sm text-muted-foreground mb-8">
               <span className="font-semibold text-foreground">
@@ -1021,7 +1063,7 @@ export default function App() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                   {[
                     {
-                      model: "Swift Dzire / Honda City / Toyota Aura",
+                      model: "Swift Dzire / Honda City / Hyundai Aura",
                       tag: "Comfortable Sedan",
                       desc: "Smooth, fuel-efficient sedans ideal for city trips and short journeys. Our own vehicles — ₹18–22/km",
                       badge: "Own Car",
@@ -1718,7 +1760,7 @@ export default function App() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
               {/* Calculator */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -1832,233 +1874,818 @@ export default function App() {
                 </Card>
               </motion.div>
 
-              {/* Rate Query Form */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
-                <Card className="border-0 shadow-hero overflow-hidden">
-                  <div className="h-1.5 bg-gradient-to-r from-accent via-accent/70 to-primary" />
-                  <CardContent className="p-6 md:p-8">
-                    <h3 className="font-display font-bold text-xl mb-2 text-foreground">
-                      Get a Rate Quote
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-6">
-                      Fill in your details and we&apos;ll send you a
-                      personalized rate estimate.
-                    </p>
-                    <div className="space-y-3">
-                      <Input
-                        placeholder="Your Name"
-                        value={calcQueryData.name}
-                        onChange={(e) =>
-                          setCalcQueryData((p) => ({
-                            ...p,
-                            name: e.target.value,
-                          }))
-                        }
-                        data-ocid="calculator.input"
-                      />
-                      <Input
-                        type="email"
-                        placeholder="Your Email"
-                        value={calcQueryData.email}
-                        onChange={(e) =>
-                          setCalcQueryData((p) => ({
-                            ...p,
-                            email: e.target.value,
-                          }))
-                        }
-                        data-ocid="calculator.input"
-                      />
-                      <Input
-                        placeholder="Phone Number"
-                        value={calcQueryData.phone}
-                        onChange={(e) =>
-                          setCalcQueryData((p) => ({
-                            ...p,
-                            phone: e.target.value,
-                          }))
-                        }
-                        data-ocid="calculator.input"
-                      />
-                      <Input
-                        placeholder="Destination (e.g. Manali, Haridwar)"
-                        value={calcQueryData.destination}
-                        onChange={(e) =>
-                          setCalcQueryData((p) => ({
-                            ...p,
-                            destination: e.target.value,
-                          }))
-                        }
-                        data-ocid="calculator.input"
-                      />
-                      <Input
-                        placeholder="Estimated Distance (km)"
-                        value={calcQueryData.km}
-                        onChange={(e) =>
-                          setCalcQueryData((p) => ({
-                            ...p,
-                            km: e.target.value,
-                          }))
-                        }
-                        data-ocid="calculator.input"
-                      />
-                      <Textarea
-                        placeholder="Any additional details or questions..."
-                        value={calcQueryData.message}
-                        onChange={(e) =>
-                          setCalcQueryData((p) => ({
-                            ...p,
-                            message: e.target.value,
-                          }))
-                        }
-                        rows={3}
-                        data-ocid="calculator.textarea"
-                      />
-                      <Button
-                        className="w-full bg-primary hover:bg-primary/90 text-white font-semibold"
-                        data-ocid="calculator.submit_button"
-                        onClick={() => {
-                          const body = encodeURIComponent(
-                            `Rate Query from ${calcQueryData.name}\n\nName: ${calcQueryData.name}\nEmail: ${calcQueryData.email}\nPhone: ${calcQueryData.phone}\nDestination: ${calcQueryData.destination}\nEstimated KM: ${calcQueryData.km}\n\nMessage: ${calcQueryData.message}\n\n---\nEstimated Fare (avg ₹28/km): ₹${calcQueryData.km ? (Number(calcQueryData.km) * 28).toLocaleString("en-IN") : "N/A"}\nNote: State taxes, toll charges, and driver night charges (₹300/night) extra as per actuals.`,
-                          );
-                          window.location.href = `mailto:meenagaurav4748@gmail.com?subject=${encodeURIComponent("Rate Query - Meena Tour and Travels")}&body=${body}`;
-                        }}
-                      >
-                        <Mail size={15} className="mr-2" />
-                        Send Rate Query
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
               {/* Trip Route Guide */}
               {(() => {
                 const routeData: Record<
                   string,
-                  { distance: number; highway: string; note?: string }
+                  {
+                    distance: number;
+                    highway: string;
+                    time: number;
+                    note?: string;
+                  }
                 > = {
                   "Delhi-Agra": {
                     distance: 233,
                     highway: "NH 19 (Yamuna Expressway)",
+                    time: 3,
                   },
                   "Delhi-Jaipur": {
                     distance: 282,
                     highway: "NH 48 (Delhi–Jaipur Expressway)",
+                    time: 4.5,
                   },
                   "Delhi-Haridwar": {
                     distance: 220,
                     highway: "NH 334 via Meerut–Muzaffarnagar",
+                    time: 4,
                   },
                   "Delhi-Rishikesh": {
                     distance: 245,
                     highway: "NH 334 & NH 7",
+                    time: 4.5,
                   },
                   "Delhi-Manali": {
                     distance: 540,
                     highway: "NH 44 via Chandigarh & Kullu",
+                    time: 13,
                     note: "Multi-day trip",
                   },
                   "Delhi-Shimla": {
                     distance: 370,
                     highway: "NH 44 & NH 5 via Chandigarh",
+                    time: 8,
                   },
                   "Delhi-Chandigarh": {
                     distance: 260,
                     highway: "NH 44 (Delhi–Chandigarh Expressway)",
+                    time: 4.5,
                   },
                   "Delhi-Mathura": {
                     distance: 183,
                     highway: "NH 19 (Yamuna Expressway)",
+                    time: 2.5,
                   },
                   "Delhi-Vrindavan": {
                     distance: 187,
                     highway: "NH 19 (Yamuna Expressway)",
+                    time: 2.5,
                   },
                   "Delhi-Varanasi": {
                     distance: 820,
                     highway: "NH 19 via Agra & Allahabad",
+                    time: 14,
                     note: "Overnight trip",
                   },
                   "Delhi-Ayodhya": {
                     distance: 690,
                     highway: "NH 27 via Lucknow",
+                    time: 11,
                   },
                   "Delhi-Amritsar": {
                     distance: 452,
                     highway: "NH 44 via Ludhiana",
+                    time: 7,
                   },
                   "Delhi-Dehradun": {
                     distance: 300,
                     highway: "NH 334 & NH 72A",
+                    time: 6,
                   },
                   "Delhi-Nainital": {
                     distance: 310,
                     highway: "NH 9 via Moradabad",
+                    time: 6.5,
                   },
                   "Delhi-Mussoorie": {
                     distance: 295,
                     highway: "NH 334 via Dehradun",
+                    time: 6,
                   },
                   "Delhi-Salasar Balaji": {
                     distance: 395,
                     highway: "NH 48 & SH 8 (Rajasthan)",
+                    time: 7,
                   },
                   "Delhi-Khatu Shyam": {
                     distance: 375,
                     highway: "NH 48 via Sikar",
+                    time: 6.5,
                   },
                   "Delhi-Pushkar": {
                     distance: 410,
                     highway: "NH 48 via Ajmer",
+                    time: 7,
                   },
                   "Delhi-Bikaner": {
                     distance: 490,
                     highway: "NH 62 via Hanumangarh",
+                    time: 8,
                   },
-                  "Delhi-Ajmer": { distance: 390, highway: "NH 48" },
-                  "Delhi-Kota": { distance: 490, highway: "NH 52 via Dausa" },
-                  "Jaipur-Agra": {
-                    distance: 238,
-                    highway: "NH 21 (Agra–Jaipur Expressway)",
+                  "Delhi-Ajmer": { distance: 390, highway: "NH 48", time: 6.5 },
+                  "Delhi-Kota": {
+                    distance: 490,
+                    highway: "NH 52 via Dausa",
+                    time: 8,
                   },
-                  "Jaipur-Udaipur": {
-                    distance: 397,
-                    highway: "NH 48 via Ajmer",
-                  },
-                  "Jaipur-Jodhpur": { distance: 340, highway: "NH 62" },
                   "Delhi-Mumbai": {
                     distance: 1450,
                     highway: "NH 48 (Delhi–Mumbai Expressway)",
+                    time: 24,
                     note: "Multi-day trip",
                   },
                   "Delhi-Kolkata": {
                     distance: 1530,
                     highway: "NH 19 via Varanasi",
+                    time: 26,
                     note: "Multi-day trip",
                   },
                   "Delhi-Bangalore": {
                     distance: 2150,
                     highway: "NH 44 via Nagpur",
+                    time: 36,
                     note: "Multi-day trip",
                   },
                   "Delhi-Goa": {
                     distance: 1900,
                     highway: "NH 48 via Mumbai",
+                    time: 32,
                     note: "Multi-day trip",
                   },
                   "Delhi-Pune": {
                     distance: 1490,
                     highway: "NH 48 via Jaipur & Mumbai",
+                    time: 25,
                     note: "Multi-day trip",
                   },
                   "Delhi-Hyderabad": {
                     distance: 1650,
                     highway: "NH 44 via Nagpur",
+                    time: 28,
                     note: "Multi-day trip",
+                  },
+                  "Delhi-Jodhpur": {
+                    distance: 605,
+                    highway: "NH 48 via Jaipur",
+                    time: 10,
+                    note: "Long trip",
+                  },
+                  "Delhi-Udaipur": {
+                    distance: 660,
+                    highway: "NH 48 via Jaipur & Ajmer",
+                    time: 11,
+                    note: "Long trip",
+                  },
+                  "Delhi-Jaisalmer": {
+                    distance: 870,
+                    highway: "NH 48 via Jaipur & Jodhpur",
+                    time: 14,
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Sawai Madhopur": {
+                    distance: 385,
+                    highway: "NH 48 & NH 52 via Dausa",
+                    time: 7,
+                  },
+                  "Delhi-Ranthambore": {
+                    distance: 390,
+                    highway: "NH 48 & NH 52",
+                    time: 7,
+                  },
+                  "Delhi-Chittorgarh": {
+                    distance: 595,
+                    highway: "NH 48 via Jaipur",
+                    time: 10,
+                  },
+                  "Delhi-Bundi": {
+                    distance: 490,
+                    highway: "NH 48 & NH 52 via Kota",
+                    time: 8,
+                  },
+                  "Delhi-Tonk": {
+                    distance: 350,
+                    highway: "NH 48 via Jaipur",
+                    time: 6.5,
+                  },
+                  "Delhi-Sikar": {
+                    distance: 330,
+                    highway: "NH 48 via Jaipur",
+                    time: 6,
+                  },
+                  "Delhi-Barmer": {
+                    distance: 820,
+                    highway: "NH 62 via Bikaner",
+                    time: 14,
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Pali": {
+                    distance: 530,
+                    highway: "NH 62 via Jodhpur",
+                    time: 9,
+                  },
+                  "Delhi-Nagaur": {
+                    distance: 460,
+                    highway: "NH 62 via Bikaner bypass",
+                    time: 8,
+                  },
+                  "Delhi-Bharatpur": {
+                    distance: 200,
+                    highway: "NH 21 via Agra road",
+                    time: 3.5,
+                  },
+                  "Delhi-Alwar": {
+                    distance: 165,
+                    highway: "NH 248 via Rewari",
+                    time: 3,
+                  },
+                  "Delhi-Lucknow": {
+                    distance: 555,
+                    highway: "NH 27 (Agra–Lucknow Expressway)",
+                    time: 8,
+                  },
+                  "Delhi-Allahabad (Prayagraj)": {
+                    distance: 645,
+                    highway: "NH 19 via Agra",
+                    time: 10,
+                  },
+                  "Delhi-Kanpur": {
+                    distance: 480,
+                    highway: "NH 19 via Agra–Lucknow Expressway",
+                    time: 7,
+                  },
+                  "Delhi-Meerut": {
+                    distance: 70,
+                    highway: "NH 58 (Delhi–Meerut Expressway)",
+                    time: 1.5,
+                  },
+                  "Delhi-Moradabad": {
+                    distance: 165,
+                    highway: "NH 9",
+                    time: 3,
+                  },
+                  "Delhi-Aligarh": {
+                    distance: 130,
+                    highway: "NH 19 via Yamuna Expressway",
+                    time: 2,
+                  },
+                  "Delhi-Bareilly": {
+                    distance: 255,
+                    highway: "NH 9 via Moradabad",
+                    time: 5,
+                  },
+                  "Delhi-Muzaffarnagar": {
+                    distance: 125,
+                    highway: "NH 58",
+                    time: 2.5,
+                  },
+                  "Delhi-Saharanpur": {
+                    distance: 175,
+                    highway: "NH 58 via Muzaffarnagar",
+                    time: 3.5,
+                  },
+                  "Delhi-Ambala": {
+                    distance: 200,
+                    highway: "NH 44",
+                    time: 3.5,
+                  },
+                  "Delhi-Karnal": {
+                    distance: 130,
+                    highway: "NH 44",
+                    time: 2.5,
+                  },
+                  "Delhi-Panipat": { distance: 90, highway: "NH 44", time: 2 },
+                  "Delhi-Sonipat": { distance: 45, highway: "NH 44", time: 1 },
+                  "Delhi-Rohtak": { distance: 75, highway: "NH 9", time: 1.5 },
+                  "Delhi-Gurgaon": {
+                    distance: 32,
+                    highway: "NH 48 (Delhi–Gurugram Expressway)",
+                    time: 1,
+                  },
+                  "Delhi-Faridabad": {
+                    distance: 30,
+                    highway: "NH 19",
+                    time: 1,
+                  },
+                  "Delhi-Noida": {
+                    distance: 20,
+                    highway: "DND Flyway / NH 24",
+                    time: 0.5,
+                  },
+                  "Delhi-Ludhiana": {
+                    distance: 320,
+                    highway: "NH 44",
+                    time: 5.5,
+                  },
+                  "Delhi-Jalandhar": {
+                    distance: 375,
+                    highway: "NH 44",
+                    time: 6,
+                  },
+                  "Delhi-Pathankot": {
+                    distance: 440,
+                    highway: "NH 44 via Jalandhar",
+                    time: 7.5,
+                  },
+                  "Delhi-Dharamshala": {
+                    distance: 475,
+                    highway: "NH 44 via Pathankot",
+                    time: 8.5,
+                  },
+                  "Delhi-Dalhousie": {
+                    distance: 560,
+                    highway: "NH 44 via Pathankot",
+                    time: 10,
+                  },
+                  "Delhi-Kullu": {
+                    distance: 505,
+                    highway: "NH 44 via Chandigarh",
+                    time: 11,
+                  },
+                  "Delhi-Kasauli": {
+                    distance: 300,
+                    highway: "NH 44 via Chandigarh",
+                    time: 5.5,
+                  },
+                  "Delhi-Solan": {
+                    distance: 340,
+                    highway: "NH 44 via Chandigarh",
+                    time: 6,
+                  },
+                  "Delhi-Spiti": {
+                    distance: 740,
+                    highway: "NH 5 via Shimla–Kinnaur",
+                    time: 16,
+                    note: "Multi-day trip",
+                  },
+                  "Delhi-Jammu": {
+                    distance: 595,
+                    highway: "NH 44 via Pathankot",
+                    time: 10,
+                  },
+                  "Delhi-Vaishno Devi": {
+                    distance: 650,
+                    highway: "NH 44 via Jammu",
+                    time: 11,
+                  },
+                  "Delhi-Hanumangarh": {
+                    distance: 450,
+                    highway: "NH 9 via Sirsa",
+                    time: 8,
+                  },
+                  "Delhi-Sirsa": {
+                    distance: 290,
+                    highway: "NH 9 via Hisar",
+                    time: 5,
+                  },
+                  "Delhi-Hisar": { distance: 165, highway: "NH 9", time: 3 },
+                  "Delhi-Bhiwani": {
+                    distance: 130,
+                    highway: "NH 9 via Rohtak",
+                    time: 2.5,
+                  },
+                  "Delhi-Sambhal": {
+                    distance: 160,
+                    highway: "NH 9 via Moradabad",
+                    time: 3,
+                  },
+                  "Delhi-Shamli": {
+                    distance: 115,
+                    highway: "NH 58 via Muzaffarnagar",
+                    time: 2,
+                  },
+                  "Delhi-Bulandshahr": {
+                    distance: 80,
+                    highway: "NH 9 via Noida",
+                    time: 1.5,
+                  },
+                  "Delhi-Etah": {
+                    distance: 200,
+                    highway: "NH 19 via Aligarh",
+                    time: 3.5,
+                  },
+                  "Jaipur-Agra": {
+                    distance: 238,
+                    highway: "NH 21 (Agra–Jaipur Expressway)",
+                    time: 4,
+                  },
+                  "Jaipur-Udaipur": {
+                    distance: 397,
+                    highway: "NH 48 via Ajmer",
+                    time: 7,
+                  },
+                  "Jaipur-Jodhpur": {
+                    distance: 340,
+                    highway: "NH 62",
+                    time: 6,
+                  },
+                  "Jaipur-Ajmer": {
+                    distance: 135,
+                    highway: "NH 48",
+                    time: 2.5,
+                  },
+                  "Jaipur-Pushkar": {
+                    distance: 150,
+                    highway: "NH 48 via Ajmer",
+                    time: 2.5,
+                  },
+                  "Jaipur-Bikaner": {
+                    distance: 330,
+                    highway: "NH 62 via Sikar–Fatehpur",
+                    time: 5.5,
+                  },
+                  "Jaipur-Kota": { distance: 250, highway: "NH 52", time: 4.5 },
+                  "Jaipur-Bundi": {
+                    distance: 210,
+                    highway: "NH 52 via Kota",
+                    time: 3.5,
+                  },
+                  "Jaipur-Chittorgarh": {
+                    distance: 320,
+                    highway: "NH 48 via Ajmer",
+                    time: 5.5,
+                  },
+                  "Jaipur-Sawai Madhopur": {
+                    distance: 165,
+                    highway: "NH 52",
+                    time: 3,
+                  },
+                  "Jaipur-Ranthambore": {
+                    distance: 165,
+                    highway: "NH 52",
+                    time: 3,
+                  },
+                  "Jaipur-Sikar": {
+                    distance: 110,
+                    highway: "NH 52 via Chomu",
+                    time: 2,
+                  },
+                  "Jaipur-Khatu Shyam": {
+                    distance: 130,
+                    highway: "NH 52 via Sikar",
+                    time: 2.5,
+                  },
+                  "Jaipur-Salasar Balaji": {
+                    distance: 175,
+                    highway: "NH 52 via Sikar",
+                    time: 3,
+                  },
+                  "Jaipur-Bharatpur": {
+                    distance: 185,
+                    highway: "NH 21",
+                    time: 3.5,
+                  },
+                  "Jaipur-Alwar": {
+                    distance: 148,
+                    highway: "NH 248 via Kotputli",
+                    time: 3,
+                  },
+                  "Jaipur-Tonk": { distance: 100, highway: "NH 48", time: 2 },
+                  "Jaipur-Nagaur": {
+                    distance: 200,
+                    highway: "NH 62 via Degana",
+                    time: 3.5,
+                  },
+                  "Jaipur-Barmer": {
+                    distance: 580,
+                    highway: "NH 62 via Jodhpur",
+                    time: 10,
+                  },
+                  "Jaipur-Pali": {
+                    distance: 260,
+                    highway: "NH 62 via Jodhpur bypass",
+                    time: 4.5,
+                  },
+                  "Jaipur-Jaisalmer": {
+                    distance: 570,
+                    highway: "NH 62 via Jodhpur",
+                    time: 10,
+                  },
+                  "Jaipur-Varanasi": {
+                    distance: 760,
+                    highway: "NH 19 via Agra",
+                    time: 13,
+                  },
+                  "Jaipur-Lucknow": {
+                    distance: 550,
+                    highway: "NH 19 via Agra–Lucknow",
+                    time: 9,
+                  },
+                  "Agra-Mathura": {
+                    distance: 58,
+                    highway: "NH 19 (Yamuna Expressway)",
+                    time: 1,
+                  },
+                  "Agra-Vrindavan": {
+                    distance: 62,
+                    highway: "NH 19 (Yamuna Expressway)",
+                    time: 1.2,
+                  },
+                  "Agra-Varanasi": {
+                    distance: 600,
+                    highway: "NH 19 via Allahabad",
+                    time: 10,
+                  },
+                  "Agra-Lucknow": {
+                    distance: 350,
+                    highway: "Agra–Lucknow Expressway",
+                    time: 5,
+                  },
+                  "Agra-Allahabad (Prayagraj)": {
+                    distance: 410,
+                    highway: "NH 19",
+                    time: 7,
+                  },
+                  "Agra-Jhansi": { distance: 175, highway: "NH 44", time: 3 },
+                  "Agra-Gwalior": {
+                    distance: 120,
+                    highway: "NH 44",
+                    time: 2.5,
+                  },
+                  "Agra-Kanpur": {
+                    distance: 290,
+                    highway: "Agra–Lucknow Expressway",
+                    time: 4.5,
+                  },
+                  "Agra-Bharatpur": { distance: 55, highway: "NH 21", time: 1 },
+                  "Haridwar-Rishikesh": {
+                    distance: 25,
+                    highway: "NH 58",
+                    time: 0.5,
+                  },
+                  "Haridwar-Dehradun": {
+                    distance: 53,
+                    highway: "NH 72A",
+                    time: 1,
+                  },
+                  "Haridwar-Mussoorie": {
+                    distance: 90,
+                    highway: "NH 72A via Dehradun",
+                    time: 2,
+                  },
+                  "Haridwar-Shimla": {
+                    distance: 310,
+                    highway: "NH 72A via Dehradun & Chandigarh",
+                    time: 7,
+                  },
+                  "Haridwar-Chandigarh": {
+                    distance: 230,
+                    highway: "NH 72A via Dehradun",
+                    time: 4.5,
+                  },
+                  "Haridwar-Nainital": {
+                    distance: 280,
+                    highway: "NH 58 via Kashipur",
+                    time: 6,
+                  },
+                  "Rishikesh-Dehradun": {
+                    distance: 42,
+                    highway: "NH 7",
+                    time: 1,
+                  },
+                  "Rishikesh-Mussoorie": {
+                    distance: 80,
+                    highway: "NH 7 via Dehradun",
+                    time: 2,
+                  },
+                  "Rishikesh-Nainital": {
+                    distance: 295,
+                    highway: "NH 58 via Kashipur",
+                    time: 6.5,
+                  },
+                  "Dehradun-Shimla": {
+                    distance: 295,
+                    highway: "NH 72A via Chandigarh",
+                    time: 6.5,
+                  },
+                  "Dehradun-Manali": {
+                    distance: 500,
+                    highway: "NH 5 via Chandigarh",
+                    time: 11,
+                  },
+                  "Dehradun-Mussoorie": {
+                    distance: 35,
+                    highway: "Mussoorie Road",
+                    time: 1,
+                  },
+                  "Dehradun-Nainital": {
+                    distance: 295,
+                    highway: "NH 58 via Kashipur",
+                    time: 6.5,
+                  },
+                  "Lucknow-Varanasi": {
+                    distance: 320,
+                    highway: "NH 19 (Purvanchal Expressway)",
+                    time: 5,
+                  },
+                  "Lucknow-Ayodhya": {
+                    distance: 140,
+                    highway: "NH 27",
+                    time: 2.5,
+                  },
+                  "Lucknow-Allahabad (Prayagraj)": {
+                    distance: 215,
+                    highway: "NH 19",
+                    time: 4,
+                  },
+                  "Lucknow-Kanpur": {
+                    distance: 80,
+                    highway: "NH 27",
+                    time: 1.5,
+                  },
+                  "Lucknow-Mathura": {
+                    distance: 340,
+                    highway: "Agra–Lucknow Expressway",
+                    time: 5.5,
+                  },
+                  "Lucknow-Gorakhpur": {
+                    distance: 265,
+                    highway: "NH 28",
+                    time: 5,
+                  },
+                  "Chandigarh-Amritsar": {
+                    distance: 230,
+                    highway: "NH 44",
+                    time: 4,
+                  },
+                  "Chandigarh-Ludhiana": {
+                    distance: 100,
+                    highway: "NH 44",
+                    time: 2,
+                  },
+                  "Chandigarh-Shimla": {
+                    distance: 115,
+                    highway: "NH 5",
+                    time: 3,
+                  },
+                  "Chandigarh-Manali": {
+                    distance: 310,
+                    highway: "NH 3 via Kullu",
+                    time: 8,
+                  },
+                  "Chandigarh-Dharamshala": {
+                    distance: 245,
+                    highway: "NH 44 via Pathankot",
+                    time: 5,
+                  },
+                  "Chandigarh-Pathankot": {
+                    distance: 180,
+                    highway: "NH 44",
+                    time: 3.5,
+                  },
+                  "Chandigarh-Jalandhar": {
+                    distance: 145,
+                    highway: "NH 44",
+                    time: 2.5,
+                  },
+                  "Amritsar-Pathankot": {
+                    distance: 100,
+                    highway: "NH 44",
+                    time: 2,
+                  },
+                  "Amritsar-Dharamshala": {
+                    distance: 185,
+                    highway: "NH 44 via Pathankot",
+                    time: 4,
+                  },
+                  "Amritsar-Jalandhar": {
+                    distance: 80,
+                    highway: "NH 44",
+                    time: 1.5,
+                  },
+                  "Amritsar-Ludhiana": {
+                    distance: 155,
+                    highway: "NH 44",
+                    time: 3,
+                  },
+                  "Jodhpur-Udaipur": {
+                    distance: 270,
+                    highway: "NH 62 via Pali",
+                    time: 5,
+                  },
+                  "Jodhpur-Bikaner": {
+                    distance: 245,
+                    highway: "NH 65",
+                    time: 4.5,
+                  },
+                  "Jodhpur-Jaisalmer": {
+                    distance: 290,
+                    highway: "NH 125",
+                    time: 5,
+                  },
+                  "Jodhpur-Ajmer": {
+                    distance: 200,
+                    highway: "NH 62 via Pali",
+                    time: 4,
+                  },
+                  "Jodhpur-Pushkar": {
+                    distance: 190,
+                    highway: "NH 62 via Pali & Ajmer",
+                    time: 4,
+                  },
+                  "Jodhpur-Barmer": {
+                    distance: 220,
+                    highway: "NH 125",
+                    time: 4,
+                  },
+                  "Jodhpur-Pali": { distance: 72, highway: "NH 62", time: 1.5 },
+                  "Jodhpur-Nagaur": {
+                    distance: 140,
+                    highway: "NH 65",
+                    time: 2.5,
+                  },
+                  "Udaipur-Chittorgarh": {
+                    distance: 115,
+                    highway: "NH 48",
+                    time: 2,
+                  },
+                  "Udaipur-Kota": {
+                    distance: 255,
+                    highway: "NH 52 via Chittorgarh",
+                    time: 4.5,
+                  },
+                  "Udaipur-Ajmer": { distance: 275, highway: "NH 48", time: 5 },
+                  "Udaipur-Bikaner": {
+                    distance: 510,
+                    highway: "NH 62 via Jodhpur",
+                    time: 9,
+                  },
+                  "Udaipur-Pushkar": {
+                    distance: 260,
+                    highway: "NH 48 via Ajmer",
+                    time: 4.5,
+                  },
+                  "Udaipur-Nathdwara": {
+                    distance: 48,
+                    highway: "NH 48",
+                    time: 1,
+                  },
+                  "Udaipur-Abu Road": {
+                    distance: 160,
+                    highway: "NH 27",
+                    time: 3,
+                  },
+                  "Udaipur-Ahmedabad": {
+                    distance: 260,
+                    highway: "NH 48",
+                    time: 4.5,
+                  },
+                  "Shimla-Manali": {
+                    distance: 270,
+                    highway: "NH 3 via Kullu",
+                    time: 8,
+                  },
+                  "Shimla-Dharamshala": {
+                    distance: 250,
+                    highway: "NH 154A via Bilaspur",
+                    time: 7,
+                  },
+                  "Shimla-Kullu": { distance: 235, highway: "NH 3", time: 6 },
+                  "Shimla-Kasauli": { distance: 70, highway: "NH 22", time: 2 },
+                  "Shimla-Solan": { distance: 45, highway: "NH 5", time: 1 },
+                  "Varanasi-Allahabad (Prayagraj)": {
+                    distance: 125,
+                    highway: "NH 19",
+                    time: 2.5,
+                  },
+                  "Varanasi-Ayodhya": {
+                    distance: 200,
+                    highway: "NH 27 via Sultanpur",
+                    time: 4,
+                  },
+                  "Varanasi-Gorakhpur": {
+                    distance: 230,
+                    highway: "NH 29",
+                    time: 4.5,
+                  },
+                  "Mathura-Vrindavan": {
+                    distance: 12,
+                    highway: "Local Road (Mathura–Vrindavan Road)",
+                    time: 0.3,
+                  },
+                  "Mathura-Agra": {
+                    distance: 58,
+                    highway: "NH 19 (Yamuna Expressway)",
+                    time: 1,
+                  },
+                  "Nainital-Corbett": {
+                    distance: 65,
+                    highway: "SH 18 via Ramnagar",
+                    time: 2,
+                  },
+                  "Meerut-Haridwar": {
+                    distance: 165,
+                    highway: "NH 58 via Muzaffarnagar",
+                    time: 3,
+                  },
+                  "Meerut-Mathura": {
+                    distance: 155,
+                    highway: "NH 58 via Palwal",
+                    time: 3,
+                  },
+                  "Meerut-Moradabad": {
+                    distance: 130,
+                    highway: "NH 9",
+                    time: 2.5,
                   },
                 };
                 const cities = [
@@ -2280,6 +2907,18 @@ export default function App() {
                                 {route.distance} km
                               </span>
                             </div>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-muted-foreground">
+                                ⏱️ Est. Travel Time
+                              </span>
+                              <span className="font-semibold text-foreground">
+                                {route.time >= 24
+                                  ? `${Math.floor(route.time / 24)}d ${route.time % 24 > 0 ? `${route.time % 24}h` : ""}`
+                                  : route.time < 1
+                                    ? `${Math.round(route.time * 60)} mins`
+                                    : `${route.time} hrs`}
+                              </span>
+                            </div>
                             {(() => {
                               const taxiRates: Record<
                                 string,
@@ -2294,7 +2933,7 @@ export default function App() {
                                 ertiga: { label: "Ertiga", min: 22, max: 28 },
                                 crysta: {
                                   label: "Innova Crysta",
-                                  min: 35,
+                                  min: 28,
                                   max: 35,
                                 },
                                 suv: { label: "Premium SUV", min: 28, max: 35 },
@@ -2397,15 +3036,95 @@ export default function App() {
                           </motion.div>
                         )}
 
-                        {(noRoute || sameCity) && (
+                        {sameCity && (
                           <div
                             className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground flex-1"
                             data-ocid="route.error_state"
                           >
-                            Route info not available. Please call us for a
-                            custom quote.
+                            Origin and destination are the same. Please select
+                            different cities.
                           </div>
                         )}
+                        {noRoute &&
+                          (routeData[`Delhi-${routeOrigin}`] ||
+                          routeData[`${routeOrigin}-Delhi`] ? (
+                            routeData[`Delhi-${routeDest}`] ||
+                            routeData[`${routeDest}-Delhi`] ? (
+                              <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex-1 space-y-2"
+                                data-ocid="route.error_state"
+                              >
+                                <p className="text-xs font-semibold text-amber-800 mb-2">
+                                  📍 Approximate Route Info ({routeOrigin} →{" "}
+                                  {routeDest})
+                                </p>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">
+                                    Est. Distance
+                                  </span>
+                                  <span className="font-semibold">
+                                    ~
+                                    {Math.round(
+                                      ((routeData[`Delhi-${routeOrigin}`] ||
+                                        routeData[`${routeOrigin}-Delhi`])!
+                                        .distance +
+                                        (routeData[`Delhi-${routeDest}`] ||
+                                          routeData[`${routeDest}-Delhi`])!
+                                          .distance) *
+                                        0.85,
+                                    )}{" "}
+                                    km
+                                  </span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">
+                                    ⏱️ Est. Travel Time
+                                  </span>
+                                  <span className="font-semibold">
+                                    ~
+                                    {Math.round(
+                                      ((routeData[`Delhi-${routeOrigin}`] ||
+                                        routeData[`${routeOrigin}-Delhi`])!
+                                        .time +
+                                        (routeData[`Delhi-${routeDest}`] ||
+                                          routeData[`${routeDest}-Delhi`])!
+                                          .time) *
+                                        0.85 *
+                                        2,
+                                    ) / 2}{" "}
+                                    hrs
+                                  </span>
+                                </div>
+                                <p className="text-xs text-amber-700 mt-2">
+                                  Route via major highways. For exact toll &
+                                  route info, call us:{" "}
+                                  <strong>9990104748</strong>
+                                </p>
+                              </motion.div>
+                            ) : (
+                              <div
+                                className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground flex-1"
+                                data-ocid="route.error_state"
+                              >
+                                Route info not available. Please call us:{" "}
+                                <strong className="text-foreground">
+                                  9990104748
+                                </strong>
+                              </div>
+                            )
+                          ) : (
+                            <div
+                              className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground flex-1"
+                              data-ocid="route.error_state"
+                            >
+                              Route info not available. Please call us:{" "}
+                              <strong className="text-foreground">
+                                9990104748
+                              </strong>
+                            </div>
+                          ))}
 
                         {!routeOrigin && !routeDest && (
                           <div className="bg-secondary/30 border border-border/50 rounded-xl p-4 text-sm text-muted-foreground text-center flex-1 flex items-center justify-center">
@@ -2869,6 +3588,73 @@ export default function App() {
                     </CardContent>
                   </Card>
                 </motion.div>
+                {/* Bank Transfer Details Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <Card className="border-0 shadow-card overflow-hidden">
+                    <CardContent className="p-5">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Landmark size={18} className="text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground">
+                            Bank Transfer Details
+                          </h3>
+                          <p className="text-xs text-muted-foreground">
+                            For bank transfer payments
+                          </p>
+                        </div>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between gap-2">
+                          <span className="text-muted-foreground font-medium">
+                            Account Name
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            GAURAV
+                          </span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <span className="text-muted-foreground font-medium">
+                            Account No
+                          </span>
+                          <span className="font-semibold text-foreground tracking-wide">
+                            51112853125
+                          </span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <span className="text-muted-foreground font-medium">
+                            Bank
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            State Bank of India
+                          </span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <span className="text-muted-foreground font-medium">
+                            IFSC Code
+                          </span>
+                          <span className="font-semibold text-foreground tracking-wider">
+                            SBIN0031580
+                          </span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                          <span className="text-muted-foreground font-medium">
+                            Branch
+                          </span>
+                          <span className="font-semibold text-foreground text-right">
+                            Mandir Marg, Saket
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </div>
 
               {/* Map */}
@@ -3057,6 +3843,31 @@ export default function App() {
                     <p className="text-white/50 text-xs mt-2">
                       Visa, MasterCard &amp; PayPal not accepted.
                     </p>
+                  </div>
+                  <div className="mt-5 pt-4 border-t border-white/15">
+                    <p className="text-white/70 text-xs font-semibold mb-3 flex items-center gap-1.5">
+                      <span>🏦</span> BANK TRANSFER DETAILS
+                    </p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                      <span className="text-white/50">Account Name</span>
+                      <span className="text-white/80 font-medium">GAURAV</span>
+                      <span className="text-white/50">Account No</span>
+                      <span className="text-white/80 font-medium tracking-wide">
+                        51112853125
+                      </span>
+                      <span className="text-white/50">Bank</span>
+                      <span className="text-white/80 font-medium">
+                        State Bank of India
+                      </span>
+                      <span className="text-white/50">IFSC Code</span>
+                      <span className="text-white/80 font-medium tracking-wider">
+                        SBIN0031580
+                      </span>
+                      <span className="text-white/50">Branch</span>
+                      <span className="text-white/80 font-medium">
+                        Mandir Marg, Saket
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

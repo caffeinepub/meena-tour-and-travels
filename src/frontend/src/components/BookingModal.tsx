@@ -62,9 +62,9 @@ const EMPTY_FORM: FormState = {
 
 const STANDARD_VEHICLES = [
   { value: "Sedan (Standard)", label: "Sedan (Standard)", rate: "₹18–22/km" },
-  { value: "Ertiga", label: "Ertiga", rate: "₹25–32/km" },
-  { value: "Innova Crysta", label: "Innova Crysta", rate: "₹25–32/km" },
-  { value: "Premium SUV", label: "Premium SUV", rate: "₹25–32/km" },
+  { value: "Ertiga", label: "Ertiga", rate: "₹22–28/km" },
+  { value: "Innova Crysta", label: "Innova Crysta", rate: "₹28–35/km" },
+  { value: "Premium SUV", label: "Premium SUV", rate: "₹28–35/km" },
 ];
 
 const VIP_VEHICLES = [
