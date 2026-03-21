@@ -70,6 +70,11 @@ const STANDARD_VEHICLES = [
 const VIP_VEHICLES = [
   { value: "BMW (VIP)", label: "BMW", rate: "On Request" },
   { value: "Mercedes (VIP)", label: "Mercedes", rate: "On Request" },
+  {
+    value: "Land Rover Defender (VIP)",
+    label: "Land Rover Defender",
+    rate: "On Request",
+  },
 ];
 
 export function BookingModal({

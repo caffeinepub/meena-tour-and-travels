@@ -280,7 +280,25 @@ const TRIPS = [
   },
 ];
 
-const TESTIMONIALS = [
+const TESTIMONIALS: {
+  id: number;
+  name: string;
+  role: string;
+  rating: number;
+  review: string;
+  initials: string;
+  photo?: string;
+}[] = [
+  {
+    id: 0,
+    name: "Mangal Singh Lodha",
+    role: "Businessman & Politician, Ministry of Skill Development and Entrepreneurship, Maharashtra",
+    rating: 5,
+    review:
+      "As someone who travels extensively across India for business and ministerial responsibilities, reliability and comfort are non-negotiable. Meena Tour and Travels has been my trusted travel partner for over seven years now. Whether it is a last-minute corporate trip or a planned journey across states, Gaurav and his team have never let me down. Their fleet is impeccable, drivers are professional and experienced, and the service is always on time. For anyone who values punctuality, privacy, and premium travel — Meena Tour and Travels is the only name I recommend.",
+    initials: "ML",
+    photo: "/assets/generated/mangal-singh-lodha-portrait.dim_200x200.jpg",
+  },
   {
     id: 1,
     name: "Rajesh Agarwal",
@@ -319,21 +337,21 @@ const TESTIMONIALS = [
   },
   {
     id: 5,
-    name: "Suresh Gupta",
-    role: "Entrepreneur, UP",
-    rating: 5,
-    review:
-      "I have referred Meena Tour and Travels to at least 20 of my friends and business associates. In 8 years, there has not been a single bad experience. That says everything about their commitment.",
-    initials: "SG",
-  },
-  {
-    id: 6,
     name: "Kavita Sharma",
     role: "HR Head, Noida",
     rating: 5,
     review:
       "We manage travel for over 50 employees monthly through Meena Tour and Travels. The coordination is smooth, drivers are always on time, and Gaurav is always reachable. A truly reliable partner.",
     initials: "KS",
+  },
+  {
+    id: 6,
+    name: "Reliance Industries",
+    role: "Corporate Client, Mumbai",
+    rating: 5,
+    review:
+      "Meena Tour and Travels has been our trusted travel partner for over 8 years. Their professionalism, punctuality, and premium fleet have made them our go-to choice for all executive travel needs across India. Gaurav and his team consistently deliver excellence.",
+    initials: "RI",
   },
 ];
 
@@ -1063,7 +1081,7 @@ export default function App() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                   {[
                     {
-                      model: "Swift Dzire / Honda City / Hyundai Aura",
+                      model: "Swift Dzire / Honda Amaze / Hyundai Aura",
                       tag: "Comfortable Sedan",
                       desc: "Smooth, fuel-efficient sedans ideal for city trips and short journeys. Our own vehicles — ₹18–22/km",
                       badge: "Own Car",
@@ -1153,6 +1171,13 @@ export default function App() {
                       desc: "The pinnacle of luxury travel. For those who demand the very best on every journey.",
                       badge: "VIP",
                       emoji: "🚘",
+                    },
+                    {
+                      model: "Land Rover Defender",
+                      tag: "Luxury SUV",
+                      desc: "Commanding presence with unmatched luxury. Perfect for adventurous executives and VIP off-road journeys.",
+                      badge: "VIP",
+                      emoji: "🛡️",
                     },
                   ].map((car, i) => (
                     <motion.div
@@ -1719,9 +1744,17 @@ export default function App() {
                           &ldquo;{t.review}&rdquo;
                         </p>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
-                            {t.initials}
-                          </div>
+                          {t.photo ? (
+                            <img
+                              src={t.photo}
+                              alt={t.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
+                              {t.initials}
+                            </div>
+                          )}
                           <div>
                             <div className="font-semibold text-sm">
                               {t.name}
@@ -2878,7 +2911,7 @@ export default function App() {
                               <option value="crysta">Innova Crysta</option>
                               <option value="suv">Premium SUV</option>
                               <option value="luxury">
-                                BMW / Mercedes (VIP)
+                                BMW / Mercedes / LR Defender (VIP)
                               </option>
                             </select>
                           </div>
@@ -2938,7 +2971,7 @@ export default function App() {
                                 },
                                 suv: { label: "Premium SUV", min: 28, max: 35 },
                                 luxury: {
-                                  label: "BMW / Mercedes",
+                                  label: "BMW / Mercedes / LR Defender",
                                   min: 0,
                                   max: 0,
                                   isLuxury: true,
@@ -2959,7 +2992,8 @@ export default function App() {
                                 return (
                                   <div className="bg-yellow-50 border border-yellow-300 rounded-lg px-3 py-2 text-sm text-yellow-900 text-center">
                                     <p className="font-semibold">
-                                      ✨ BMW / Mercedes — VIP Service
+                                      ✨ BMW / Mercedes / LR Defender — VIP
+                                      Service
                                     </p>
                                     <p className="text-xs mt-1">
                                       Contact for personalized quote:
