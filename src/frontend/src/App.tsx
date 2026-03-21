@@ -422,8 +422,10 @@ export default function App() {
   const [selectedTrip, setSelectedTrip] = useState<(typeof TRIPS)[0] | null>(
     null,
   );
+  const [destSearch, setDestSearch] = useState<string>("");
   const [routeOrigin, setRouteOrigin] = useState<string>("");
   const [routeDest, setRouteDest] = useState<string>("");
+  const [routeTaxi, setRouteTaxi] = useState<string>("");
   const currentYear = new Date().getFullYear();
 
   function handleFormSubmit(e: React.FormEvent) {
@@ -1305,61 +1307,89 @@ export default function App() {
               </p>
             </motion.div>
 
-            <div
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-              data-ocid="destinations.list"
-            >
-              {TRIPS.map((trip, i) => (
-                <motion.div
-                  key={trip.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: (i % 4) * 0.08, duration: 0.5 }}
-                  data-ocid={`destinations.item.${i + 1}`}
-                  className="group cursor-pointer"
-                  onClick={() => setSelectedTrip(trip)}
+            <input
+              type="text"
+              placeholder="Search destinations... (e.g. Manali, Jaipur, Varanasi)"
+              value={destSearch}
+              onChange={(e) => setDestSearch(e.target.value)}
+              className="w-full border border-input rounded-xl px-4 py-3 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring mb-6 shadow-sm"
+              data-ocid="destinations.search_input"
+            />
+            {(() => {
+              const filteredTrips = TRIPS.filter(
+                (t) =>
+                  t.name.toLowerCase().includes(destSearch.toLowerCase()) ||
+                  (t.description?.toLowerCase() ?? "").includes(
+                    destSearch.toLowerCase(),
+                  ),
+              );
+              if (filteredTrips.length === 0) {
+                return (
+                  <p
+                    className="text-center text-muted-foreground py-10"
+                    data-ocid="destinations.empty_state"
+                  >
+                    No destinations found for "{destSearch}". Try a different
+                    name.
+                  </p>
+                );
+              }
+              return (
+                <div
+                  className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                  data-ocid="destinations.list"
                 >
-                  <div className="relative rounded-xl overflow-hidden shadow-card hover:shadow-hero transition-all hover:-translate-y-1 hover:scale-[1.02]">
-                    <div className="aspect-[4/3] overflow-hidden">
-                      <img
-                        src={trip.image}
-                        alt={trip.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    <div className="absolute top-3 left-3">
-                      <Badge className="bg-primary/90 text-white border-0 text-xs font-semibold backdrop-blur-sm">
-                        {trip.type}
-                      </Badge>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                      <p className="text-white/70 text-xs mb-0.5">
-                        {trip.emoji} {trip.state}
-                      </p>
-                      <h3 className="text-white font-display font-bold text-sm leading-tight mb-1">
-                        {trip.name}
-                      </h3>
-                      <div className="flex items-center justify-between">
-                        <p className="text-white/60 text-xs flex items-center gap-1">
-                          <Navigation2 size={10} />
-                          {trip.approxKm}
-                        </p>
-                        <span className="text-primary text-xs font-semibold bg-white/10 backdrop-blur-sm rounded-full px-2 py-0.5">
-                          Explore →
-                        </span>
+                  {filteredTrips.map((trip, i) => (
+                    <motion.div
+                      key={trip.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: (i % 4) * 0.08, duration: 0.5 }}
+                      data-ocid={`destinations.item.${i + 1}`}
+                      className="group cursor-pointer"
+                      onClick={() => setSelectedTrip(trip)}
+                    >
+                      <div className="relative rounded-xl overflow-hidden shadow-card hover:shadow-hero transition-all hover:-translate-y-1 hover:scale-[1.02]">
+                        <div className="aspect-[4/3] overflow-hidden">
+                          <img
+                            src={trip.image}
+                            alt={trip.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                        <div className="absolute top-3 left-3">
+                          <Badge className="bg-primary/90 text-white border-0 text-xs font-semibold backdrop-blur-sm">
+                            {trip.type}
+                          </Badge>
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 p-3">
+                          <p className="text-white/70 text-xs mb-0.5">
+                            {trip.emoji} {trip.state}
+                          </p>
+                          <h3 className="text-white font-display font-bold text-sm leading-tight mb-1">
+                            {trip.name}
+                          </h3>
+                          <div className="flex items-center justify-between">
+                            <p className="text-white/60 text-xs flex items-center gap-1">
+                              <Navigation2 size={10} />
+                              {trip.approxKm}
+                            </p>
+                            <span className="text-primary text-xs font-semibold bg-white/10 backdrop-blur-sm rounded-full px-2 py-0.5">
+                              Explore →
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                    </motion.div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </section>
-
-        {/* TRIP DETAIL SHEET */}
         <Sheet
           open={!!selectedTrip}
           onOpenChange={(open) => !open && setSelectedTrip(null)}
@@ -1468,8 +1498,6 @@ export default function App() {
             )}
           </SheetContent>
         </Sheet>
-
-        {/* TESTIMONIALS */}
         <section
           id="about"
           className="py-20 bg-gradient-to-br from-primary/5 via-background to-accent/5"
@@ -1630,8 +1658,6 @@ export default function App() {
             </div>
           </div>
         </section>
-
-        {/* RATE CALCULATOR */}
         <section className="py-16 bg-amber-950/5 border-y border-primary/10">
           <div className="container mx-auto px-4">
             <motion.div
@@ -1997,36 +2023,101 @@ export default function App() {
                   },
                 };
                 const cities = [
-                  "Delhi",
                   "Agra",
-                  "Jaipur",
-                  "Haridwar",
-                  "Rishikesh",
-                  "Manali",
-                  "Shimla",
-                  "Chandigarh",
-                  "Mathura",
-                  "Vrindavan",
-                  "Varanasi",
-                  "Ayodhya",
-                  "Amritsar",
-                  "Dehradun",
-                  "Nainital",
-                  "Mussoorie",
-                  "Salasar Balaji",
-                  "Khatu Shyam",
-                  "Pushkar",
-                  "Bikaner",
                   "Ajmer",
-                  "Kota",
-                  "Udaipur",
+                  "Aligarh",
+                  "Allahabad (Prayagraj)",
+                  "Alwar",
+                  "Ambala",
+                  "Amritsar",
+                  "Ayodhya",
+                  "Bareilly",
+                  "Barmer",
+                  "Bharatpur",
+                  "Bhiwani",
+                  "Bikaner",
+                  "Bijnor",
+                  "Bilaspur (HP)",
+                  "Bulandshahr",
+                  "Bundi",
+                  "Chandigarh",
+                  "Chittorgarh",
+                  "Churu",
+                  "Dalhousie",
+                  "Dausa",
+                  "Dehradun",
+                  "Delhi",
+                  "Dharamshala",
+                  "Dholpur",
+                  "Dungarpur",
+                  "Etawah",
+                  "Firozabad",
+                  "Ganganagar",
+                  "Goa",
+                  "Gorakhpur",
+                  "Hanumangarh",
+                  "Hapur",
+                  "Haridwar",
+                  "Hisar",
+                  "Jalandhar",
+                  "Jaipur",
+                  "Jaisalmer",
+                  "Jammu",
+                  "Jhalawar",
+                  "Jhunjhunu",
+                  "Jhansi",
                   "Jodhpur",
+                  "Karauli",
+                  "Karnal",
+                  "Kasauli",
+                  "Kota",
+                  "Kullu",
+                  "Kurukshetra",
+                  "Leh",
+                  "Lucknow",
+                  "Ludhiana",
+                  "Mainpuri",
+                  "Manali",
+                  "Mandi",
+                  "Mathura",
+                  "Meerut",
+                  "Moradabad",
+                  "Mount Abu",
                   "Mumbai",
+                  "Mussoorie",
+                  "Muzaffarnagar",
+                  "Nagaur",
+                  "Nainital",
+                  "Palampur",
+                  "Pali",
+                  "Panipat",
+                  "Pathankot",
+                  "Pushkar",
+                  "Rajsamand",
+                  "Rampur",
+                  "Ranthambore",
+                  "Rishikesh",
+                  "Rohtak",
+                  "Saharanpur",
+                  "Salasar Balaji",
+                  "Sambhal",
+                  "Sawai Madhopur",
+                  "Shamli",
+                  "Shimla",
+                  "Sikar",
+                  "Sirsa",
+                  "Solan",
+                  "Sonipat",
+                  "Spiti",
+                  "Tonk",
+                  "Udaipur",
+                  "Varanasi",
+                  "Vrindavan",
+                  "Khatu Shyam",
                   "Kolkata",
                   "Bangalore",
-                  "Goa",
-                  "Pune",
                   "Hyderabad",
+                  "Pune",
                 ];
                 const key1 =
                   routeOrigin && routeDest ? `${routeOrigin}-${routeDest}` : "";
@@ -2101,6 +2192,30 @@ export default function App() {
                               ))}
                             </select>
                           </div>
+                          <div>
+                            <label
+                              htmlFor="route-taxi"
+                              className="text-sm font-semibold text-foreground mb-1.5 block"
+                            >
+                              Select Taxi Type
+                            </label>
+                            <select
+                              id="route-taxi"
+                              value={routeTaxi}
+                              onChange={(e) => setRouteTaxi(e.target.value)}
+                              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                              data-ocid="route.select"
+                            >
+                              <option value="">Select vehicle type...</option>
+                              <option value="sedan">Sedan</option>
+                              <option value="ertiga">Ertiga</option>
+                              <option value="crysta">Innova Crysta</option>
+                              <option value="suv">Premium SUV</option>
+                              <option value="luxury">
+                                BMW / Mercedes (VIP)
+                              </option>
+                            </select>
+                          </div>
                         </div>
 
                         {route && (
@@ -2126,32 +2241,106 @@ export default function App() {
                                 {route.distance} km
                               </span>
                             </div>
-                            <div className="space-y-1 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">
-                                  Avg Fare (₹28/km)
-                                </span>
-                                <span className="font-bold text-primary">
-                                  ₹
-                                  {(route.distance * 28).toLocaleString(
-                                    "en-IN",
-                                  )}
-                                </span>
-                              </div>
-                              <div className="flex justify-between text-xs text-muted-foreground">
-                                <span>Fare Range</span>
-                                <span>
-                                  ₹
-                                  {(route.distance * 25).toLocaleString(
-                                    "en-IN",
-                                  )}{" "}
-                                  – ₹
-                                  {(route.distance * 35).toLocaleString(
-                                    "en-IN",
-                                  )}
-                                </span>
-                              </div>
-                            </div>
+                            {(() => {
+                              const taxiRates: Record<
+                                string,
+                                {
+                                  label: string;
+                                  min: number;
+                                  max: number;
+                                  isLuxury?: boolean;
+                                }
+                              > = {
+                                sedan: { label: "Sedan", min: 18, max: 22 },
+                                ertiga: { label: "Ertiga", min: 22, max: 28 },
+                                crysta: {
+                                  label: "Innova Crysta",
+                                  min: 35,
+                                  max: 35,
+                                },
+                                suv: { label: "Premium SUV", min: 28, max: 35 },
+                                luxury: {
+                                  label: "BMW / Mercedes",
+                                  min: 0,
+                                  max: 0,
+                                  isLuxury: true,
+                                },
+                              };
+                              const selectedTaxi = routeTaxi
+                                ? taxiRates[routeTaxi]
+                                : null;
+                              if (!selectedTaxi) {
+                                return (
+                                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 text-center">
+                                    ☝️ Select a taxi type above to see fare
+                                    estimate
+                                  </div>
+                                );
+                              }
+                              if (selectedTaxi.isLuxury) {
+                                return (
+                                  <div className="bg-yellow-50 border border-yellow-300 rounded-lg px-3 py-2 text-sm text-yellow-900 text-center">
+                                    <p className="font-semibold">
+                                      ✨ BMW / Mercedes — VIP Service
+                                    </p>
+                                    <p className="text-xs mt-1">
+                                      Contact for personalized quote:
+                                    </p>
+                                    <p className="font-bold text-primary text-base mt-0.5">
+                                      📞 9990104748
+                                    </p>
+                                  </div>
+                                );
+                              }
+                              if (selectedTaxi.min === selectedTaxi.max) {
+                                return (
+                                  <div className="space-y-1 text-sm">
+                                    <div className="flex justify-between">
+                                      <span className="text-muted-foreground">
+                                        {selectedTaxi.label} Fare
+                                      </span>
+                                      <span className="font-bold text-primary">
+                                        ₹
+                                        {(
+                                          route.distance * selectedTaxi.min
+                                        ).toLocaleString("en-IN")}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between text-xs text-muted-foreground">
+                                      <span>Rate</span>
+                                      <span>
+                                        ₹{selectedTaxi.min}/km (fixed)
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="space-y-1 text-sm">
+                                  <div className="flex justify-between">
+                                    <span className="text-muted-foreground">
+                                      {selectedTaxi.label} Fare
+                                    </span>
+                                    <span className="font-bold text-primary">
+                                      ₹
+                                      {(
+                                        route.distance * selectedTaxi.min
+                                      ).toLocaleString("en-IN")}{" "}
+                                      – ₹
+                                      {(
+                                        route.distance * selectedTaxi.max
+                                      ).toLocaleString("en-IN")}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between text-xs text-muted-foreground">
+                                    <span>Rate Range</span>
+                                    <span>
+                                      ₹{selectedTaxi.min}–{selectedTaxi.max}/km
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })()}
                             {route.distance > 500 && (
                               <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
                                 🌙 Long trip — driver night charges ₹300/night
@@ -2192,8 +2381,6 @@ export default function App() {
             </div>
           </div>
         </section>
-
-        {/* CONTACT */}
         <section
           id="contact"
           className="py-16 bg-gradient-to-br from-secondary/40 via-background to-secondary/20"
@@ -2665,8 +2852,6 @@ export default function App() {
             </div>
           </div>
         </section>
-
-        {/* FOOTER */}
         <footer className="bg-primary text-white">
           <div className="container mx-auto px-4 py-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
