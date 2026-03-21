@@ -452,15 +452,16 @@ export default function App() {
               data-ocid="nav.link"
             >
               <img
-                src="/assets/uploads/duty-slip-3-1.jpeg"
+                src="/assets/generated/meena-logo-rectangular-transparent.dim_600x200.png"
                 alt="Meena Tour and Travels"
                 style={{
-                  height: "56px",
-                  width: "auto",
+                  height: "52px",
+                  width: "195px",
                   objectFit: "contain",
                   objectPosition: "left center",
+                  borderRadius: 0,
                 }}
-                className="md:h-14 h-11"
+                className="md:h-14 h-10"
               />
             </a>
 
