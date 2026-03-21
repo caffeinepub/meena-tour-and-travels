@@ -253,6 +253,44 @@ const TRIPS = [
     image:
       "https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80",
   },
+  {
+    id: 13,
+    name: "Ranthambore",
+    state: "Rajasthan",
+    type: "Wildlife & Nature",
+    emoji: "🐯",
+    description:
+      "Home to the majestic Royal Bengal Tiger. Ranthambore National Park offers thrilling jungle safaris, the ancient Ranthambore Fort, and rich wildlife surrounded by scenic Aravalli hills.",
+    highlights: [
+      "Tiger Safari",
+      "Ranthambore Fort",
+      "Padam Lake",
+      "Jogi Mahal",
+    ],
+    bestTime: "October – June",
+    approxKm: "380 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=600&q=80",
+  },
+  {
+    id: 14,
+    name: "Jaisalmer",
+    state: "Rajasthan",
+    type: "Heritage & Desert",
+    emoji: "🏰",
+    description:
+      "The Golden City of Rajasthan. A UNESCO-listed living fort, endless Thar Desert dunes, camel safaris, and vibrant folk culture make Jaisalmer an unforgettable experience.",
+    highlights: [
+      "Jaisalmer Fort",
+      "Sam Sand Dunes",
+      "Camel Safari",
+      "Patwon Ki Haveli",
+    ],
+    bestTime: "October – March",
+    approxKm: "770 km from Delhi",
+    image:
+      "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80",
+  },
 ];
 
 const TESTIMONIALS = [
@@ -452,7 +490,7 @@ export default function App() {
               data-ocid="nav.link"
             >
               <img
-                src="/assets/generated/meena-logo-rectangular-transparent.dim_600x200.png"
+                src="/assets/generated/meena-tour-travels-logo-transparent.dim_600x200.png"
                 alt="Meena Tour and Travels"
                 style={{
                   height: "52px",
