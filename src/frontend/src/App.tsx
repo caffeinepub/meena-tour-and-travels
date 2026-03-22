@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { AdminBookings } from "@/pages/AdminBookings";
+import { type RouteInfo, getRouteInfo } from "@/services/mapmyindia";
 import {
   Award,
   BatteryCharging,
@@ -25,6 +26,7 @@ import {
   Heart,
   Instagram,
   Landmark,
+  Loader2,
   Mail,
   MapPin,
   Menu,
@@ -300,42 +302,6 @@ const TESTIMONIALS: {
     photo: "/assets/generated/mangal-singh-lodha-portrait.dim_200x200.jpg",
   },
   {
-    id: 1,
-    name: "Rajesh Agarwal",
-    role: "Managing Director, Kolkata",
-    rating: 5,
-    review:
-      "We have been using Meena Tour and Travels for our executive travel requirements for the past 9 years. Whether it is airport transfers or outstation trips, Gaurav's team has never let us down. Highly recommended for any corporate requirement.",
-    initials: "RA",
-  },
-  {
-    id: 2,
-    name: "Sunita Verma",
-    role: "Senior Manager, Bangalore",
-    rating: 5,
-    review:
-      "I was referred by a colleague and I am glad I made that call. Their drivers are experienced, the cars are always clean and well-maintained, and the per-km pricing is completely transparent. No hidden charges, ever.",
-    initials: "SV",
-  },
-  {
-    id: 3,
-    name: "Amit Bhardwaj",
-    role: "Business Owner, Delhi",
-    rating: 5,
-    review:
-      "Trusted them for a Haridwar pilgrimage trip with my family of 6. The car had everything — water bottles, charger, first aid. Driver was respectful and knowledgeable about the route. Will book again for Ayodhya next.",
-    initials: "AB",
-  },
-  {
-    id: 4,
-    name: "Priya Mehta",
-    role: "Director, Mumbai",
-    rating: 5,
-    review:
-      "Our company switched to Meena Tour and Travels for all employee travel after one of our MDs recommended them. They handle last-minute bookings professionally and the monthly billing is always accurate.",
-    initials: "PM",
-  },
-  {
     id: 5,
     name: "Reliance Industries",
     role: "Corporate Client, Mumbai",
@@ -480,14 +446,15 @@ export default function App() {
     phone: string;
     message: string;
   } | null>(null);
-  const [whatsAppMenuOpen, setWhatsAppMenuOpen] = useState(false);
+  const [whatsAppSubMenuOpen, setWhatsAppSubMenuOpen] = useState(false);
+  const [callMenuOpen, setCallMenuOpen] = useState(false);
   const [searchDestination, setSearchDestination] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [searchGuests, setSearchGuests] = useState("");
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingDestination, setBookingDestination] = useState("");
-  const [calcKm, setCalcKm] = useState<string>("");
-  const [calcNights, setCalcNights] = useState<string>("");
+  const [mergedNights, setMergedNights] = useState<string>("");
+  const [manualKm, setManualKm] = useState<string>("");
   const [selectedTrip, setSelectedTrip] = useState<(typeof TRIPS)[0] | null>(
     null,
   );
@@ -495,6 +462,9 @@ export default function App() {
   const [routeOrigin, setRouteOrigin] = useState<string>("");
   const [routeDest, setRouteDest] = useState<string>("");
   const [routeTaxi, setRouteTaxi] = useState<string>("");
+  const [liveRouteData, setLiveRouteData] = useState<RouteInfo | null>(null);
+  const [routeLoading, setRouteLoading] = useState(false);
+  const [routeError, setRouteError] = useState<string | null>(null);
   const currentYear = new Date().getFullYear();
 
   function handleFormSubmit(e: React.FormEvent) {
@@ -1027,20 +997,6 @@ Message: ${data.message}`;
               </span>{" "}
               State taxes &amp; toll charges applied as per actuals.
             </div>
-
-            <div className="text-center">
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-white font-semibold px-10 shadow-hero"
-                data-ocid="pricing.primary_button"
-                onClick={() => {
-                  setBookingDestination("");
-                  setBookingOpen(true);
-                }}
-              >
-                Get a Custom Quote
-              </Button>
-            </div>
           </div>
         </section>
 
@@ -1198,7 +1154,7 @@ Message: ${data.message}`;
                     ✨ Premium Service
                   </Badge>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {[
                     {
                       model: "BMW",
@@ -1736,31 +1692,6 @@ Message: ${data.message}`;
               ))}
             </div>
 
-            {/* CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-10 text-center text-white shadow-hero"
-              data-ocid="about.panel"
-            >
-              <h3 className="font-display text-2xl md:text-3xl font-bold mb-3">
-                Ready to Plan Your Perfect Trip?
-              </h3>
-              <p className="text-white/80 max-w-lg mx-auto mb-6 text-base">
-                Get a free quote tailored to your destination, group size, and
-                preferences. No obligations — just a conversation.
-              </p>
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-6 text-base shadow-lg rounded-xl"
-                data-ocid="about.primary_button"
-                onClick={() => setBookingOpen(true)}
-              >
-                Request a Free Quote 🚀
-              </Button>
-            </motion.div>
-
             {/* Testimonials */}
             <div className="mt-16">
               <h3 className="font-display text-2xl font-bold text-center text-foreground mb-8">
@@ -1823,1396 +1754,1302 @@ Message: ${data.message}`;
               className="text-center mb-10"
             >
               <Badge className="bg-primary/10 text-primary border-primary/20 mb-3">
-                Trip Cost Estimator
+                Route &amp; Fare Estimator
               </Badge>
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-                Estimate Your Trip Cost
+                Plan Your Trip &amp; Estimate Fare
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto text-sm">
-                Get an instant estimate based on distance. Final rates vary
-                between ₹28–₹35/km. State taxes, toll charges, and extra as per
-                actuals.
+                Enter your route to get highway details, distance, and an
+                instant fare estimate.
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              {/* Calculator */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
-                <Card className="border-0 shadow-hero overflow-hidden">
-                  <div className="h-1.5 bg-gradient-to-r from-primary via-primary/70 to-accent" />
-                  <CardContent className="p-6 md:p-8">
-                    <h3 className="font-display font-bold text-xl mb-6 text-foreground">
-                      Quick Fare Calculator
-                    </h3>
-                    <div className="space-y-5">
-                      <div>
-                        <label
-                          htmlFor="calc-km"
-                          className="text-sm font-semibold text-foreground mb-1.5 block"
-                        >
-                          Distance (km)
-                        </label>
-                        <Input
-                          id="calc-km"
-                          type="number"
-                          placeholder="e.g. 300"
-                          value={calcKm}
-                          onChange={(e) => setCalcKm(e.target.value)}
-                          className="text-base"
-                          data-ocid="calculator.input"
-                          min="0"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="calc-nights"
-                          className="text-sm font-semibold text-foreground mb-1.5 block"
-                        >
-                          Driver Night Stays
-                        </label>
-                        <Input
-                          id="calc-nights"
-                          type="number"
-                          placeholder="e.g. 2"
-                          value={calcNights}
-                          onChange={(e) => setCalcNights(e.target.value)}
-                          className="text-base"
-                          data-ocid="calculator.input"
-                          min="0"
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          ₹300 per night for driver stay
-                        </p>
-                      </div>
-                    </div>
+            {(() => {
+              const routeData: Record<
+                string,
+                {
+                  distance: number;
+                  highway: string;
+                  time: number;
+                  note?: string;
+                }
+              > = {
+                "Delhi-Agra": {
+                  distance: 233,
+                  highway: "NH 19 (Yamuna Expressway)",
+                  time: 3,
+                },
+                "Delhi-Jaipur": {
+                  distance: 282,
+                  highway: "NH 48 (Delhi–Jaipur Expressway)",
+                  time: 4.5,
+                },
+                "Delhi-Haridwar": {
+                  distance: 220,
+                  highway: "NH 334 via Meerut–Muzaffarnagar",
+                  time: 4,
+                },
+                "Delhi-Rishikesh": {
+                  distance: 245,
+                  highway: "NH 334 & NH 7",
+                  time: 4.5,
+                },
+                "Delhi-Manali": {
+                  distance: 540,
+                  highway: "NH 44 via Chandigarh & Kullu",
+                  time: 13,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Shimla": {
+                  distance: 370,
+                  highway: "NH 44 & NH 5 via Chandigarh",
+                  time: 8,
+                },
+                "Delhi-Chandigarh": {
+                  distance: 260,
+                  highway: "NH 44 (Delhi–Chandigarh Expressway)",
+                  time: 4.5,
+                },
+                "Delhi-Mathura": {
+                  distance: 183,
+                  highway: "NH 19 (Yamuna Expressway)",
+                  time: 2.5,
+                },
+                "Delhi-Vrindavan": {
+                  distance: 187,
+                  highway: "NH 19 (Yamuna Expressway)",
+                  time: 2.5,
+                },
+                "Delhi-Varanasi": {
+                  distance: 820,
+                  highway: "NH 19 via Agra & Allahabad",
+                  time: 14,
+                  note: "Overnight trip",
+                },
+                "Delhi-Ayodhya": {
+                  distance: 690,
+                  highway: "NH 27 via Lucknow",
+                  time: 11,
+                },
+                "Delhi-Amritsar": {
+                  distance: 452,
+                  highway: "NH 44 via Ludhiana",
+                  time: 7,
+                },
+                "Delhi-Dehradun": {
+                  distance: 300,
+                  highway: "NH 334 & NH 72A",
+                  time: 6,
+                },
+                "Delhi-Nainital": {
+                  distance: 310,
+                  highway: "NH 9 via Moradabad",
+                  time: 6.5,
+                },
+                "Delhi-Mussoorie": {
+                  distance: 295,
+                  highway: "NH 334 via Dehradun",
+                  time: 6,
+                },
+                "Delhi-Salasar Balaji": {
+                  distance: 395,
+                  highway: "NH 48 & SH 8 (Rajasthan)",
+                  time: 7,
+                },
+                "Delhi-Khatu Shyam": {
+                  distance: 375,
+                  highway: "NH 48 via Sikar",
+                  time: 6.5,
+                },
+                "Delhi-Pushkar": {
+                  distance: 410,
+                  highway: "NH 48 via Ajmer",
+                  time: 7,
+                },
+                "Delhi-Bikaner": {
+                  distance: 490,
+                  highway: "NH 62 via Hanumangarh",
+                  time: 8,
+                },
+                "Delhi-Ajmer": { distance: 390, highway: "NH 48", time: 6.5 },
+                "Delhi-Kota": {
+                  distance: 490,
+                  highway: "NH 52 via Dausa",
+                  time: 8,
+                },
+                "Delhi-Mumbai": {
+                  distance: 1450,
+                  highway: "NH 48 (Delhi–Mumbai Expressway)",
+                  time: 24,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Kolkata": {
+                  distance: 1530,
+                  highway: "NH 19 via Varanasi",
+                  time: 26,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Bangalore": {
+                  distance: 2150,
+                  highway: "NH 44 via Nagpur",
+                  time: 36,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Goa": {
+                  distance: 1900,
+                  highway: "NH 48 via Mumbai",
+                  time: 32,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Pune": {
+                  distance: 1490,
+                  highway: "NH 48 via Jaipur & Mumbai",
+                  time: 25,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Hyderabad": {
+                  distance: 1650,
+                  highway: "NH 44 via Nagpur",
+                  time: 28,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Jodhpur": {
+                  distance: 605,
+                  highway: "NH 48 via Jaipur",
+                  time: 10,
+                  note: "Long trip",
+                },
+                "Delhi-Udaipur": {
+                  distance: 660,
+                  highway: "NH 48 via Jaipur & Ajmer",
+                  time: 11,
+                  note: "Long trip",
+                },
+                "Delhi-Jaisalmer": {
+                  distance: 870,
+                  highway: "NH 48 via Jaipur & Jodhpur",
+                  time: 14,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Sawai Madhopur": {
+                  distance: 385,
+                  highway: "NH 48 & NH 52 via Dausa",
+                  time: 7,
+                },
+                "Delhi-Ranthambore": {
+                  distance: 390,
+                  highway: "NH 48 & NH 52",
+                  time: 7,
+                },
+                "Delhi-Chittorgarh": {
+                  distance: 595,
+                  highway: "NH 48 via Jaipur",
+                  time: 10,
+                },
+                "Delhi-Bundi": {
+                  distance: 490,
+                  highway: "NH 48 & NH 52 via Kota",
+                  time: 8,
+                },
+                "Delhi-Tonk": {
+                  distance: 350,
+                  highway: "NH 48 via Jaipur",
+                  time: 6.5,
+                },
+                "Delhi-Sikar": {
+                  distance: 330,
+                  highway: "NH 48 via Jaipur",
+                  time: 6,
+                },
+                "Delhi-Barmer": {
+                  distance: 820,
+                  highway: "NH 62 via Bikaner",
+                  time: 14,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Pali": {
+                  distance: 530,
+                  highway: "NH 62 via Jodhpur",
+                  time: 9,
+                },
+                "Delhi-Nagaur": {
+                  distance: 460,
+                  highway: "NH 62 via Bikaner bypass",
+                  time: 8,
+                },
+                "Delhi-Bharatpur": {
+                  distance: 200,
+                  highway: "NH 21 via Agra road",
+                  time: 3.5,
+                },
+                "Delhi-Alwar": {
+                  distance: 165,
+                  highway: "NH 248 via Rewari",
+                  time: 3,
+                },
+                "Delhi-Lucknow": {
+                  distance: 555,
+                  highway: "NH 27 (Agra–Lucknow Expressway)",
+                  time: 8,
+                },
+                "Delhi-Allahabad (Prayagraj)": {
+                  distance: 645,
+                  highway: "NH 19 via Agra",
+                  time: 10,
+                },
+                "Delhi-Kanpur": {
+                  distance: 480,
+                  highway: "NH 19 via Agra–Lucknow Expressway",
+                  time: 7,
+                },
+                "Delhi-Meerut": {
+                  distance: 70,
+                  highway: "NH 58 (Delhi–Meerut Expressway)",
+                  time: 1.5,
+                },
+                "Delhi-Moradabad": { distance: 165, highway: "NH 9", time: 3 },
+                "Delhi-Karnal": { distance: 130, highway: "NH 44", time: 2.5 },
+                "Delhi-Panipat": { distance: 90, highway: "NH 44", time: 2 },
+                "Delhi-Sonipat": { distance: 45, highway: "NH 44", time: 1 },
+                "Delhi-Rohtak": { distance: 75, highway: "NH 9", time: 1.5 },
+                "Delhi-Gurgaon": {
+                  distance: 32,
+                  highway: "NH 48 (Delhi–Gurugram Expressway)",
+                  time: 1,
+                },
+                "Delhi-Faridabad": { distance: 30, highway: "NH 19", time: 1 },
+                "Delhi-Noida": {
+                  distance: 20,
+                  highway: "DND Flyway / NH 24",
+                  time: 0.5,
+                },
+                "Delhi-Ludhiana": {
+                  distance: 320,
+                  highway: "NH 44",
+                  time: 5.5,
+                },
+                "Delhi-Jalandhar": { distance: 375, highway: "NH 44", time: 6 },
+                "Delhi-Pathankot": {
+                  distance: 440,
+                  highway: "NH 44 via Jalandhar",
+                  time: 7.5,
+                },
+                "Delhi-Dharamshala": {
+                  distance: 475,
+                  highway: "NH 44 via Pathankot",
+                  time: 8.5,
+                },
+                "Delhi-Dalhousie": {
+                  distance: 560,
+                  highway: "NH 44 via Pathankot",
+                  time: 10,
+                },
+                "Delhi-Kullu": {
+                  distance: 505,
+                  highway: "NH 44 via Chandigarh",
+                  time: 11,
+                },
+                "Delhi-Kasauli": {
+                  distance: 300,
+                  highway: "NH 44 via Chandigarh",
+                  time: 5.5,
+                },
+                "Delhi-Solan": {
+                  distance: 340,
+                  highway: "NH 44 via Chandigarh",
+                  time: 6,
+                },
+                "Delhi-Spiti": {
+                  distance: 740,
+                  highway: "NH 5 via Shimla–Kinnaur",
+                  time: 16,
+                  note: "Multi-day trip",
+                },
+                "Delhi-Jammu": {
+                  distance: 595,
+                  highway: "NH 44 via Pathankot",
+                  time: 10,
+                },
+                "Delhi-Vaishno Devi": {
+                  distance: 650,
+                  highway: "NH 44 via Jammu",
+                  time: 11,
+                },
+                "Delhi-Hanumangarh": {
+                  distance: 450,
+                  highway: "NH 9 via Sirsa",
+                  time: 8,
+                },
+                "Delhi-Sirsa": {
+                  distance: 290,
+                  highway: "NH 9 via Hisar",
+                  time: 5,
+                },
+                "Delhi-Hisar": { distance: 165, highway: "NH 9", time: 3 },
+                "Delhi-Bhiwani": {
+                  distance: 130,
+                  highway: "NH 9 via Rohtak",
+                  time: 2.5,
+                },
+                "Delhi-Sambhal": {
+                  distance: 160,
+                  highway: "NH 9 via Moradabad",
+                  time: 3,
+                },
+                "Delhi-Shamli": {
+                  distance: 115,
+                  highway: "NH 58 via Muzaffarnagar",
+                  time: 2,
+                },
+                "Delhi-Bulandshahr": {
+                  distance: 80,
+                  highway: "NH 9 via Noida",
+                  time: 1.5,
+                },
+                "Delhi-Etah": {
+                  distance: 200,
+                  highway: "NH 19 via Aligarh",
+                  time: 3.5,
+                },
+                "Jaipur-Agra": {
+                  distance: 238,
+                  highway: "NH 21 (Agra–Jaipur Expressway)",
+                  time: 4,
+                },
+                "Jaipur-Udaipur": {
+                  distance: 397,
+                  highway: "NH 48 via Ajmer",
+                  time: 7,
+                },
+                "Jaipur-Jodhpur": { distance: 340, highway: "NH 62", time: 6 },
+                "Jaipur-Ajmer": { distance: 135, highway: "NH 48", time: 2.5 },
+                "Jaipur-Pushkar": {
+                  distance: 150,
+                  highway: "NH 48 via Ajmer",
+                  time: 2.5,
+                },
+                "Jaipur-Bikaner": {
+                  distance: 330,
+                  highway: "NH 62 via Sikar–Fatehpur",
+                  time: 5.5,
+                },
+                "Jaipur-Kota": { distance: 250, highway: "NH 52", time: 4.5 },
+                "Jaipur-Bundi": {
+                  distance: 210,
+                  highway: "NH 52 via Kota",
+                  time: 3.5,
+                },
+                "Jaipur-Chittorgarh": {
+                  distance: 320,
+                  highway: "NH 48 via Ajmer",
+                  time: 5.5,
+                },
+                "Jaipur-Sawai Madhopur": {
+                  distance: 165,
+                  highway: "NH 52",
+                  time: 3,
+                },
+                "Jaipur-Ranthambore": {
+                  distance: 165,
+                  highway: "NH 52",
+                  time: 3,
+                },
+                "Jaipur-Sikar": {
+                  distance: 110,
+                  highway: "NH 52 via Chomu",
+                  time: 2,
+                },
+                "Jaipur-Khatu Shyam": {
+                  distance: 130,
+                  highway: "NH 52 via Sikar",
+                  time: 2.5,
+                },
+                "Jaipur-Salasar Balaji": {
+                  distance: 175,
+                  highway: "NH 52 via Sikar",
+                  time: 3,
+                },
+                "Jaipur-Bharatpur": {
+                  distance: 185,
+                  highway: "NH 21",
+                  time: 3.5,
+                },
+                "Jaipur-Alwar": {
+                  distance: 148,
+                  highway: "NH 248 via Kotputli",
+                  time: 3,
+                },
+                "Jaipur-Tonk": { distance: 100, highway: "NH 48", time: 2 },
+                "Jaipur-Nagaur": {
+                  distance: 200,
+                  highway: "NH 62 via Degana",
+                  time: 3.5,
+                },
+                "Jaipur-Barmer": {
+                  distance: 580,
+                  highway: "NH 62 via Jodhpur",
+                  time: 10,
+                },
+                "Jaipur-Pali": {
+                  distance: 260,
+                  highway: "NH 62 via Jodhpur bypass",
+                  time: 4.5,
+                },
+                "Jaipur-Jaisalmer": {
+                  distance: 570,
+                  highway: "NH 62 via Jodhpur",
+                  time: 10,
+                },
+                "Jaipur-Varanasi": {
+                  distance: 760,
+                  highway: "NH 19 via Agra",
+                  time: 13,
+                },
+                "Jaipur-Lucknow": {
+                  distance: 550,
+                  highway: "NH 19 via Agra–Lucknow",
+                  time: 9,
+                },
+                "Agra-Mathura": {
+                  distance: 58,
+                  highway: "NH 19 (Yamuna Expressway)",
+                  time: 1,
+                },
+                "Lucknow-Gorakhpur": {
+                  distance: 265,
+                  highway: "NH 28",
+                  time: 5,
+                },
+                "Chandigarh-Amritsar": {
+                  distance: 230,
+                  highway: "NH 44",
+                  time: 4,
+                },
+                "Chandigarh-Ludhiana": {
+                  distance: 100,
+                  highway: "NH 44",
+                  time: 2,
+                },
+                "Chandigarh-Shimla": {
+                  distance: 115,
+                  highway: "NH 5",
+                  time: 3,
+                },
+                "Chandigarh-Manali": {
+                  distance: 310,
+                  highway: "NH 3 via Kullu",
+                  time: 8,
+                },
+                "Chandigarh-Dharamshala": {
+                  distance: 245,
+                  highway: "NH 44 via Pathankot",
+                  time: 5,
+                },
+                "Chandigarh-Pathankot": {
+                  distance: 180,
+                  highway: "NH 44",
+                  time: 3.5,
+                },
+                "Chandigarh-Jalandhar": {
+                  distance: 145,
+                  highway: "NH 44",
+                  time: 2.5,
+                },
+                "Amritsar-Pathankot": {
+                  distance: 100,
+                  highway: "NH 44",
+                  time: 2,
+                },
+                "Amritsar-Dharamshala": {
+                  distance: 185,
+                  highway: "NH 44 via Pathankot",
+                  time: 4,
+                },
+                "Amritsar-Jalandhar": {
+                  distance: 80,
+                  highway: "NH 44",
+                  time: 1.5,
+                },
+                "Amritsar-Ludhiana": {
+                  distance: 155,
+                  highway: "NH 44",
+                  time: 3,
+                },
+                "Jodhpur-Udaipur": {
+                  distance: 270,
+                  highway: "NH 62 via Pali",
+                  time: 5,
+                },
+                "Jodhpur-Bikaner": {
+                  distance: 245,
+                  highway: "NH 65",
+                  time: 4.5,
+                },
+                "Jodhpur-Jaisalmer": {
+                  distance: 290,
+                  highway: "NH 125",
+                  time: 5,
+                },
+                "Jodhpur-Ajmer": {
+                  distance: 200,
+                  highway: "NH 62 via Pali",
+                  time: 4,
+                },
+                "Jodhpur-Pushkar": {
+                  distance: 190,
+                  highway: "NH 62 via Pali & Ajmer",
+                  time: 4,
+                },
+                "Jodhpur-Barmer": { distance: 220, highway: "NH 125", time: 4 },
+                "Jodhpur-Pali": { distance: 72, highway: "NH 62", time: 1.5 },
+                "Jodhpur-Nagaur": {
+                  distance: 140,
+                  highway: "NH 65",
+                  time: 2.5,
+                },
+                "Udaipur-Chittorgarh": {
+                  distance: 115,
+                  highway: "NH 48",
+                  time: 2,
+                },
+                "Udaipur-Kota": {
+                  distance: 255,
+                  highway: "NH 52 via Chittorgarh",
+                  time: 4.5,
+                },
+                "Udaipur-Ajmer": { distance: 275, highway: "NH 48", time: 5 },
+                "Udaipur-Bikaner": {
+                  distance: 510,
+                  highway: "NH 62 via Jodhpur",
+                  time: 9,
+                },
+                "Udaipur-Pushkar": {
+                  distance: 260,
+                  highway: "NH 48 via Ajmer",
+                  time: 4.5,
+                },
+                "Udaipur-Nathdwara": {
+                  distance: 48,
+                  highway: "NH 48",
+                  time: 1,
+                },
+                "Udaipur-Abu Road": {
+                  distance: 160,
+                  highway: "NH 27",
+                  time: 3,
+                },
+                "Udaipur-Ahmedabad": {
+                  distance: 260,
+                  highway: "NH 48",
+                  time: 4.5,
+                },
+                "Shimla-Manali": {
+                  distance: 270,
+                  highway: "NH 3 via Kullu",
+                  time: 8,
+                },
+                "Shimla-Dharamshala": {
+                  distance: 250,
+                  highway: "NH 154A via Bilaspur",
+                  time: 7,
+                },
+                "Shimla-Kullu": { distance: 235, highway: "NH 3", time: 6 },
+                "Shimla-Kasauli": { distance: 70, highway: "NH 22", time: 2 },
+                "Shimla-Solan": { distance: 45, highway: "NH 5", time: 1 },
+                "Varanasi-Allahabad (Prayagraj)": {
+                  distance: 125,
+                  highway: "NH 19",
+                  time: 2.5,
+                },
+                "Varanasi-Ayodhya": {
+                  distance: 200,
+                  highway: "NH 27 via Sultanpur",
+                  time: 4,
+                },
+                "Varanasi-Gorakhpur": {
+                  distance: 230,
+                  highway: "NH 29",
+                  time: 4.5,
+                },
+                "Mathura-Vrindavan": {
+                  distance: 12,
+                  highway: "Local Road (Mathura–Vrindavan Road)",
+                  time: 0.3,
+                },
+                "Mathura-Agra": {
+                  distance: 58,
+                  highway: "NH 19 (Yamuna Expressway)",
+                  time: 1,
+                },
+                "Nainital-Corbett": {
+                  distance: 65,
+                  highway: "SH 18 via Ramnagar",
+                  time: 2,
+                },
+                "Meerut-Haridwar": {
+                  distance: 165,
+                  highway: "NH 58 via Muzaffarnagar",
+                  time: 3,
+                },
+                "Meerut-Mathura": {
+                  distance: 155,
+                  highway: "NH 58 via Palwal",
+                  time: 3,
+                },
+                "Meerut-Moradabad": {
+                  distance: 130,
+                  highway: "NH 9",
+                  time: 2.5,
+                },
+              };
 
-                    {calcKm && Number(calcKm) > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-6 bg-gradient-to-br from-primary/5 to-teal-50 border border-primary/15 rounded-xl p-5 space-y-3"
-                        data-ocid="calculator.success_state"
-                      >
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-muted-foreground">
-                            Base Fare (avg ₹28/km)
-                          </span>
-                          <span className="font-semibold text-foreground">
-                            ₹{(Number(calcKm) * 28).toLocaleString("en-IN")}
-                          </span>
+              const cities = [
+                "Agra",
+                "Ajmer",
+                "Aligarh",
+                "Allahabad (Prayagraj)",
+                "Alwar",
+                "Ambala",
+                "Amritsar",
+                "Ayodhya",
+                "Bareilly",
+                "Barmer",
+                "Bharatpur",
+                "Bhiwani",
+                "Bikaner",
+                "Bijnor",
+                "Bilaspur (HP)",
+                "Bulandshahr",
+                "Bundi",
+                "Chandigarh",
+                "Chittorgarh",
+                "Churu",
+                "Dalhousie",
+                "Dausa",
+                "Dehradun",
+                "Delhi",
+                "Dharamshala",
+                "Dholpur",
+                "Dungarpur",
+                "Etawah",
+                "Firozabad",
+                "Ganganagar",
+                "Goa",
+                "Gorakhpur",
+                "Hanumangarh",
+                "Hapur",
+                "Haridwar",
+                "Hisar",
+                "Jalandhar",
+                "Jaipur",
+                "Jaisalmer",
+                "Jammu",
+                "Jhalawar",
+                "Jhunjhunu",
+                "Jhansi",
+                "Jodhpur",
+                "Karauli",
+                "Karnal",
+                "Kasauli",
+                "Khatu Shyam",
+                "Kolkata",
+                "Kota",
+                "Kullu",
+                "Lucknow",
+                "Ludhiana",
+                "Manali",
+                "Mathura",
+                "Meerut",
+                "Moradabad",
+                "Mount Abu",
+                "Mumbai",
+                "Mussoorie",
+                "Muzaffarnagar",
+                "Nagaur",
+                "Nainital",
+                "Palampur",
+                "Pali",
+                "Panipat",
+                "Pathankot",
+                "Pushkar",
+                "Rajsamand",
+                "Rampur",
+                "Ranthambore",
+                "Rishikesh",
+                "Rohtak",
+                "Saharanpur",
+                "Salasar Balaji",
+                "Sambhal",
+                "Sawai Madhopur",
+                "Shamli",
+                "Shimla",
+                "Sikar",
+                "Sirsa",
+                "Solan",
+                "Sonipat",
+                "Spiti",
+                "Tonk",
+                "Udaipur",
+                "Varanasi",
+                "Vrindavan",
+                "Bangalore",
+                "Hyderabad",
+                "Pune",
+              ];
+
+              const taxiRates: Record<
+                string,
+                { label: string; min: number; max: number; isLuxury?: boolean }
+              > = {
+                sedan: { label: "Sedan", min: 18, max: 22 },
+                ertiga: { label: "Ertiga", min: 22, max: 28 },
+                crysta: { label: "Innova Crysta", min: 28, max: 35 },
+                suv: { label: "Premium SUV", min: 28, max: 35 },
+                luxury: {
+                  label: "BMW / Mercedes / LR Defender",
+                  min: 0,
+                  max: 0,
+                  isLuxury: true,
+                },
+              };
+
+              const key1 =
+                routeOrigin && routeDest ? `${routeOrigin}-${routeDest}` : "";
+              const key2 =
+                routeOrigin && routeDest ? `${routeDest}-${routeOrigin}` : "";
+              const route = routeData[key1] || routeData[key2] || null;
+              const noRoute =
+                routeOrigin && routeDest && routeOrigin !== routeDest && !route;
+              const sameCity =
+                routeOrigin && routeDest && routeOrigin === routeDest;
+
+              // Determine km to use for fare calc (live data takes priority)
+              const kmForFare = liveRouteData
+                ? liveRouteData.distanceKm
+                : route
+                  ? route.distance
+                  : manualKm && Number(manualKm) > 0
+                    ? Number(manualKm)
+                    : 0;
+
+              const selectedTaxi = routeTaxi ? taxiRates[routeTaxi] : null;
+              const nightCharges =
+                mergedNights && Number(mergedNights) > 0
+                  ? Number(mergedNights) * 300
+                  : 0;
+              const fareMin =
+                selectedTaxi && !selectedTaxi.isLuxury && kmForFare > 0
+                  ? kmForFare * selectedTaxi.min
+                  : 0;
+              const fareMax =
+                selectedTaxi && !selectedTaxi.isLuxury && kmForFare > 0
+                  ? kmForFare * selectedTaxi.max
+                  : 0;
+
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="max-w-4xl mx-auto"
+                >
+                  <Card className="border-0 shadow-hero overflow-hidden">
+                    <div className="h-1.5 bg-gradient-to-r from-primary via-amber-400 to-accent" />
+                    <CardContent className="p-6 md:p-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        {/* From */}
+                        <div>
+                          <label
+                            htmlFor="route-origin"
+                            className="text-sm font-semibold text-foreground mb-1.5 block"
+                          >
+                            📍 From (Origin)
+                          </label>
+                          <select
+                            id="route-origin"
+                            value={routeOrigin}
+                            onChange={(e) => {
+                              setRouteOrigin(e.target.value);
+                              setLiveRouteData(null);
+                              setRouteError(null);
+                            }}
+                            className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            data-ocid="route.select"
+                          >
+                            <option value="">Select city...</option>
+                            {cities.map((c) => (
+                              <option key={c} value={c}>
+                                {c}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                        <div className="flex justify-between items-center text-xs text-muted-foreground">
-                          <span>Range (₹28–₹35/km)</span>
-                          <span>
-                            ₹{(Number(calcKm) * 25).toLocaleString("en-IN")} – ₹
-                            {(Number(calcKm) * 32).toLocaleString("en-IN")}
-                          </span>
+                        {/* To */}
+                        <div>
+                          <label
+                            htmlFor="route-dest"
+                            className="text-sm font-semibold text-foreground mb-1.5 block"
+                          >
+                            🏁 To (Destination)
+                          </label>
+                          <select
+                            id="route-dest"
+                            value={routeDest}
+                            onChange={(e) => {
+                              setRouteDest(e.target.value);
+                              setLiveRouteData(null);
+                              setRouteError(null);
+                            }}
+                            className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            data-ocid="route.select"
+                          >
+                            <option value="">Select city...</option>
+                            {cities.map((c) => (
+                              <option key={c} value={c}>
+                                {c}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                        {calcNights && Number(calcNights) > 0 && (
-                          <div className="flex justify-between items-center text-sm">
-                            <span className="text-muted-foreground">
-                              Driver Night Charges ({calcNights} night
-                              {Number(calcNights) > 1 ? "s" : ""})
+                        {/* Taxi type */}
+                        <div>
+                          <label
+                            htmlFor="route-taxi"
+                            className="text-sm font-semibold text-foreground mb-1.5 block"
+                          >
+                            🚗 Select Taxi Type
+                          </label>
+                          <select
+                            id="route-taxi"
+                            value={routeTaxi}
+                            onChange={(e) => setRouteTaxi(e.target.value)}
+                            className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            data-ocid="route.select"
+                          >
+                            <option value="">Select vehicle type...</option>
+                            <option value="sedan">
+                              Sedan (Swift Dzire / Aura / Amaze) — ₹18–22/km
+                            </option>
+                            <option value="ertiga">Ertiga — ₹22–28/km</option>
+                            <option value="crysta">
+                              Innova Crysta — ₹28–35/km
+                            </option>
+                            <option value="suv">Premium SUV — ₹28–35/km</option>
+                            <option value="luxury">
+                              BMW / Mercedes / LR Defender (VIP)
+                            </option>
+                          </select>
+                        </div>
+                        {/* Night stays */}
+                        <div>
+                          <label
+                            htmlFor="merged-nights"
+                            className="text-sm font-semibold text-foreground mb-1.5 block"
+                          >
+                            🌙 Driver Night Stays{" "}
+                            <span className="text-muted-foreground font-normal">
+                              (optional)
                             </span>
-                            <span className="font-semibold text-foreground">
-                              ₹
-                              {(Number(calcNights) * 300).toLocaleString(
-                                "en-IN",
+                          </label>
+                          <Input
+                            id="merged-nights"
+                            type="number"
+                            placeholder="e.g. 2"
+                            value={mergedNights}
+                            onChange={(e) => setMergedNights(e.target.value)}
+                            className="text-base"
+                            data-ocid="calculator.input"
+                            min="0"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            ₹300 per night for driver stay
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Search Route button */}
+                      {routeOrigin &&
+                        routeDest &&
+                        routeOrigin !== routeDest && (
+                          <div className="flex gap-3 items-center mb-2">
+                            <Button
+                              onClick={async () => {
+                                setRouteLoading(true);
+                                setRouteError(null);
+                                setLiveRouteData(null);
+                                const result = await getRouteInfo(
+                                  routeOrigin,
+                                  routeDest,
+                                );
+                                if (result) {
+                                  setLiveRouteData(result);
+                                } else {
+                                  setRouteError(
+                                    "Live data unavailable. Showing estimated data.",
+                                  );
+                                }
+                                setRouteLoading(false);
+                              }}
+                              disabled={routeLoading}
+                              className="bg-primary text-white"
+                              data-ocid="route.primary_button"
+                            >
+                              {routeLoading ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                                  Fetching Live Data...
+                                </>
+                              ) : (
+                                <>
+                                  <Navigation2 className="mr-2 h-4 w-4" />{" "}
+                                  Search Live Route
+                                </>
                               )}
-                            </span>
+                            </Button>
+                            {routeError && (
+                              <p className="text-xs text-amber-600">
+                                {routeError}
+                              </p>
+                            )}
                           </div>
                         )}
-                        <div className="border-t border-primary/15 pt-3 flex justify-between items-center">
-                          <span className="font-bold text-foreground">
-                            Estimated Total
-                          </span>
-                          <span className="font-bold text-primary text-lg">
-                            ₹
-                            {(
-                              Number(calcKm) * 28 +
-                              (Number(calcNights) || 0) * 300
-                            ).toLocaleString("en-IN")}
-                          </span>
-                        </div>
-                        <p className="text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                          ⚠️ State taxes, toll charges, and driver night charges
-                          are extra as per actuals. Final rate may vary between
-                          ₹28–₹35 per km.
-                        </p>
-                      </motion.div>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
 
-              {/* Trip Route Guide */}
-              {(() => {
-                const routeData: Record<
-                  string,
-                  {
-                    distance: number;
-                    highway: string;
-                    time: number;
-                    note?: string;
-                  }
-                > = {
-                  "Delhi-Agra": {
-                    distance: 233,
-                    highway: "NH 19 (Yamuna Expressway)",
-                    time: 3,
-                  },
-                  "Delhi-Jaipur": {
-                    distance: 282,
-                    highway: "NH 48 (Delhi–Jaipur Expressway)",
-                    time: 4.5,
-                  },
-                  "Delhi-Haridwar": {
-                    distance: 220,
-                    highway: "NH 334 via Meerut–Muzaffarnagar",
-                    time: 4,
-                  },
-                  "Delhi-Rishikesh": {
-                    distance: 245,
-                    highway: "NH 334 & NH 7",
-                    time: 4.5,
-                  },
-                  "Delhi-Manali": {
-                    distance: 540,
-                    highway: "NH 44 via Chandigarh & Kullu",
-                    time: 13,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Shimla": {
-                    distance: 370,
-                    highway: "NH 44 & NH 5 via Chandigarh",
-                    time: 8,
-                  },
-                  "Delhi-Chandigarh": {
-                    distance: 260,
-                    highway: "NH 44 (Delhi–Chandigarh Expressway)",
-                    time: 4.5,
-                  },
-                  "Delhi-Mathura": {
-                    distance: 183,
-                    highway: "NH 19 (Yamuna Expressway)",
-                    time: 2.5,
-                  },
-                  "Delhi-Vrindavan": {
-                    distance: 187,
-                    highway: "NH 19 (Yamuna Expressway)",
-                    time: 2.5,
-                  },
-                  "Delhi-Varanasi": {
-                    distance: 820,
-                    highway: "NH 19 via Agra & Allahabad",
-                    time: 14,
-                    note: "Overnight trip",
-                  },
-                  "Delhi-Ayodhya": {
-                    distance: 690,
-                    highway: "NH 27 via Lucknow",
-                    time: 11,
-                  },
-                  "Delhi-Amritsar": {
-                    distance: 452,
-                    highway: "NH 44 via Ludhiana",
-                    time: 7,
-                  },
-                  "Delhi-Dehradun": {
-                    distance: 300,
-                    highway: "NH 334 & NH 72A",
-                    time: 6,
-                  },
-                  "Delhi-Nainital": {
-                    distance: 310,
-                    highway: "NH 9 via Moradabad",
-                    time: 6.5,
-                  },
-                  "Delhi-Mussoorie": {
-                    distance: 295,
-                    highway: "NH 334 via Dehradun",
-                    time: 6,
-                  },
-                  "Delhi-Salasar Balaji": {
-                    distance: 395,
-                    highway: "NH 48 & SH 8 (Rajasthan)",
-                    time: 7,
-                  },
-                  "Delhi-Khatu Shyam": {
-                    distance: 375,
-                    highway: "NH 48 via Sikar",
-                    time: 6.5,
-                  },
-                  "Delhi-Pushkar": {
-                    distance: 410,
-                    highway: "NH 48 via Ajmer",
-                    time: 7,
-                  },
-                  "Delhi-Bikaner": {
-                    distance: 490,
-                    highway: "NH 62 via Hanumangarh",
-                    time: 8,
-                  },
-                  "Delhi-Ajmer": { distance: 390, highway: "NH 48", time: 6.5 },
-                  "Delhi-Kota": {
-                    distance: 490,
-                    highway: "NH 52 via Dausa",
-                    time: 8,
-                  },
-                  "Delhi-Mumbai": {
-                    distance: 1450,
-                    highway: "NH 48 (Delhi–Mumbai Expressway)",
-                    time: 24,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Kolkata": {
-                    distance: 1530,
-                    highway: "NH 19 via Varanasi",
-                    time: 26,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Bangalore": {
-                    distance: 2150,
-                    highway: "NH 44 via Nagpur",
-                    time: 36,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Goa": {
-                    distance: 1900,
-                    highway: "NH 48 via Mumbai",
-                    time: 32,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Pune": {
-                    distance: 1490,
-                    highway: "NH 48 via Jaipur & Mumbai",
-                    time: 25,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Hyderabad": {
-                    distance: 1650,
-                    highway: "NH 44 via Nagpur",
-                    time: 28,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Jodhpur": {
-                    distance: 605,
-                    highway: "NH 48 via Jaipur",
-                    time: 10,
-                    note: "Long trip",
-                  },
-                  "Delhi-Udaipur": {
-                    distance: 660,
-                    highway: "NH 48 via Jaipur & Ajmer",
-                    time: 11,
-                    note: "Long trip",
-                  },
-                  "Delhi-Jaisalmer": {
-                    distance: 870,
-                    highway: "NH 48 via Jaipur & Jodhpur",
-                    time: 14,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Sawai Madhopur": {
-                    distance: 385,
-                    highway: "NH 48 & NH 52 via Dausa",
-                    time: 7,
-                  },
-                  "Delhi-Ranthambore": {
-                    distance: 390,
-                    highway: "NH 48 & NH 52",
-                    time: 7,
-                  },
-                  "Delhi-Chittorgarh": {
-                    distance: 595,
-                    highway: "NH 48 via Jaipur",
-                    time: 10,
-                  },
-                  "Delhi-Bundi": {
-                    distance: 490,
-                    highway: "NH 48 & NH 52 via Kota",
-                    time: 8,
-                  },
-                  "Delhi-Tonk": {
-                    distance: 350,
-                    highway: "NH 48 via Jaipur",
-                    time: 6.5,
-                  },
-                  "Delhi-Sikar": {
-                    distance: 330,
-                    highway: "NH 48 via Jaipur",
-                    time: 6,
-                  },
-                  "Delhi-Barmer": {
-                    distance: 820,
-                    highway: "NH 62 via Bikaner",
-                    time: 14,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Pali": {
-                    distance: 530,
-                    highway: "NH 62 via Jodhpur",
-                    time: 9,
-                  },
-                  "Delhi-Nagaur": {
-                    distance: 460,
-                    highway: "NH 62 via Bikaner bypass",
-                    time: 8,
-                  },
-                  "Delhi-Bharatpur": {
-                    distance: 200,
-                    highway: "NH 21 via Agra road",
-                    time: 3.5,
-                  },
-                  "Delhi-Alwar": {
-                    distance: 165,
-                    highway: "NH 248 via Rewari",
-                    time: 3,
-                  },
-                  "Delhi-Lucknow": {
-                    distance: 555,
-                    highway: "NH 27 (Agra–Lucknow Expressway)",
-                    time: 8,
-                  },
-                  "Delhi-Allahabad (Prayagraj)": {
-                    distance: 645,
-                    highway: "NH 19 via Agra",
-                    time: 10,
-                  },
-                  "Delhi-Kanpur": {
-                    distance: 480,
-                    highway: "NH 19 via Agra–Lucknow Expressway",
-                    time: 7,
-                  },
-                  "Delhi-Meerut": {
-                    distance: 70,
-                    highway: "NH 58 (Delhi–Meerut Expressway)",
-                    time: 1.5,
-                  },
-                  "Delhi-Moradabad": {
-                    distance: 165,
-                    highway: "NH 9",
-                    time: 3,
-                  },
-                  "Delhi-Aligarh": {
-                    distance: 130,
-                    highway: "NH 19 via Yamuna Expressway",
-                    time: 2,
-                  },
-                  "Delhi-Bareilly": {
-                    distance: 255,
-                    highway: "NH 9 via Moradabad",
-                    time: 5,
-                  },
-                  "Delhi-Muzaffarnagar": {
-                    distance: 125,
-                    highway: "NH 58",
-                    time: 2.5,
-                  },
-                  "Delhi-Saharanpur": {
-                    distance: 175,
-                    highway: "NH 58 via Muzaffarnagar",
-                    time: 3.5,
-                  },
-                  "Delhi-Ambala": {
-                    distance: 200,
-                    highway: "NH 44",
-                    time: 3.5,
-                  },
-                  "Delhi-Karnal": {
-                    distance: 130,
-                    highway: "NH 44",
-                    time: 2.5,
-                  },
-                  "Delhi-Panipat": { distance: 90, highway: "NH 44", time: 2 },
-                  "Delhi-Sonipat": { distance: 45, highway: "NH 44", time: 1 },
-                  "Delhi-Rohtak": { distance: 75, highway: "NH 9", time: 1.5 },
-                  "Delhi-Gurgaon": {
-                    distance: 32,
-                    highway: "NH 48 (Delhi–Gurugram Expressway)",
-                    time: 1,
-                  },
-                  "Delhi-Faridabad": {
-                    distance: 30,
-                    highway: "NH 19",
-                    time: 1,
-                  },
-                  "Delhi-Noida": {
-                    distance: 20,
-                    highway: "DND Flyway / NH 24",
-                    time: 0.5,
-                  },
-                  "Delhi-Ludhiana": {
-                    distance: 320,
-                    highway: "NH 44",
-                    time: 5.5,
-                  },
-                  "Delhi-Jalandhar": {
-                    distance: 375,
-                    highway: "NH 44",
-                    time: 6,
-                  },
-                  "Delhi-Pathankot": {
-                    distance: 440,
-                    highway: "NH 44 via Jalandhar",
-                    time: 7.5,
-                  },
-                  "Delhi-Dharamshala": {
-                    distance: 475,
-                    highway: "NH 44 via Pathankot",
-                    time: 8.5,
-                  },
-                  "Delhi-Dalhousie": {
-                    distance: 560,
-                    highway: "NH 44 via Pathankot",
-                    time: 10,
-                  },
-                  "Delhi-Kullu": {
-                    distance: 505,
-                    highway: "NH 44 via Chandigarh",
-                    time: 11,
-                  },
-                  "Delhi-Kasauli": {
-                    distance: 300,
-                    highway: "NH 44 via Chandigarh",
-                    time: 5.5,
-                  },
-                  "Delhi-Solan": {
-                    distance: 340,
-                    highway: "NH 44 via Chandigarh",
-                    time: 6,
-                  },
-                  "Delhi-Spiti": {
-                    distance: 740,
-                    highway: "NH 5 via Shimla–Kinnaur",
-                    time: 16,
-                    note: "Multi-day trip",
-                  },
-                  "Delhi-Jammu": {
-                    distance: 595,
-                    highway: "NH 44 via Pathankot",
-                    time: 10,
-                  },
-                  "Delhi-Vaishno Devi": {
-                    distance: 650,
-                    highway: "NH 44 via Jammu",
-                    time: 11,
-                  },
-                  "Delhi-Hanumangarh": {
-                    distance: 450,
-                    highway: "NH 9 via Sirsa",
-                    time: 8,
-                  },
-                  "Delhi-Sirsa": {
-                    distance: 290,
-                    highway: "NH 9 via Hisar",
-                    time: 5,
-                  },
-                  "Delhi-Hisar": { distance: 165, highway: "NH 9", time: 3 },
-                  "Delhi-Bhiwani": {
-                    distance: 130,
-                    highway: "NH 9 via Rohtak",
-                    time: 2.5,
-                  },
-                  "Delhi-Sambhal": {
-                    distance: 160,
-                    highway: "NH 9 via Moradabad",
-                    time: 3,
-                  },
-                  "Delhi-Shamli": {
-                    distance: 115,
-                    highway: "NH 58 via Muzaffarnagar",
-                    time: 2,
-                  },
-                  "Delhi-Bulandshahr": {
-                    distance: 80,
-                    highway: "NH 9 via Noida",
-                    time: 1.5,
-                  },
-                  "Delhi-Etah": {
-                    distance: 200,
-                    highway: "NH 19 via Aligarh",
-                    time: 3.5,
-                  },
-                  "Jaipur-Agra": {
-                    distance: 238,
-                    highway: "NH 21 (Agra–Jaipur Expressway)",
-                    time: 4,
-                  },
-                  "Jaipur-Udaipur": {
-                    distance: 397,
-                    highway: "NH 48 via Ajmer",
-                    time: 7,
-                  },
-                  "Jaipur-Jodhpur": {
-                    distance: 340,
-                    highway: "NH 62",
-                    time: 6,
-                  },
-                  "Jaipur-Ajmer": {
-                    distance: 135,
-                    highway: "NH 48",
-                    time: 2.5,
-                  },
-                  "Jaipur-Pushkar": {
-                    distance: 150,
-                    highway: "NH 48 via Ajmer",
-                    time: 2.5,
-                  },
-                  "Jaipur-Bikaner": {
-                    distance: 330,
-                    highway: "NH 62 via Sikar–Fatehpur",
-                    time: 5.5,
-                  },
-                  "Jaipur-Kota": { distance: 250, highway: "NH 52", time: 4.5 },
-                  "Jaipur-Bundi": {
-                    distance: 210,
-                    highway: "NH 52 via Kota",
-                    time: 3.5,
-                  },
-                  "Jaipur-Chittorgarh": {
-                    distance: 320,
-                    highway: "NH 48 via Ajmer",
-                    time: 5.5,
-                  },
-                  "Jaipur-Sawai Madhopur": {
-                    distance: 165,
-                    highway: "NH 52",
-                    time: 3,
-                  },
-                  "Jaipur-Ranthambore": {
-                    distance: 165,
-                    highway: "NH 52",
-                    time: 3,
-                  },
-                  "Jaipur-Sikar": {
-                    distance: 110,
-                    highway: "NH 52 via Chomu",
-                    time: 2,
-                  },
-                  "Jaipur-Khatu Shyam": {
-                    distance: 130,
-                    highway: "NH 52 via Sikar",
-                    time: 2.5,
-                  },
-                  "Jaipur-Salasar Balaji": {
-                    distance: 175,
-                    highway: "NH 52 via Sikar",
-                    time: 3,
-                  },
-                  "Jaipur-Bharatpur": {
-                    distance: 185,
-                    highway: "NH 21",
-                    time: 3.5,
-                  },
-                  "Jaipur-Alwar": {
-                    distance: 148,
-                    highway: "NH 248 via Kotputli",
-                    time: 3,
-                  },
-                  "Jaipur-Tonk": { distance: 100, highway: "NH 48", time: 2 },
-                  "Jaipur-Nagaur": {
-                    distance: 200,
-                    highway: "NH 62 via Degana",
-                    time: 3.5,
-                  },
-                  "Jaipur-Barmer": {
-                    distance: 580,
-                    highway: "NH 62 via Jodhpur",
-                    time: 10,
-                  },
-                  "Jaipur-Pali": {
-                    distance: 260,
-                    highway: "NH 62 via Jodhpur bypass",
-                    time: 4.5,
-                  },
-                  "Jaipur-Jaisalmer": {
-                    distance: 570,
-                    highway: "NH 62 via Jodhpur",
-                    time: 10,
-                  },
-                  "Jaipur-Varanasi": {
-                    distance: 760,
-                    highway: "NH 19 via Agra",
-                    time: 13,
-                  },
-                  "Jaipur-Lucknow": {
-                    distance: 550,
-                    highway: "NH 19 via Agra–Lucknow",
-                    time: 9,
-                  },
-                  "Agra-Mathura": {
-                    distance: 58,
-                    highway: "NH 19 (Yamuna Expressway)",
-                    time: 1,
-                  },
-                  "Agra-Vrindavan": {
-                    distance: 62,
-                    highway: "NH 19 (Yamuna Expressway)",
-                    time: 1.2,
-                  },
-                  "Agra-Varanasi": {
-                    distance: 600,
-                    highway: "NH 19 via Allahabad",
-                    time: 10,
-                  },
-                  "Agra-Lucknow": {
-                    distance: 350,
-                    highway: "Agra–Lucknow Expressway",
-                    time: 5,
-                  },
-                  "Agra-Allahabad (Prayagraj)": {
-                    distance: 410,
-                    highway: "NH 19",
-                    time: 7,
-                  },
-                  "Agra-Jhansi": { distance: 175, highway: "NH 44", time: 3 },
-                  "Agra-Gwalior": {
-                    distance: 120,
-                    highway: "NH 44",
-                    time: 2.5,
-                  },
-                  "Agra-Kanpur": {
-                    distance: 290,
-                    highway: "Agra–Lucknow Expressway",
-                    time: 4.5,
-                  },
-                  "Agra-Bharatpur": { distance: 55, highway: "NH 21", time: 1 },
-                  "Haridwar-Rishikesh": {
-                    distance: 25,
-                    highway: "NH 58",
-                    time: 0.5,
-                  },
-                  "Haridwar-Dehradun": {
-                    distance: 53,
-                    highway: "NH 72A",
-                    time: 1,
-                  },
-                  "Haridwar-Mussoorie": {
-                    distance: 90,
-                    highway: "NH 72A via Dehradun",
-                    time: 2,
-                  },
-                  "Haridwar-Shimla": {
-                    distance: 310,
-                    highway: "NH 72A via Dehradun & Chandigarh",
-                    time: 7,
-                  },
-                  "Haridwar-Chandigarh": {
-                    distance: 230,
-                    highway: "NH 72A via Dehradun",
-                    time: 4.5,
-                  },
-                  "Haridwar-Nainital": {
-                    distance: 280,
-                    highway: "NH 58 via Kashipur",
-                    time: 6,
-                  },
-                  "Rishikesh-Dehradun": {
-                    distance: 42,
-                    highway: "NH 7",
-                    time: 1,
-                  },
-                  "Rishikesh-Mussoorie": {
-                    distance: 80,
-                    highway: "NH 7 via Dehradun",
-                    time: 2,
-                  },
-                  "Rishikesh-Nainital": {
-                    distance: 295,
-                    highway: "NH 58 via Kashipur",
-                    time: 6.5,
-                  },
-                  "Dehradun-Shimla": {
-                    distance: 295,
-                    highway: "NH 72A via Chandigarh",
-                    time: 6.5,
-                  },
-                  "Dehradun-Manali": {
-                    distance: 500,
-                    highway: "NH 5 via Chandigarh",
-                    time: 11,
-                  },
-                  "Dehradun-Mussoorie": {
-                    distance: 35,
-                    highway: "Mussoorie Road",
-                    time: 1,
-                  },
-                  "Dehradun-Nainital": {
-                    distance: 295,
-                    highway: "NH 58 via Kashipur",
-                    time: 6.5,
-                  },
-                  "Lucknow-Varanasi": {
-                    distance: 320,
-                    highway: "NH 19 (Purvanchal Expressway)",
-                    time: 5,
-                  },
-                  "Lucknow-Ayodhya": {
-                    distance: 140,
-                    highway: "NH 27",
-                    time: 2.5,
-                  },
-                  "Lucknow-Allahabad (Prayagraj)": {
-                    distance: 215,
-                    highway: "NH 19",
-                    time: 4,
-                  },
-                  "Lucknow-Kanpur": {
-                    distance: 80,
-                    highway: "NH 27",
-                    time: 1.5,
-                  },
-                  "Lucknow-Mathura": {
-                    distance: 340,
-                    highway: "Agra–Lucknow Expressway",
-                    time: 5.5,
-                  },
-                  "Lucknow-Gorakhpur": {
-                    distance: 265,
-                    highway: "NH 28",
-                    time: 5,
-                  },
-                  "Chandigarh-Amritsar": {
-                    distance: 230,
-                    highway: "NH 44",
-                    time: 4,
-                  },
-                  "Chandigarh-Ludhiana": {
-                    distance: 100,
-                    highway: "NH 44",
-                    time: 2,
-                  },
-                  "Chandigarh-Shimla": {
-                    distance: 115,
-                    highway: "NH 5",
-                    time: 3,
-                  },
-                  "Chandigarh-Manali": {
-                    distance: 310,
-                    highway: "NH 3 via Kullu",
-                    time: 8,
-                  },
-                  "Chandigarh-Dharamshala": {
-                    distance: 245,
-                    highway: "NH 44 via Pathankot",
-                    time: 5,
-                  },
-                  "Chandigarh-Pathankot": {
-                    distance: 180,
-                    highway: "NH 44",
-                    time: 3.5,
-                  },
-                  "Chandigarh-Jalandhar": {
-                    distance: 145,
-                    highway: "NH 44",
-                    time: 2.5,
-                  },
-                  "Amritsar-Pathankot": {
-                    distance: 100,
-                    highway: "NH 44",
-                    time: 2,
-                  },
-                  "Amritsar-Dharamshala": {
-                    distance: 185,
-                    highway: "NH 44 via Pathankot",
-                    time: 4,
-                  },
-                  "Amritsar-Jalandhar": {
-                    distance: 80,
-                    highway: "NH 44",
-                    time: 1.5,
-                  },
-                  "Amritsar-Ludhiana": {
-                    distance: 155,
-                    highway: "NH 44",
-                    time: 3,
-                  },
-                  "Jodhpur-Udaipur": {
-                    distance: 270,
-                    highway: "NH 62 via Pali",
-                    time: 5,
-                  },
-                  "Jodhpur-Bikaner": {
-                    distance: 245,
-                    highway: "NH 65",
-                    time: 4.5,
-                  },
-                  "Jodhpur-Jaisalmer": {
-                    distance: 290,
-                    highway: "NH 125",
-                    time: 5,
-                  },
-                  "Jodhpur-Ajmer": {
-                    distance: 200,
-                    highway: "NH 62 via Pali",
-                    time: 4,
-                  },
-                  "Jodhpur-Pushkar": {
-                    distance: 190,
-                    highway: "NH 62 via Pali & Ajmer",
-                    time: 4,
-                  },
-                  "Jodhpur-Barmer": {
-                    distance: 220,
-                    highway: "NH 125",
-                    time: 4,
-                  },
-                  "Jodhpur-Pali": { distance: 72, highway: "NH 62", time: 1.5 },
-                  "Jodhpur-Nagaur": {
-                    distance: 140,
-                    highway: "NH 65",
-                    time: 2.5,
-                  },
-                  "Udaipur-Chittorgarh": {
-                    distance: 115,
-                    highway: "NH 48",
-                    time: 2,
-                  },
-                  "Udaipur-Kota": {
-                    distance: 255,
-                    highway: "NH 52 via Chittorgarh",
-                    time: 4.5,
-                  },
-                  "Udaipur-Ajmer": { distance: 275, highway: "NH 48", time: 5 },
-                  "Udaipur-Bikaner": {
-                    distance: 510,
-                    highway: "NH 62 via Jodhpur",
-                    time: 9,
-                  },
-                  "Udaipur-Pushkar": {
-                    distance: 260,
-                    highway: "NH 48 via Ajmer",
-                    time: 4.5,
-                  },
-                  "Udaipur-Nathdwara": {
-                    distance: 48,
-                    highway: "NH 48",
-                    time: 1,
-                  },
-                  "Udaipur-Abu Road": {
-                    distance: 160,
-                    highway: "NH 27",
-                    time: 3,
-                  },
-                  "Udaipur-Ahmedabad": {
-                    distance: 260,
-                    highway: "NH 48",
-                    time: 4.5,
-                  },
-                  "Shimla-Manali": {
-                    distance: 270,
-                    highway: "NH 3 via Kullu",
-                    time: 8,
-                  },
-                  "Shimla-Dharamshala": {
-                    distance: 250,
-                    highway: "NH 154A via Bilaspur",
-                    time: 7,
-                  },
-                  "Shimla-Kullu": { distance: 235, highway: "NH 3", time: 6 },
-                  "Shimla-Kasauli": { distance: 70, highway: "NH 22", time: 2 },
-                  "Shimla-Solan": { distance: 45, highway: "NH 5", time: 1 },
-                  "Varanasi-Allahabad (Prayagraj)": {
-                    distance: 125,
-                    highway: "NH 19",
-                    time: 2.5,
-                  },
-                  "Varanasi-Ayodhya": {
-                    distance: 200,
-                    highway: "NH 27 via Sultanpur",
-                    time: 4,
-                  },
-                  "Varanasi-Gorakhpur": {
-                    distance: 230,
-                    highway: "NH 29",
-                    time: 4.5,
-                  },
-                  "Mathura-Vrindavan": {
-                    distance: 12,
-                    highway: "Local Road (Mathura–Vrindavan Road)",
-                    time: 0.3,
-                  },
-                  "Mathura-Agra": {
-                    distance: 58,
-                    highway: "NH 19 (Yamuna Expressway)",
-                    time: 1,
-                  },
-                  "Nainital-Corbett": {
-                    distance: 65,
-                    highway: "SH 18 via Ramnagar",
-                    time: 2,
-                  },
-                  "Meerut-Haridwar": {
-                    distance: 165,
-                    highway: "NH 58 via Muzaffarnagar",
-                    time: 3,
-                  },
-                  "Meerut-Mathura": {
-                    distance: 155,
-                    highway: "NH 58 via Palwal",
-                    time: 3,
-                  },
-                  "Meerut-Moradabad": {
-                    distance: 130,
-                    highway: "NH 9",
-                    time: 2.5,
-                  },
-                };
-                const cities = [
-                  "Agra",
-                  "Ajmer",
-                  "Aligarh",
-                  "Allahabad (Prayagraj)",
-                  "Alwar",
-                  "Ambala",
-                  "Amritsar",
-                  "Ayodhya",
-                  "Bareilly",
-                  "Barmer",
-                  "Bharatpur",
-                  "Bhiwani",
-                  "Bikaner",
-                  "Bijnor",
-                  "Bilaspur (HP)",
-                  "Bulandshahr",
-                  "Bundi",
-                  "Chandigarh",
-                  "Chittorgarh",
-                  "Churu",
-                  "Dalhousie",
-                  "Dausa",
-                  "Dehradun",
-                  "Delhi",
-                  "Dharamshala",
-                  "Dholpur",
-                  "Dungarpur",
-                  "Etawah",
-                  "Firozabad",
-                  "Ganganagar",
-                  "Goa",
-                  "Gorakhpur",
-                  "Hanumangarh",
-                  "Hapur",
-                  "Haridwar",
-                  "Hisar",
-                  "Jalandhar",
-                  "Jaipur",
-                  "Jaisalmer",
-                  "Jammu",
-                  "Jhalawar",
-                  "Jhunjhunu",
-                  "Jhansi",
-                  "Jodhpur",
-                  "Karauli",
-                  "Karnal",
-                  "Kasauli",
-                  "Kota",
-                  "Kullu",
-                  "Kurukshetra",
-                  "Leh",
-                  "Lucknow",
-                  "Ludhiana",
-                  "Mainpuri",
-                  "Manali",
-                  "Mandi",
-                  "Mathura",
-                  "Meerut",
-                  "Moradabad",
-                  "Mount Abu",
-                  "Mumbai",
-                  "Mussoorie",
-                  "Muzaffarnagar",
-                  "Nagaur",
-                  "Nainital",
-                  "Palampur",
-                  "Pali",
-                  "Panipat",
-                  "Pathankot",
-                  "Pushkar",
-                  "Rajsamand",
-                  "Rampur",
-                  "Ranthambore",
-                  "Rishikesh",
-                  "Rohtak",
-                  "Saharanpur",
-                  "Salasar Balaji",
-                  "Sambhal",
-                  "Sawai Madhopur",
-                  "Shamli",
-                  "Shimla",
-                  "Sikar",
-                  "Sirsa",
-                  "Solan",
-                  "Sonipat",
-                  "Spiti",
-                  "Tonk",
-                  "Udaipur",
-                  "Varanasi",
-                  "Vrindavan",
-                  "Khatu Shyam",
-                  "Kolkata",
-                  "Bangalore",
-                  "Hyderabad",
-                  "Pune",
-                ];
-                const key1 =
-                  routeOrigin && routeDest ? `${routeOrigin}-${routeDest}` : "";
-                const key2 =
-                  routeOrigin && routeDest ? `${routeDest}-${routeOrigin}` : "";
-                const route = routeData[key1] || routeData[key2] || null;
-                const noRoute =
-                  routeOrigin &&
-                  routeDest &&
-                  routeOrigin !== routeDest &&
-                  !route;
-                const sameCity =
-                  routeOrigin && routeDest && routeOrigin === routeDest;
-                return (
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                  >
-                    <Card className="border-0 shadow-hero overflow-hidden h-full">
-                      <div className="h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500" />
-                      <CardContent className="p-6 md:p-8 flex flex-col h-full">
-                        <h3 className="font-display font-bold text-xl mb-2 text-foreground">
-                          🗺️ Trip Route Guide
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-5">
-                          Select origin &amp; destination to see the highway
-                          route and estimated fare.
-                        </p>
-                        <div className="space-y-3 mb-4">
-                          <div>
-                            <label
-                              htmlFor="route-origin"
-                              className="text-sm font-semibold text-foreground mb-1.5 block"
-                            >
-                              From (Origin)
-                            </label>
-                            <select
-                              id="route-origin"
-                              value={routeOrigin}
-                              onChange={(e) => setRouteOrigin(e.target.value)}
-                              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                              data-ocid="route.select"
-                            >
-                              <option value="">Select city...</option>
-                              {cities.map((c) => (
-                                <option key={c} value={c}>
-                                  {c}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label
-                              htmlFor="route-dest"
-                              className="text-sm font-semibold text-foreground mb-1.5 block"
-                            >
-                              To (Destination)
-                            </label>
-                            <select
-                              id="route-dest"
-                              value={routeDest}
-                              onChange={(e) => setRouteDest(e.target.value)}
-                              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                              data-ocid="route.select"
-                            >
-                              <option value="">Select city...</option>
-                              {cities.map((c) => (
-                                <option key={c} value={c}>
-                                  {c}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label
-                              htmlFor="route-taxi"
-                              className="text-sm font-semibold text-foreground mb-1.5 block"
-                            >
-                              Select Taxi Type
-                            </label>
-                            <select
-                              id="route-taxi"
-                              value={routeTaxi}
-                              onChange={(e) => setRouteTaxi(e.target.value)}
-                              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                              data-ocid="route.select"
-                            >
-                              <option value="">Select vehicle type...</option>
-                              <option value="sedan">Sedan</option>
-                              <option value="ertiga">Ertiga</option>
-                              <option value="crysta">Innova Crysta</option>
-                              <option value="suv">Premium SUV</option>
-                              <option value="luxury">
-                                BMW / Mercedes / LR Defender (VIP)
-                              </option>
-                            </select>
-                          </div>
+                      {/* Results area */}
+                      {sameCity && (
+                        <div
+                          className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground"
+                          data-ocid="route.error_state"
+                        >
+                          Origin and destination are the same. Please select
+                          different cities.
                         </div>
+                      )}
 
-                        {route && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-gradient-to-br from-primary/5 to-teal-50 border border-primary/15 rounded-xl p-4 space-y-3 flex-1"
-                            data-ocid="route.success_state"
-                          >
-                            <div className="space-y-1.5">
+                      {route && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="space-y-4"
+                          data-ocid="route.success_state"
+                        >
+                          {/* Route info pills */}
+                          <div className="bg-gradient-to-br from-primary/5 to-teal-50 border border-primary/15 rounded-xl p-4">
+                            <div className="flex items-center justify-between mb-3">
                               <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                                Highway Route
+                                Route Information
                               </p>
-                              <p className="font-bold text-foreground text-sm">
-                                🛣️ {route.highway}
-                              </p>
+                              {liveRouteData && (
+                                <span className="flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-green-200">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                                  Live Data · Powered by MapMyIndia
+                                </span>
+                              )}
                             </div>
-                            <div className="flex justify-between items-center text-sm border-t border-primary/10 pt-3">
-                              <span className="text-muted-foreground">
-                                Approx Distance
-                              </span>
-                              <span className="font-semibold text-foreground">
-                                {route.distance} km
-                              </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              <div className="bg-white/70 border border-primary/10 rounded-lg px-3 py-2.5 text-center">
+                                <p className="text-xs text-muted-foreground mb-0.5">
+                                  🛣️ Highway
+                                </p>
+                                <p className="font-semibold text-foreground text-sm leading-tight">
+                                  {route.highway}
+                                </p>
+                              </div>
+                              <div className="bg-white/70 border border-primary/10 rounded-lg px-3 py-2.5 text-center">
+                                <p className="text-xs text-muted-foreground mb-0.5">
+                                  📏 Distance
+                                </p>
+                                <p className="font-bold text-foreground text-lg">
+                                  {liveRouteData
+                                    ? liveRouteData.distanceKm
+                                    : route.distance}{" "}
+                                  <span className="text-sm font-normal">
+                                    km
+                                  </span>
+                                </p>
+                              </div>
+                              <div className="bg-white/70 border border-primary/10 rounded-lg px-3 py-2.5 text-center">
+                                <p className="text-xs text-muted-foreground mb-0.5">
+                                  ⏱️ Travel Time
+                                </p>
+                                <p className="font-bold text-foreground text-lg">
+                                  {(() => {
+                                    const t = liveRouteData
+                                      ? liveRouteData.durationHrs
+                                      : route.time;
+                                    return t >= 24
+                                      ? `${Math.floor(t / 24)}d ${t % 24 > 0 ? `${t % 24}h` : ""}`
+                                      : t < 1
+                                        ? `${Math.round(t * 60)} min`
+                                        : `${t} hrs`;
+                                  })()}
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-muted-foreground">
-                                ⏱️ Est. Travel Time
-                              </span>
-                              <span className="font-semibold text-foreground">
-                                {route.time >= 24
-                                  ? `${Math.floor(route.time / 24)}d ${route.time % 24 > 0 ? `${route.time % 24}h` : ""}`
-                                  : route.time < 1
-                                    ? `${Math.round(route.time * 60)} mins`
-                                    : `${route.time} hrs`}
-                              </span>
-                            </div>
-                            {(() => {
-                              const taxiRates: Record<
-                                string,
-                                {
-                                  label: string;
-                                  min: number;
-                                  max: number;
-                                  isLuxury?: boolean;
-                                }
-                              > = {
-                                sedan: { label: "Sedan", min: 18, max: 22 },
-                                ertiga: { label: "Ertiga", min: 22, max: 28 },
-                                crysta: {
-                                  label: "Innova Crysta",
-                                  min: 28,
-                                  max: 35,
-                                },
-                                suv: { label: "Premium SUV", min: 28, max: 35 },
-                                luxury: {
-                                  label: "BMW / Mercedes / LR Defender",
-                                  min: 0,
-                                  max: 0,
-                                  isLuxury: true,
-                                },
-                              };
-                              const selectedTaxi = routeTaxi
-                                ? taxiRates[routeTaxi]
-                                : null;
-                              if (!selectedTaxi) {
-                                return (
-                                  <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 text-center">
-                                    ☝️ Select a taxi type above to see fare
-                                    estimate
-                                  </div>
-                                );
-                              }
-                              if (selectedTaxi.isLuxury) {
-                                return (
-                                  <div className="bg-yellow-50 border border-yellow-300 rounded-lg px-3 py-2 text-sm text-yellow-900 text-center">
-                                    <p className="font-semibold">
-                                      ✨ BMW / Mercedes / LR Defender — VIP
-                                      Service
-                                    </p>
-                                    <p className="text-xs mt-1">
-                                      Contact for personalized quote:
-                                    </p>
-                                    <p className="font-bold text-primary text-base mt-0.5">
-                                      📞 9990104748
-                                    </p>
-                                  </div>
-                                );
-                              }
-                              if (selectedTaxi.min === selectedTaxi.max) {
-                                return (
-                                  <div className="space-y-1 text-sm">
-                                    <div className="flex justify-between">
-                                      <span className="text-muted-foreground">
-                                        {selectedTaxi.label} Fare
-                                      </span>
-                                      <span className="font-bold text-primary">
-                                        ₹
-                                        {(
-                                          route.distance * selectedTaxi.min
-                                        ).toLocaleString("en-IN")}
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between text-xs text-muted-foreground">
-                                      <span>Rate</span>
-                                      <span>
-                                        ₹{selectedTaxi.min}/km (fixed)
-                                      </span>
-                                    </div>
-                                  </div>
-                                );
-                              }
-                              return (
-                                <div className="space-y-1 text-sm">
-                                  <div className="flex justify-between">
-                                    <span className="text-muted-foreground">
-                                      {selectedTaxi.label} Fare
-                                    </span>
-                                    <span className="font-bold text-primary">
-                                      ₹
-                                      {(
-                                        route.distance * selectedTaxi.min
-                                      ).toLocaleString("en-IN")}{" "}
-                                      – ₹
-                                      {(
-                                        route.distance * selectedTaxi.max
-                                      ).toLocaleString("en-IN")}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between text-xs text-muted-foreground">
-                                    <span>Rate Range</span>
-                                    <span>
-                                      ₹{selectedTaxi.min}–{selectedTaxi.max}/km
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                            {route.distance > 500 && (
-                              <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
-                                🌙 Long trip — driver night charges ₹300/night
-                                will apply
+                            {liveRouteData?.tollCount !== undefined && (
+                              <div className="mt-2 bg-orange-50 border border-orange-200 rounded-lg px-3 py-1.5 text-xs text-orange-800">
+                                🛂 Estimated toll cost on this route: ₹
+                                {liveRouteData.tollCount}
                               </div>
                             )}
                             {route.note && (
-                              <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-xs text-blue-800">
+                              <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5 text-xs text-blue-800">
                                 📌 {route.note}
                               </div>
                             )}
-                            <p className="text-xs text-muted-foreground italic">
-                              ⚠️ Tolls &amp; state taxes extra as per actuals.
-                            </p>
-                          </motion.div>
-                        )}
-
-                        {sameCity && (
-                          <div
-                            className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground flex-1"
-                            data-ocid="route.error_state"
-                          >
-                            Origin and destination are the same. Please select
-                            different cities.
                           </div>
-                        )}
-                        {noRoute &&
-                          (routeData[`Delhi-${routeOrigin}`] ||
-                          routeData[`${routeOrigin}-Delhi`] ? (
+
+                          {/* Fare breakdown */}
+                          {selectedTaxi && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4 space-y-2"
+                              data-ocid="calculator.success_state"
+                            >
+                              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">
+                                Fare Estimate — {selectedTaxi.label}
+                              </p>
+                              {selectedTaxi.isLuxury ? (
+                                <div className="text-center py-2">
+                                  <p className="font-semibold text-yellow-900">
+                                    ✨ VIP Service — Contact for Personalised
+                                    Quote
+                                  </p>
+                                  <p className="font-bold text-primary text-lg mt-1">
+                                    📞 9990104748
+                                  </p>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="flex justify-between items-center text-sm">
+                                    <span className="text-muted-foreground">
+                                      Base Fare ({route.distance} km × ₹
+                                      {selectedTaxi.min}–{selectedTaxi.max}/km)
+                                    </span>
+                                    <span className="font-semibold text-foreground">
+                                      ₹{fareMin.toLocaleString("en-IN")} – ₹
+                                      {fareMax.toLocaleString("en-IN")}
+                                    </span>
+                                  </div>
+                                  {nightCharges > 0 && (
+                                    <div className="flex justify-between items-center text-sm">
+                                      <span className="text-muted-foreground">
+                                        Driver Night Charges ({mergedNights}{" "}
+                                        night
+                                        {Number(mergedNights) > 1 ? "s" : ""} ×
+                                        ₹300)
+                                      </span>
+                                      <span className="font-semibold text-foreground">
+                                        ₹{nightCharges.toLocaleString("en-IN")}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <div className="border-t border-amber-200 pt-2 flex justify-between items-center">
+                                    <span className="font-bold text-foreground">
+                                      Total Estimated Range
+                                    </span>
+                                    <span className="font-bold text-primary text-lg">
+                                      ₹
+                                      {(fareMin + nightCharges).toLocaleString(
+                                        "en-IN",
+                                      )}{" "}
+                                      – ₹
+                                      {(fareMax + nightCharges).toLocaleString(
+                                        "en-IN",
+                                      )}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground bg-amber-100 border border-amber-200 rounded-lg px-3 py-2 mt-1">
+                                    ⚠️ State taxes, toll charges, and driver
+                                    night charges are extra as per actuals.
+                                    Final rate may vary.
+                                  </p>
+                                </>
+                              )}
+                            </motion.div>
+                          )}
+                          {!routeTaxi && (
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 text-center">
+                              ☝️ Select a taxi type above to see fare estimate
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+
+                      {noRoute &&
+                        (() => {
+                          const fromDelhi =
+                            routeData[`Delhi-${routeOrigin}`] ||
+                            routeData[`${routeOrigin}-Delhi`];
+                          const toDelhi =
                             routeData[`Delhi-${routeDest}`] ||
-                            routeData[`${routeDest}-Delhi`] ? (
-                              <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex-1 space-y-2"
-                                data-ocid="route.error_state"
-                              >
-                                <p className="text-xs font-semibold text-amber-800 mb-2">
-                                  📍 Approximate Route Info ({routeOrigin} →{" "}
-                                  {routeDest})
-                                </p>
-                                <div className="flex justify-between text-sm">
-                                  <span className="text-muted-foreground">
-                                    Est. Distance
-                                  </span>
-                                  <span className="font-semibold">
-                                    ~
-                                    {Math.round(
-                                      ((routeData[`Delhi-${routeOrigin}`] ||
-                                        routeData[`${routeOrigin}-Delhi`])!
-                                        .distance +
-                                        (routeData[`Delhi-${routeDest}`] ||
-                                          routeData[`${routeDest}-Delhi`])!
-                                          .distance) *
-                                        0.85,
-                                    )}{" "}
-                                    km
-                                  </span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                  <span className="text-muted-foreground">
-                                    ⏱️ Est. Travel Time
-                                  </span>
-                                  <span className="font-semibold">
-                                    ~
-                                    {Math.round(
-                                      ((routeData[`Delhi-${routeOrigin}`] ||
-                                        routeData[`${routeOrigin}-Delhi`])!
-                                        .time +
-                                        (routeData[`Delhi-${routeDest}`] ||
-                                          routeData[`${routeDest}-Delhi`])!
-                                          .time) *
-                                        0.85 *
-                                        2,
-                                    ) / 2}{" "}
-                                    hrs
-                                  </span>
-                                </div>
-                                <p className="text-xs text-amber-700 mt-2">
-                                  Route via major highways. For exact toll &
-                                  route info, call us:{" "}
-                                  <strong>9990104748</strong>
-                                </p>
-                              </motion.div>
-                            ) : (
-                              <div
-                                className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground flex-1"
-                                data-ocid="route.error_state"
-                              >
-                                Route info not available. Please call us:{" "}
-                                <strong className="text-foreground">
-                                  9990104748
-                                </strong>
-                              </div>
-                            )
-                          ) : (
-                            <div
-                              className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground flex-1"
+                            routeData[`${routeDest}-Delhi`];
+                          const estKm =
+                            fromDelhi && toDelhi
+                              ? Math.round(
+                                  (fromDelhi.distance + toDelhi.distance) *
+                                    0.85,
+                                )
+                              : null;
+
+                          return (
+                            <motion.div
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="space-y-4"
                               data-ocid="route.error_state"
                             >
-                              Route info not available. Please call us:{" "}
-                              <strong className="text-foreground">
-                                9990104748
-                              </strong>
-                            </div>
-                          ))}
+                              {estKm ? (
+                                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4">
+                                  <p className="text-xs font-semibold text-amber-800 mb-3">
+                                    📍 Approximate Route Info ({routeOrigin} →{" "}
+                                    {routeDest})
+                                  </p>
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-white/70 border border-amber-100 rounded-lg px-3 py-2.5 text-center">
+                                      <p className="text-xs text-muted-foreground mb-0.5">
+                                        📏 Est. Distance
+                                      </p>
+                                      <p className="font-bold text-foreground text-lg">
+                                        ~{estKm}{" "}
+                                        <span className="text-sm font-normal">
+                                          km
+                                        </span>
+                                      </p>
+                                    </div>
+                                    <div className="bg-white/70 border border-amber-100 rounded-lg px-3 py-2.5 text-center">
+                                      <p className="text-xs text-muted-foreground mb-0.5">
+                                        ⏱️ Est. Time
+                                      </p>
+                                      <p className="font-bold text-foreground text-lg">
+                                        ~
+                                        {Math.round(
+                                          (fromDelhi!.time + toDelhi!.time) *
+                                            0.85,
+                                        )}{" "}
+                                        <span className="text-sm font-normal">
+                                          hrs
+                                        </span>
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <p className="text-xs text-amber-700 mt-3">
+                                    Route via major highways. For exact toll
+                                    &amp; route info, call us:{" "}
+                                    <strong>9990104748</strong>
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="bg-secondary/50 border border-border rounded-xl p-4 text-sm text-muted-foreground">
+                                  Route info not available for this combination.
+                                  Please call us:{" "}
+                                  <strong className="text-foreground">
+                                    9990104748
+                                  </strong>
+                                </div>
+                              )}
 
-                        {!routeOrigin && !routeDest && (
-                          <div className="bg-secondary/30 border border-border/50 rounded-xl p-4 text-sm text-muted-foreground text-center flex-1 flex items-center justify-center">
-                            Select origin &amp; destination to see route info
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })()}
-            </div>
+                              {/* Manual km input + fare for no-route case */}
+                              <div>
+                                <label
+                                  htmlFor="manual-km"
+                                  className="text-sm font-semibold text-foreground mb-1.5 block"
+                                >
+                                  Enter Distance Manually (km)
+                                </label>
+                                <Input
+                                  id="manual-km"
+                                  type="number"
+                                  placeholder={
+                                    estKm
+                                      ? `~${estKm} km estimated`
+                                      : "e.g. 300"
+                                  }
+                                  value={manualKm}
+                                  onChange={(e) => setManualKm(e.target.value)}
+                                  className="text-base"
+                                  data-ocid="calculator.input"
+                                  min="0"
+                                />
+                              </div>
+
+                              {selectedTaxi &&
+                                kmForFare > 0 &&
+                                !selectedTaxi.isLuxury && (
+                                  <motion.div
+                                    initial={{ opacity: 0, y: 6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4 space-y-2"
+                                    data-ocid="calculator.success_state"
+                                  >
+                                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">
+                                      Fare Estimate — {selectedTaxi.label}
+                                    </p>
+                                    <div className="flex justify-between items-center text-sm">
+                                      <span className="text-muted-foreground">
+                                        Base Fare ({kmForFare} km × ₹
+                                        {selectedTaxi.min}–{selectedTaxi.max}
+                                        /km)
+                                      </span>
+                                      <span className="font-semibold text-foreground">
+                                        ₹{fareMin.toLocaleString("en-IN")} – ₹
+                                        {fareMax.toLocaleString("en-IN")}
+                                      </span>
+                                    </div>
+                                    {nightCharges > 0 && (
+                                      <div className="flex justify-between items-center text-sm">
+                                        <span className="text-muted-foreground">
+                                          Driver Night Charges ({mergedNights}{" "}
+                                          night
+                                          {Number(mergedNights) > 1 ? "s" : ""}{" "}
+                                          × ₹300)
+                                        </span>
+                                        <span className="font-semibold text-foreground">
+                                          ₹
+                                          {nightCharges.toLocaleString("en-IN")}
+                                        </span>
+                                      </div>
+                                    )}
+                                    <div className="border-t border-amber-200 pt-2 flex justify-between items-center">
+                                      <span className="font-bold text-foreground">
+                                        Total Estimated Range
+                                      </span>
+                                      <span className="font-bold text-primary text-lg">
+                                        ₹
+                                        {(
+                                          fareMin + nightCharges
+                                        ).toLocaleString("en-IN")}{" "}
+                                        – ₹
+                                        {(
+                                          fareMax + nightCharges
+                                        ).toLocaleString("en-IN")}
+                                      </span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground bg-amber-100 border border-amber-200 rounded-lg px-3 py-2 mt-1">
+                                      ⚠️ State taxes, toll charges, and driver
+                                      night charges are extra as per actuals.
+                                    </p>
+                                  </motion.div>
+                                )}
+                            </motion.div>
+                          );
+                        })()}
+
+                      {!routeOrigin && !routeDest && (
+                        <div className="bg-secondary/30 border border-border/50 rounded-xl p-6 text-sm text-muted-foreground text-center flex items-center justify-center gap-2">
+                          <span>🗺️</span>
+                          <span>
+                            Select origin &amp; destination above to see route
+                            info and fare estimate
+                          </span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })()}
           </div>
         </section>
         <section
@@ -3250,11 +3087,11 @@ Message: ${data.message}`;
                 <div className="rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg ring-4 ring-white">
-                      <span className="text-white font-bold text-3xl font-display">
-                        G
-                      </span>
-                    </div>
+                    <img
+                      src="/assets/uploads/gaurav-photo-1-1.jpeg"
+                      alt="Gaurav"
+                      className="w-24 h-24 rounded-full object-cover shadow-lg ring-4 ring-white"
+                    />
                     <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-accent rounded-full flex items-center justify-center shadow">
                       <Sparkles size={14} className="text-foreground" />
                     </div>
@@ -3331,11 +3168,11 @@ Message: ${data.message}`;
               <div className="relative overflow-hidden rounded-2xl border border-primary/15 shadow-card bg-gradient-to-r from-teal-50/60 to-cyan-50/60 p-6 md:p-7 flex flex-col md:flex-row items-center gap-5">
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-600 to-cyan-500 flex items-center justify-center shadow-lg ring-4 ring-white">
-                    <span className="text-white font-bold text-xl font-display">
-                      SLM
-                    </span>
-                  </div>
+                  <img
+                    src="/assets/uploads/pita-ji-1-1.jpeg"
+                    alt="Shyam Lal Meena"
+                    className="w-20 h-20 rounded-full object-cover shadow-lg ring-4 ring-white"
+                  />
                   <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-green-100 rounded-full flex items-center justify-center shadow">
                     <CheckCircle size={13} className="text-green-600" />
                   </div>
@@ -3795,6 +3632,80 @@ Message: ${data.message}`;
                     </CardContent>
                   </Card>
                 </motion.div>
+
+                {/* UPI Pay Now */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Card className="border-0 shadow-card overflow-hidden">
+                    <CardContent className="p-5">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                          <svg
+                            viewBox="0 0 40 40"
+                            className="w-6 h-6"
+                            aria-label="UPI"
+                            role="img"
+                          >
+                            <title>UPI</title>
+                            <circle cx="20" cy="20" r="20" fill="#097939" />
+                            <text
+                              x="20"
+                              y="26"
+                              textAnchor="middle"
+                              fontSize="12"
+                              fill="white"
+                              fontFamily="Arial"
+                              fontWeight="bold"
+                            >
+                              UPI
+                            </text>
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground">
+                            Pay via UPI
+                          </h3>
+                          <p className="text-xs text-muted-foreground">
+                            GPay, PhonePe, Paytm — any UPI app
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        <div className="bg-purple-50 rounded-lg px-4 py-3 text-center">
+                          <p className="text-xs text-muted-foreground mb-0.5">
+                            UPI ID
+                          </p>
+                          <p className="font-mono font-semibold text-sm text-foreground">
+                            shyamlalmeena4151@ibl
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            SHYAM LAL MEENA
+                          </p>
+                        </div>
+                        <a
+                          href="upi://pay?pa=shyamlalmeena4151@ibl&pn=Shyam%20Lal%20Meena&cu=INR"
+                          className="w-full flex items-center justify-center gap-2 bg-[#097939] hover:bg-[#076830] text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-sm"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="w-5 h-5 fill-white"
+                            aria-hidden="true"
+                          >
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
+                          </svg>
+                          Pay Now — Open UPI App
+                        </a>
+                        <p className="text-xs text-muted-foreground text-center">
+                          Works with GPay, PhonePe, Paytm &amp; all UPI apps
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </div>
 
               {/* Map */}
@@ -4062,10 +3973,11 @@ Message: ${data.message}`;
         prefillDestination={bookingDestination}
       />
 
-      {/* Floating WhatsApp Button */}
-      <div className="fixed bottom-6 right-5 z-50 flex flex-col items-end gap-2">
-        {whatsAppMenuOpen && (
-          <div className="flex flex-col gap-2 mb-1">
+      {/* Floating Contact Widget */}
+      <div className="fixed bottom-6 right-5 z-50 flex flex-col items-end gap-3">
+        {/* WhatsApp sub-menu */}
+        {whatsAppSubMenuOpen && (
+          <div className="flex flex-col gap-2 items-end">
             <a
               href="https://wa.me/919990104748"
               target="_blank"
@@ -4106,42 +4018,142 @@ Message: ${data.message}`;
             </a>
           </div>
         )}
-        <button
-          type="button"
-          onClick={() => setWhatsAppMenuOpen((v) => !v)}
-          className="w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-transform hover:scale-105 active:scale-95"
-          style={{ background: "#25D366" }}
-          aria-label="Chat on WhatsApp"
-          data-ocid="whatsapp.open_modal_button"
-        >
-          {whatsAppMenuOpen ? (
-            <svg
-              viewBox="0 0 24 24"
-              className="w-6 h-6 fill-white"
-              aria-label="Close"
-              role="img"
+
+        {/* Call sub-menu */}
+        {callMenuOpen && (
+          <div className="flex flex-col gap-2 items-end">
+            <a
+              href="tel:+919990104748"
+              className="flex items-center gap-2 bg-white shadow-lg border border-amber-300/50 rounded-full px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-amber-50 transition-colors whitespace-nowrap"
+              data-ocid="call.gaurav_link"
             >
-              <title>Close</title>
-              <path
-                d="M18 6L6 18M6 6l12 12"
-                stroke="white"
-                strokeWidth="2.5"
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4 shrink-0 fill-none stroke-amber-500"
+                strokeWidth="2"
                 strokeLinecap="round"
-                fill="none"
-              />
-            </svg>
-          ) : (
-            <svg
-              viewBox="0 0 24 24"
-              className="w-7 h-7 fill-white"
-              aria-label="WhatsApp"
-              role="img"
+                strokeLinejoin="round"
+                aria-label="Call"
+                role="img"
+              >
+                <title>Call</title>
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.4 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16l.92.92z" />
+              </svg>
+              Gaurav — 9990104748
+            </a>
+            <a
+              href="tel:+919868901253"
+              className="flex items-center gap-2 bg-white shadow-lg border border-amber-300/50 rounded-full px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-amber-50 transition-colors whitespace-nowrap"
+              data-ocid="call.shyam_link"
             >
-              <title>WhatsApp</title>
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-            </svg>
-          )}
-        </button>
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4 shrink-0 fill-none stroke-amber-500"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-label="Call"
+                role="img"
+              >
+                <title>Call</title>
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.4 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16l.92.92z" />
+              </svg>
+              Shyam Lal Ji — 9868901253
+            </a>
+          </div>
+        )}
+
+        {/* Always-visible vertical icon bar: WhatsApp | Email | Call */}
+        <div className="flex flex-col items-center gap-3">
+          {/* WhatsApp */}
+          <button
+            type="button"
+            onClick={() => {
+              setWhatsAppSubMenuOpen((v) => !v);
+              setCallMenuOpen(false);
+            }}
+            className="flex flex-col items-center gap-1 group cursor-pointer bg-transparent border-0 p-0"
+            data-ocid="contact.whatsapp.button"
+            aria-label="WhatsApp"
+          >
+            <div
+              className="w-13 h-13 w-[52px] h-[52px] rounded-full shadow-xl flex items-center justify-center group-hover:scale-110 group-active:scale-95 transition-transform"
+              style={{ background: "#25D366" }}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-6 h-6 fill-white"
+                aria-label="WhatsApp"
+                role="img"
+              >
+                <title>WhatsApp</title>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+            </div>
+            <span className="text-[10px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] leading-tight">
+              WhatsApp
+            </span>
+          </button>
+
+          {/* Email */}
+          <a
+            href="https://mail.google.com/mail/?view=cm&to=meenagaurav4748@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-1 group"
+            data-ocid="contact.email.button"
+            aria-label="Send Email via Gmail"
+          >
+            <div className="w-[52px] h-[52px] rounded-full shadow-xl flex items-center justify-center bg-blue-600 group-hover:scale-110 group-active:scale-95 transition-transform">
+              <svg
+                viewBox="0 0 24 24"
+                className="w-6 h-6 fill-none stroke-white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-label="Email"
+                role="img"
+              >
+                <title>Email</title>
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+            </div>
+            <span className="text-[10px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] leading-tight">
+              Email
+            </span>
+          </a>
+
+          {/* Call */}
+          <button
+            type="button"
+            onClick={() => {
+              setCallMenuOpen((v) => !v);
+              setWhatsAppSubMenuOpen(false);
+            }}
+            className="flex flex-col items-center gap-1 group cursor-pointer bg-transparent border-0 p-0"
+            data-ocid="contact.call.button"
+            aria-label="Call Us"
+          >
+            <div className="w-[52px] h-[52px] rounded-full shadow-xl flex items-center justify-center bg-amber-500 group-hover:scale-110 group-active:scale-95 transition-transform">
+              <svg
+                viewBox="0 0 24 24"
+                className="w-6 h-6 fill-none stroke-white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-label="Call"
+                role="img"
+              >
+                <title>Call</title>
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.4 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16l.92.92z" />
+              </svg>
+            </div>
+            <span className="text-[10px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] leading-tight">
+              Call
+            </span>
+          </button>
+        </div>
       </div>
     </>
   );
