@@ -3282,7 +3282,7 @@ export default function App() {
               </div>
             </motion.div>
 
-            {/* Shyam Lal Meena — Co-Founder & Director, Corporate Relations */}
+            {/* Shyam Lal Meena — Co-Founder & Director — Corporate Deals & Rate Negotiations */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -3306,19 +3306,23 @@ export default function App() {
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                     <Badge className="bg-teal-100 text-teal-800 border-teal-200 text-xs font-semibold">
-                      Co-Founder & Director, Corporate Relations
+                      Co-Founder & Director — Corporate Deals & Rate
+                      Negotiations
                     </Badge>
                   </div>
                   <h3 className="font-display text-xl font-bold text-teal-700 mt-1 mb-2">
                     Shyam Lal Meena
                   </h3>
                   <p className="text-foreground/70 leading-relaxed max-w-lg text-sm">
-                    The Deal Maker. Shyamlal Meena is the visionary who started
-                    it all. He connects directly with companies, Managing
-                    Directors, and key decision-makers across India — building
-                    lasting partnerships and closing deals that bring our most
-                    valued corporate clients on board. His network spans Delhi,
-                    Mumbai, Kolkata, Bangalore, and beyond.
+                    The Corporate Deal Maker. Shyam Lal Meena is the driving
+                    force behind all our corporate relationships. He directly
+                    connects with companies, Managing Directors, and key
+                    decision-makers across India — negotiating and fixing travel
+                    rates on behalf of Meena Tour and Travels. From signing
+                    corporate contracts to finalising per-kilometre rates for
+                    long-term clients, he ensures every company gets the best
+                    value while the business grows stronger. His network spans
+                    Delhi, Mumbai, Kolkata, Bangalore, and beyond.
                   </p>
                   <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
                     <a
@@ -3513,6 +3517,9 @@ export default function App() {
                         <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">
                           📞 Call Us Anytime
                         </p>
+                        <p className="text-xs text-muted-foreground">
+                          GAURAV (Managing Director)
+                        </p>
                         <a
                           href="tel:+919990104748"
                           className="font-bold text-primary text-base hover:text-primary/80 transition-colors block"
@@ -3521,6 +3528,15 @@ export default function App() {
                         </a>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           Mon – Sat, 9 AM – 7 PM
+                        </p>
+                        <a
+                          href="tel:+919868901253"
+                          className="font-bold text-teal-700 text-base hover:text-teal-600 transition-colors block mt-2"
+                        >
+                          +91 9868901253
+                        </a>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Shyam Lal Meena (Corporate)
                         </p>
                       </div>
                     </div>
@@ -3804,14 +3820,36 @@ export default function App() {
                   <li className="flex items-start gap-2">
                     <Phone
                       size={14}
+                      className="text-yellow-300 mt-0.5 flex-shrink-0"
+                    />
+                    <div>
+                      <p className="text-white/50 text-xs mb-0.5">
+                        Shyam Lal Meena (Corporate)
+                      </p>
+                      <a
+                        href="tel:+919868901253"
+                        className="text-white font-semibold hover:text-yellow-300 text-sm transition-colors"
+                      >
+                        +91 9868901253
+                      </a>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Phone
+                      size={14}
                       className="text-white/60 mt-0.5 flex-shrink-0"
                     />
-                    <a
-                      href="tel:+919990104748"
-                      className="text-white/80 hover:text-white text-sm transition-colors"
-                    >
-                      +91 9990104748
-                    </a>
+                    <div>
+                      <p className="text-white/50 text-xs mb-0.5">
+                        GAURAV (Operations)
+                      </p>
+                      <a
+                        href="tel:+919990104748"
+                        className="text-white/80 hover:text-white text-sm transition-colors"
+                      >
+                        +91 9990104748
+                      </a>
+                    </div>
                   </li>
                   <li className="flex items-start gap-2">
                     <Mail
