@@ -10,6 +10,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { useActor } from "@/hooks/useActor";
 import { AdminBookings } from "@/pages/AdminBookings";
 import { type RouteInfo, getRouteInfo } from "@/services/mapmyindia";
 import {
@@ -280,6 +281,114 @@ const TRIPS = [
     approxKm: "770 km from Delhi",
     image: "/assets/generated/trip-jaisalmer.dim_800x500.jpg",
   },
+  {
+    id: 15,
+    name: "Kashmir",
+    state: "Jammu & Kashmir",
+    type: "Nature & Adventure",
+    emoji: "🏔️",
+    description:
+      "Jannat on Earth. Dal Lake houseboats, Gulmarg snow slopes, Pahalgam meadows, and Mughal gardens make Kashmir the crown jewel of Indian tourism.",
+    highlights: [
+      "Dal Lake & Shikara Ride",
+      "Gulmarg Gondola",
+      "Pahalgam Valley",
+      "Mughal Gardens",
+    ],
+    bestTime: "April – October",
+    approxKm: "800 km from Delhi",
+    image: "/assets/generated/trip-kashmir.dim_800x500.jpg",
+  },
+  {
+    id: 16,
+    name: "Vaishno Devi",
+    state: "Jammu & Kashmir",
+    type: "Pilgrimage",
+    emoji: "🙏",
+    description:
+      "One of the holiest Hindu shrines in India, nestled in the Trikuta Mountains. Millions of devotees make the sacred trek each year to seek the blessings of Mata Vaishno Devi.",
+    highlights: [
+      "Mata Vaishno Devi Shrine",
+      "Trikuta Mountain Trek",
+      "Bhairon Temple",
+      "Katra Base Camp",
+    ],
+    bestTime: "March – October",
+    approxKm: "700 km from Delhi",
+    image: "/assets/generated/trip-vaishno-devi.dim_800x500.jpg",
+  },
+  {
+    id: 17,
+    name: "Amritsar",
+    state: "Punjab",
+    type: "Spiritual & Heritage",
+    emoji: "✨",
+    description:
+      "Home to the magnificent Golden Temple, Amritsar is the spiritual heart of Sikhism. Experience the Wagah Border ceremony, langar at the Gurudwara, and vibrant Punjabi culture.",
+    highlights: [
+      "Golden Temple (Harmandir Sahib)",
+      "Wagah Border Ceremony",
+      "Jallianwala Bagh",
+      "Amritsari Food Trail",
+    ],
+    bestTime: "October – March",
+    approxKm: "450 km from Delhi",
+    image: "/assets/generated/trip-amritsar.dim_800x500.jpg",
+  },
+  {
+    id: 18,
+    name: "Udaipur",
+    state: "Rajasthan",
+    type: "Heritage & Royalty",
+    emoji: "🏯",
+    description:
+      "The City of Lakes. Udaipur enchants visitors with its majestic City Palace, shimmering Lake Pichola, royal havelis, and breathtaking Aravalli sunsets.",
+    highlights: [
+      "City Palace",
+      "Lake Pichola & Boat Ride",
+      "Jag Mandir",
+      "Sajjangarh Monsoon Palace",
+    ],
+    bestTime: "September – March",
+    approxKm: "665 km from Delhi",
+    image: "/assets/generated/trip-udaipur.dim_800x500.jpg",
+  },
+  {
+    id: 19,
+    name: "Jodhpur",
+    state: "Rajasthan",
+    type: "Heritage & Culture",
+    emoji: "🔵",
+    description:
+      "The Blue City of Rajasthan. The towering Mehrangarh Fort, vibrant blue-washed old city, and authentic Rajasthani bazaars make Jodhpur a photographer's paradise.",
+    highlights: [
+      "Mehrangarh Fort",
+      "Jaswant Thada",
+      "Blue City Old Town",
+      "Umaid Bhawan Palace",
+    ],
+    bestTime: "October – March",
+    approxKm: "600 km from Delhi",
+    image: "/assets/generated/trip-jodhpur.dim_800x500.jpg",
+  },
+  {
+    id: 20,
+    name: "Pushkar",
+    state: "Rajasthan",
+    type: "Spiritual & Cultural",
+    emoji: "🌸",
+    description:
+      "One of India's holiest towns, famous for the only Brahma Temple in the world. Pushkar Lake, the annual Camel Fair, and its spiritual aura make it a truly unique destination.",
+    highlights: [
+      "Brahma Temple",
+      "Pushkar Lake & Ghats",
+      "Pushkar Camel Fair",
+      "Rose Garden",
+    ],
+    bestTime: "October – March",
+    approxKm: "400 km from Delhi",
+    image: "/assets/generated/trip-pushkar.dim_800x500.jpg",
+  },
 ];
 
 const TESTIMONIALS: {
@@ -351,6 +460,7 @@ function StarRating({ rating, size = 14 }: { rating: number; size?: number }) {
 }
 
 export default function App() {
+  const { actor } = useActor();
   const HERO_SLIDES = [
     {
       image: "/assets/generated/hero-tajmahal.dim_1920x1080.jpg",
@@ -961,35 +1071,6 @@ Message: ${data.message}`;
                 </Card>
               </motion.div>
             </div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              data-ocid="pricing.item.3"
-            >
-              <Card className="border-2 border-amber-500 shadow-hero h-full relative overflow-hidden">
-                <div className="absolute top-3 right-3">
-                  <Badge className="bg-amber-500 text-white border-0 text-xs font-semibold">
-                    VIP
-                  </Badge>
-                </div>
-                <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-1">
-                    <Star className="w-7 h-7 text-amber-500" />
-                  </div>
-                  <h3 className="font-display font-bold text-xl text-foreground">
-                    VIP / Luxury Fleet
-                  </h3>
-                  <div className="text-3xl font-display font-bold text-amber-600">
-                    On Request
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    BMW &amp; Mercedes for corporate executives, celebrities,
-                    and VIP guests requiring premium comfort.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
 
             <div className="max-w-2xl mx-auto bg-amber-50 border border-primary/20 rounded-xl p-4 text-center text-sm text-muted-foreground mb-8">
               <span className="font-semibold text-foreground">
@@ -1003,65 +1084,13 @@ Message: ${data.message}`;
         {/* PREMIUM FLEET */}
         <section className="py-16 bg-amber-950/5 border-y border-primary/10">
           <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
+            <div className="text-center mb-10">
               <Badge className="bg-primary/10 text-primary border-primary/20 mb-3">
                 Our Fleet
               </Badge>
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-                Premium Vehicles &amp; Expert Drivers
+                Our Vehicles
               </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Every journey with Meena Tour and Travels is in a
-                top-of-the-line vehicle, driven by a seasoned professional.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-              {[
-                {
-                  icon: <Award className="w-8 h-8 text-primary" />,
-                  title: "Premium Vehicles Only",
-                  desc: "All our taxis are latest-model premium cars — fully serviced, sanitized, and travel-ready for every trip.",
-                },
-                {
-                  icon: <Users className="w-8 h-8 text-primary" />,
-                  title: "10–15+ Years Experience",
-                  desc: "Our drivers are handpicked veterans with over a decade behind the wheel, trained in safe driving and hospitality.",
-                },
-                {
-                  icon: <Shield className="w-8 h-8 text-primary" />,
-                  title: "All India Tourist Permit",
-                  desc: "Fully licensed and permitted to operate across all Indian states — no hassle, no boundaries.",
-                },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15 }}
-                  data-ocid={`fleet.item.${i + 1}`}
-                >
-                  <Card className="border-0 shadow-card hover:shadow-hero transition-all text-center p-6 h-full">
-                    <CardContent className="p-0 flex flex-col items-center gap-3">
-                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                        {item.icon}
-                      </div>
-                      <h3 className="font-display font-bold text-lg text-foreground">
-                        {item.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">
-                        {item.desc}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
             </div>
 
             {/* Car Models */}
@@ -1132,70 +1161,6 @@ Message: ${data.message}`;
                             {car.model}
                           </h4>
                           <p className="text-xs text-primary font-medium">
-                            {car.tag}
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {car.desc}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              {/* VIP / Luxury Fleet */}
-              <div>
-                <div className="flex items-center gap-3 mb-5">
-                  <h3 className="font-display text-xl font-bold text-foreground">
-                    VIP / Luxury Fleet
-                  </h3>
-                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
-                    ✨ Premium Service
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {[
-                    {
-                      model: "BMW",
-                      tag: "Luxury Sedan",
-                      desc: "Executive travel in ultimate comfort. Ideal for corporate clients, celebrities, and VIP guests.",
-                      badge: "VIP",
-                      emoji: "🏎️",
-                    },
-                    {
-                      model: "Mercedes",
-                      tag: "Elite Class",
-                      desc: "The pinnacle of luxury travel. For those who demand the very best on every journey.",
-                      badge: "VIP",
-                      emoji: "🚘",
-                    },
-                    {
-                      model: "Land Rover Defender",
-                      tag: "Luxury SUV",
-                      desc: "Commanding presence with unmatched luxury. Perfect for adventurous executives and VIP off-road journeys.",
-                      badge: "VIP",
-                      emoji: "🛡️",
-                    },
-                  ].map((car, i) => (
-                    <motion.div
-                      key={car.model}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.15 }}
-                      data-ocid={`fleet.item.${i + 8}`}
-                    >
-                      <Card className="border border-yellow-400/40 shadow-card hover:shadow-hero transition-all h-full bg-gradient-to-br from-yellow-50 to-amber-50">
-                        <CardContent className="p-5 flex flex-col gap-2">
-                          <div className="text-3xl mb-1">{car.emoji}</div>
-                          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs w-fit">
-                            {car.badge}
-                          </Badge>
-                          <h4 className="font-display font-bold text-foreground text-base">
-                            {car.model}
-                          </h4>
-                          <p className="text-xs text-amber-700 font-medium">
                             {car.tag}
                           </p>
                           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -2681,6 +2646,7 @@ Message: ${data.message}`;
                                 const result = await getRouteInfo(
                                   routeOrigin,
                                   routeDest,
+                                  actor,
                                 );
                                 if (result) {
                                   setLiveRouteData(result);
@@ -3543,22 +3509,14 @@ Message: ${data.message}`;
                       <div className="space-y-1.5 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
-                            Mon – Fri
+                            Mon – Sat
                           </span>
                           <span className="font-medium">9:00 AM – 7:00 PM</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            Saturday
-                          </span>
+                          <span className="text-muted-foreground">Sunday</span>
                           <span className="font-medium">
                             10:00 AM – 5:00 PM
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Sunday</span>
-                          <span className="font-medium text-primary">
-                            Emergency Only
                           </span>
                         </div>
                       </div>

@@ -1,50 +1,3 @@
-// MapMyIndia API credentials
-const CLIENT_ID =
-  "96dHZVzsAuvxRSSYplZvIWDvGQIR_WWPqgKlV1pNTl1KHSvZsez2SN6PHQ21hW7phx3-rdPr3vcqiter0iM3rg==";
-const CLIENT_SECRET =
-  "lrFxI-iSEg_TmqA0nCQhMtyWC8k0cQOAKVrpkWtkwPIfhoQPNWa_xhQ3-NuANE2DVr54LQheU7RzdDqu5-wlLjE7IkfxZZqe";
-
-interface TokenCache {
-  token: string;
-  expiresAt: number;
-}
-
-let tokenCache: TokenCache | null = null;
-
-export async function getAccessToken(): Promise<string> {
-  if (tokenCache && Date.now() < tokenCache.expiresAt) {
-    return tokenCache.token;
-  }
-
-  const body = new URLSearchParams({
-    grant_type: "client_credentials",
-    client_id: CLIENT_ID,
-    client_secret: CLIENT_SECRET,
-  });
-
-  const res = await fetch(
-    "https://outpost.mapmyindia.com/api/security/oauth/token",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-    },
-  );
-
-  if (!res.ok) {
-    throw new Error(`Token fetch failed: ${res.status}`);
-  }
-
-  const data = await res.json();
-  const expiresIn = data.expires_in ? Number(data.expires_in) * 1000 : 3600000;
-  tokenCache = {
-    token: data.access_token,
-    expiresAt: Date.now() + expiresIn - 60000,
-  };
-
-  return tokenCache.token;
-}
-
 // City coordinates map [lat, lng]
 export const CITY_COORDS: Record<string, [number, number]> = {
   Delhi: [28.6139, 77.209],
@@ -105,6 +58,8 @@ export const CITY_COORDS: Record<string, [number, number]> = {
   Leh: [34.1526, 77.5771],
   Jammu: [32.7266, 74.857],
   Srinagar: [34.0837, 74.7973],
+  Kashmir: [34.0837, 74.7973],
+  "Vaishno Devi": [33.0297, 74.9525],
   Aligarh: [27.8974, 78.088],
   Harigarh: [27.8837, 78.107],
   Faridabad: [28.4089, 77.3178],
@@ -122,9 +77,11 @@ export interface RouteInfo {
   source: "live" | "static";
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getRouteInfo(
   origin: string,
   dest: string,
+  actor?: any,
 ): Promise<RouteInfo | null> {
   const originCoords = CITY_COORDS[origin];
   const destCoords = CITY_COORDS[dest];
@@ -133,27 +90,19 @@ export async function getRouteInfo(
     return null;
   }
 
-  try {
-    const token = await getAccessToken();
+  if (!actor || typeof actor.getRouteInfoProxy !== "function") {
+    return null;
+  }
 
-    // MapMyIndia route API uses lng,lat order (NOT lat,lng)
+  try {
+    // Format as "lng,lat" strings for MapMyIndia
     const [oLat, oLng] = originCoords;
     const [dLat, dLng] = destCoords;
+    const originStr = `${oLng},${oLat}`;
+    const destStr = `${dLng},${dLat}`;
 
-    // Correct coordinate order: longitude,latitude
-    const url = `https://apis.mapmyindia.com/advancedmaps/v1/${token}/route_adv/driving/${oLng},${oLat};${dLng},${dLat}?geometries=polyline&steps=false`;
-
-    const res = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error(`Route API failed: ${res.status}`);
-    }
-
-    const data = await res.json();
+    const jsonStr: string = await actor.getRouteInfoProxy(originStr, destStr);
+    const data = JSON.parse(jsonStr);
 
     const routeLegs = data?.routes?.[0]?.legs;
     if (!routeLegs || routeLegs.length === 0) {
@@ -181,7 +130,7 @@ export async function getRouteInfo(
       source: "live",
     };
   } catch (err) {
-    console.warn("MapMyIndia API error:", err);
+    console.warn("MapMyIndia proxy error:", err);
     return null;
   }
 }
