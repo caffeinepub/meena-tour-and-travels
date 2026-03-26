@@ -1532,7 +1532,7 @@ Message: ${data.message}`;
                     <span className="font-semibold text-foreground">
                       Per-km pricing:
                     </span>{" "}
-                    ₹18–22/km (Sedan) · ₹45–50/km (SUV). State taxes &amp; tolls
+                    ₹18–22/km (Sedan) · ₹40–45/km (SUV). State taxes &amp; tolls
                     extra.
                   </div>
                 </div>
@@ -2456,7 +2456,7 @@ Message: ${data.message}`;
                 sedan: { label: "Sedan", min: 18, max: 22 },
                 ertiga: { label: "Ertiga", min: 22, max: 28 },
                 crysta: { label: "Innova Crysta", min: 28, max: 35 },
-                suv: { label: "Premium SUV", min: 45, max: 50 },
+                suv: { label: "Premium SUV", min: 40, max: 45 },
                 luxury: {
                   label: "BMW / Mercedes / LR Defender",
                   min: 0,
@@ -2586,7 +2586,7 @@ Message: ${data.message}`;
                             <option value="crysta">
                               Innova Crysta — ₹28–35/km
                             </option>
-                            <option value="suv">Premium SUV — ₹45–50/km</option>
+                            <option value="suv">Premium SUV — ₹40–45/km</option>
                             <option value="luxury">
                               BMW / Mercedes / LR Defender (VIP)
                             </option>

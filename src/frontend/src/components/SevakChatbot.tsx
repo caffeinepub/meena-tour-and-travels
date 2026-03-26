@@ -79,7 +79,7 @@ const FLEET: FleetCard[] = [
   {
     name: "Premium SUV",
     models: "Force Gurkha, Tata Harrier, Mahindra XUV700",
-    rate: "₹45–50/km",
+    rate: "₹40–45/km",
     img: "/assets/generated/suv-fleet.dim_600x400.jpg",
   },
 ];
@@ -157,7 +157,7 @@ function calcFare(km: number): { sedan: string; innova: string; suv: string } {
   return {
     sedan: `₹${(km * 18).toLocaleString("en-IN")}–₹${(km * 22).toLocaleString("en-IN")}`,
     innova: `₹${(km * 28).toLocaleString("en-IN")}–₹${(km * 35).toLocaleString("en-IN")}`,
-    suv: `₹${(km * 45).toLocaleString("en-IN")}–₹${(km * 50).toLocaleString("en-IN")}`,
+    suv: `₹${(km * 40).toLocaleString("en-IN")}–₹${(km * 45).toLocaleString("en-IN")}`,
   };
 }
 
@@ -245,9 +245,9 @@ function handleBookingStep(input: string): Message {
       text: `${input} — note kar liya! 📅\n\nAb **gaadi ka type** chunein:`,
       options: [
         "🚗 Sedan (₹18–22/km)",
-        "🚐 Ertiga 7-seater (₹18–22/km)",
+        "🚐 Ertiga 7-seater (₹22–28/km)",
         "🚙 Innova Crysta (₹28–35/km)",
-        "🛻 Premium SUV (₹45–50/km)",
+        "🛻 Premium SUV (₹40–45/km)",
       ],
     };
   }
@@ -389,7 +389,7 @@ function getBotReply(input: string): Message {
     return {
       id,
       role: "bot",
-      text: "Hamare standard per-km rates ji:\n\n🚗 **Sedan** (Dzire, Aura, Amaze): ₹18–22/km\n🚐 **Ertiga** (7-seater): ₹18–22/km\n🚙 **Innova Crysta**: ₹28–35/km\n🛻 **Premium SUV**: ₹45–50/km\n\n⚠️ State taxes, tolls, aur driver night charges (₹300/night) actuals ke hisaab se extra hain.\n\nKisi specific route ka estimate chahiye? Origin → Destination batayein.",
+      text: "Hamare standard per-km rates ji:\n\n🚗 **Sedan** (Dzire, Aura, Amaze): ₹18–22/km\n🚐 **Ertiga** (7-seater): ₹22–28/km\n🚙 **Innova Crysta**: ₹28–35/km\n🛻 **Premium SUV**: ₹40–45/km\n\n⚠️ State taxes, tolls, aur driver night charges (₹300/night) actuals ke hisaab se extra hain.\n\nKisi specific route ka estimate chahiye? Origin → Destination batayein.",
       options: [
         "Delhi to Jaipur rate?",
         "Delhi to Manali rate?",
