@@ -64,7 +64,7 @@ const STANDARD_VEHICLES = [
   { value: "Sedan (Standard)", label: "Sedan (Standard)", rate: "₹18–22/km" },
   { value: "Ertiga", label: "Ertiga", rate: "₹22–28/km" },
   { value: "Innova Crysta", label: "Innova Crysta", rate: "₹28–35/km" },
-  { value: "Premium SUV", label: "Premium SUV", rate: "₹28–35/km" },
+  { value: "Premium SUV", label: "Premium SUV", rate: "₹45–50/km" },
 ];
 
 const VIP_VEHICLES = [

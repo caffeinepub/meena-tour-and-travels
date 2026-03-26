@@ -1008,75 +1008,60 @@ Message: ${data.message}`;
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                data-ocid="pricing.item.1"
-              >
-                <Card className="border-2 border-primary/20 shadow-card hover:shadow-hero transition-all h-full">
-                  <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-1">
-                      <Car className="w-7 h-7 text-primary" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-10">
+              {[
+                {
+                  name: "Standard Sedan",
+                  models: "Swift Dzire · Honda Amaze · Hyundai Aura",
+                  img: "/assets/generated/sedan-fleet.dim_600x400.jpg",
+                  ocid: "pricing.item.1",
+                },
+                {
+                  name: "Ertiga",
+                  models: "Maruti Suzuki Ertiga · 7-Seater",
+                  img: "/assets/generated/ertiga-fleet.dim_600x400.jpg",
+                  ocid: "pricing.item.2",
+                },
+                {
+                  name: "Innova Crysta",
+                  models: "Toyota Innova Crysta · Premium MPV",
+                  img: "/assets/generated/innova-crysta-fleet.dim_600x400.jpg",
+                  ocid: "pricing.item.3",
+                },
+                {
+                  name: "Premium SUV",
+                  models: "Fortuner · Scorpio · Thar · Others",
+                  img: "/assets/generated/suv-fleet.dim_600x400.jpg",
+                  ocid: "pricing.item.4",
+                },
+              ].map((fleet, i) => (
+                <motion.div
+                  key={fleet.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  data-ocid={fleet.ocid}
+                >
+                  <Card className="border border-primary/20 hover:shadow-lg hover:border-primary/40 transition-all h-full overflow-hidden">
+                    <div className="h-[180px] bg-gray-50 overflow-hidden">
+                      <img
+                        src={fleet.img}
+                        alt={fleet.name}
+                        className="w-full h-full object-contain"
+                      />
                     </div>
-                    <h3 className="font-display font-bold text-xl text-foreground">
-                      Standard Sedan
-                    </h3>
-                    <div className="text-3xl font-display font-bold text-primary">
-                      ₹18–22
-                      <span className="text-base font-normal text-muted-foreground">
-                        {" "}
-                        / km
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Swift Dzire, Honda Amaze & similar comfortable sedans for
-                      everyday travel.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                data-ocid="pricing.item.2"
-              >
-                <Card className="border-2 border-primary shadow-hero h-full relative overflow-hidden">
-                  <div className="absolute top-3 right-3">
-                    <Badge className="bg-primary text-white border-0 text-xs font-semibold">
-                      Popular
-                    </Badge>
-                  </div>
-                  <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-1">
-                      <Sparkles className="w-7 h-7 text-primary" />
-                    </div>
-                    <h3 className="font-display font-bold text-xl text-foreground">
-                      SUV &amp; Innova Crysta
-                    </h3>
-                    <div className="text-3xl font-display font-bold text-primary">
-                      ₹28–35
-                      <span className="text-base font-normal text-muted-foreground">
-                        {" "}
-                        / km
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Innova Crysta, Ertiga &amp; Premium SUVs. Our own vehicles
-                      — spacious, comfortable, and reliable for long journeys.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
-
-            <div className="max-w-2xl mx-auto bg-amber-50 border border-primary/20 rounded-xl p-4 text-center text-sm text-muted-foreground mb-8">
-              <span className="font-semibold text-foreground">
-                Final fare = Kilometers × Rate.
-              </span>{" "}
-              State taxes &amp; toll charges applied as per actuals.
+                    <CardContent className="p-4 flex flex-col items-center text-center gap-1">
+                      <h3 className="font-display font-bold text-lg text-foreground">
+                        {fleet.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {fleet.models}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
@@ -1546,7 +1531,7 @@ Message: ${data.message}`;
                     <span className="font-semibold text-foreground">
                       Per-km pricing:
                     </span>{" "}
-                    ₹18–22/km (Sedan) · ₹28–35/km (SUV). State taxes &amp; tolls
+                    ₹18–22/km (Sedan) · ₹45–50/km (SUV). State taxes &amp; tolls
                     extra.
                   </div>
                 </div>
@@ -2470,7 +2455,7 @@ Message: ${data.message}`;
                 sedan: { label: "Sedan", min: 18, max: 22 },
                 ertiga: { label: "Ertiga", min: 22, max: 28 },
                 crysta: { label: "Innova Crysta", min: 28, max: 35 },
-                suv: { label: "Premium SUV", min: 28, max: 35 },
+                suv: { label: "Premium SUV", min: 45, max: 50 },
                 luxury: {
                   label: "BMW / Mercedes / LR Defender",
                   min: 0,
@@ -2600,7 +2585,7 @@ Message: ${data.message}`;
                             <option value="crysta">
                               Innova Crysta — ₹28–35/km
                             </option>
-                            <option value="suv">Premium SUV — ₹28–35/km</option>
+                            <option value="suv">Premium SUV — ₹45–50/km</option>
                             <option value="luxury">
                               BMW / Mercedes / LR Defender (VIP)
                             </option>
