@@ -1,4 +1,5 @@
 import { BookingModal } from "@/components/BookingModal";
+import { SevakChatbot } from "@/components/SevakChatbot";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -3116,7 +3117,13 @@ Message: ${data.message}`;
               viewport={{ once: true }}
               className="mb-8"
             >
-              <div className="relative overflow-hidden rounded-2xl border border-primary/15 shadow-card bg-gradient-to-r from-teal-50/60 to-cyan-50/60 p-6 md:p-7 flex flex-col md:flex-row items-center gap-5">
+              <div
+                className="relative overflow-hidden rounded-2xl border-2 shadow-card bg-gradient-to-r from-amber-50/80 to-yellow-50/80 p-6 md:p-7 flex flex-col md:flex-row items-center gap-5"
+                style={{
+                  borderColor: "gold",
+                  boxShadow: "0 0 0 2px gold, 0 8px 32px rgba(212,175,55,0.18)",
+                }}
+              >
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
                   <img
@@ -4098,6 +4105,7 @@ Message: ${data.message}`;
           </button>
         </div>
       </div>
+      <SevakChatbot />
     </>
   );
 }
