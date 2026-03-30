@@ -54,7 +54,6 @@ type BookingData = {
   vehicle?: string;
 };
 
-// Session context — remembers last destination, vehicle, etc.
 type SessionCtx = {
   lastDestination?: string;
   lastVehicle?: string;
@@ -66,6 +65,7 @@ type SessionCtx = {
 let bookingStep: BookingStep = "idle";
 let bookingData: BookingData = {};
 let sessionCtx: SessionCtx = { angryCount: 0 };
+let phoneRetryCount = 0; // retry counter for phone step
 
 const FLEET: FleetCard[] = [
   {
@@ -233,21 +233,37 @@ function findRoute(input: string): RouteResult | null {
   return null;
 }
 
-// Detect if user is writing in Hindi/Hinglish or English
+/**
+ * Smart extraction: pulls out a 10-digit Indian mobile number from any text.
+ * Handles inputs like "mera number 9876543210 hai", "+91 9876543210", "91-9876543210"
+ */
+function extractPhoneNumber(input: string): string | null {
+  // Remove common separators to normalise
+  const cleaned = input.replace(/[\s\-().]/g, "");
+
+  // Match optional +91 or 91 prefix followed by exactly 10 digits
+  const withPrefix = cleaned.match(/(?:\+91|91)([6-9]\d{9})(?!\d)/);
+  if (withPrefix) return withPrefix[1];
+
+  // Match a standalone 10-digit number starting with 6-9 (Indian mobile)
+  const standalone = cleaned.match(/(?<!\d)([6-9]\d{9})(?!\d)/);
+  if (standalone) return standalone[1];
+
+  return null;
+}
+
 function detectLanguage(input: string): "hindi" | "english" {
   const hindiPatterns =
     /kya|kitna|kaise|kab|kahan|chahiye|batao|hain|hai|mujhe|mera|aapka|aap|bhai|ji|nahi|haan|tha|thi|the|kar|gaya|jaana|book|pehle|baad|sath|liye|wala|wali|dena|lena|zyada|thoda|aur|ya|par|pe|se|ko|ka|ki|ke/;
   return hindiPatterns.test(input.toLowerCase()) ? "hindi" : "english";
 }
 
-// Detect anger/frustration
 function isAngry(input: string): boolean {
   return /bakwaas|bekar|bura|ganda|fraud|cheat|thug|ghatiya|problem|complaint|issue|late|delay|garmi|kharab|worst|bad service|angry|frustrated|terrible|horrible|useless|stupid/.test(
     input.toLowerCase(),
   );
 }
 
-// Detect discount / bargaining request
 function isAskingDiscount(input: string): boolean {
   return /discount|kam karo|kam kar do|thoda kam|reduce|negotiat|bargain|cheap|sasta|price cut|offer|deal|less rate|less price|zyada lag raha|mehnga|mahnga|afford|budget|concess/.test(
     input.toLowerCase(),
@@ -258,23 +274,62 @@ function handleBookingStep(input: string): Message {
   const id = Date.now();
 
   if (bookingStep === "name") {
-    bookingData.name = input;
-    sessionCtx.userName = input.split(" ")[0];
+    const trimmed = input.trim();
+    if (trimmed.length < 2) {
+      return {
+        id,
+        role: "bot",
+        text: "Kripya apna **poora naam** batayein ji (kam se kam 2 akshar). \uD83D\uDE4F",
+      };
+    }
+    bookingData.name = trimmed;
+    sessionCtx.userName = trimmed.split(" ")[0];
+    phoneRetryCount = 0; // reset before phone step
     bookingStep = "phone";
     return {
       id,
       role: "bot",
-      text: `Shukriya ${input} ji! \uD83D\uDE4F\n\nAb aapka **phone number** batayein taaki Gaurav ji ya Shyam Lal ji aapse trip confirm kar sakein:`,
+      text: `Shukriya **${trimmed} ji**! \uD83D\uDE4F\n\nAb aapka **10 ankon (digits) ka mobile number** batayein taaki Gaurav ji ya Shyam Lal ji aapse trip confirm kar sakein:`,
     };
   }
 
   if (bookingStep === "phone") {
-    bookingData.phone = input;
-    bookingStep = "from";
+    // --- Smart extraction: pull 10-digit number from any sentence ---
+    const extracted = extractPhoneNumber(input);
+
+    if (extracted) {
+      // Valid number found — proceed
+      bookingData.phone = extracted;
+      phoneRetryCount = 0;
+      bookingStep = "from";
+      return {
+        id,
+        role: "bot",
+        text: `Perfect! \uD83D\uDCDE Number note kar liya: **${extracted}**\n\nAapko **kahan se** pickup chahiye? (Jaise: Delhi, Noida, Gurgaon, Faridabad...)`,
+      };
+    }
+
+    // --- Invalid input ---
+    phoneRetryCount += 1;
+
+    // After 2 failures — break the loop, give direct contact
+    if (phoneRetryCount >= 2) {
+      phoneRetryCount = 0;
+      bookingStep = "idle";
+      bookingData = {};
+      return {
+        id,
+        role: "bot",
+        text: "Koi baat nahi ji, hum samajhte hain. \uD83D\uDE4F\n\nAapki booking ke liye seedha hamare team se baat karein \u2014 woh personally sab handle karenge:\n\n\uD83D\uDCDE **Gaurav ji (MD):** 9990104748\n\uD83D\uDCDE **Shyam Lal ji (Corporate):** 9868901253\n\nShubh Yatra! \uD83D\uDE97\u2728",
+        options: ["WhatsApp Gaurav ji", "WhatsApp Shyam Lal ji"],
+      };
+    }
+
+    // First failure — polite Hindi/Hinglish error with the exact requested message
     return {
       id,
       role: "bot",
-      text: "Perfect! \uD83D\uDCDE\n\nAapko **kahan se** pickup chahiye? (Jaise: Delhi, Noida, Gurgaon, Faridabad...)",
+      text: "Maaf karein, lagta hai aapne number ki jagah kuch aur type kiya hai. Kripya gaadi ki booking details aage badhane ke liye sirf **10 anko (digits)** ka mobile number type karein.\n\nJaise: **9876543210**",
     };
   }
 
@@ -297,7 +352,7 @@ function handleBookingStep(input: string): Message {
     let extra = "";
     if (route) {
       const fare = calcFare(route.km);
-      extra = `\n\n\uD83D\uDCCA **Route Info:**\n\uD83D\uDCCD ~${route.km} km | \u23F1 ${route.time} | \uD83D\uDEE3 ${route.highway}\n\uD83D\uDE97 Sedan: ${fare.sedan} | \uD83D\uDE99 Ertiga: ${fare.ertiga} | \uD83D\uDE99 Innova: ${fare.innova}`;
+      extra = `\n\n\uD83D\uDCCA **Route Info:**\n\uD83D\uDCCD ~${route.km} km | \u23F1 ${route.time} | \uD83D\uDEE3 ${route.highway}\n\uD83D\uDE97 Sedan: ${fare.sedan} | \uD83D\uDE90 Ertiga: ${fare.ertiga} | \uD83D\uDE99 Innova: ${fare.innova}`;
     }
     return {
       id,
@@ -355,6 +410,7 @@ function handleBookingStep(input: string): Message {
     }
     bookingStep = "name";
     bookingData = {};
+    phoneRetryCount = 0;
     return {
       id,
       role: "bot",
@@ -371,12 +427,10 @@ function getBotReply(input: string): Message {
   const id = Date.now();
   const lang = detectLanguage(input);
 
-  // Booking flow active
   if (bookingStep !== "idle") {
     return handleBookingStep(input);
   }
 
-  // === GUARDRAIL: Discount / Bargaining ===
   if (isAskingDiscount(msg)) {
     return {
       id,
@@ -393,7 +447,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === GUARDRAIL: Angry customer ===
   if (isAngry(msg)) {
     sessionCtx.angryCount += 1;
     if (sessionCtx.angryCount >= 2) {
@@ -416,7 +469,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Greetings ===
   if (
     /^(hi|hello|helo|namaste|namaskar|hey|hii|good morning|good evening|good afternoon|suprabhat|shubh|jai|ram ram)/.test(
       msg,
@@ -438,7 +490,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Multi-part question: rate + toll ===
   if (
     /rate|price|cost|kitna|fare|km|charges|estimate|kitne ka/.test(msg) &&
     /toll/.test(msg)
@@ -455,7 +506,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Route-specific fare query ===
   const routeResult = findRoute(msg);
   if (
     routeResult &&
@@ -476,7 +526,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Destination mention without rate query ===
   if (routeResult) {
     sessionCtx.lastRoute = routeResult;
     sessionCtx.lastDestination = routeResult.to;
@@ -493,7 +542,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Context-aware follow-up ("wahan ka toll kitna hai") ===
   if (
     /wahan|us route|is route|same route|uska|unka|iske|uske|ye route/.test(
       msg,
@@ -518,7 +566,6 @@ function getBotReply(input: string): Message {
     }
   }
 
-  // === Booking start ===
   if (
     /book|booking|reserve|trip confirm|book karna|trip karna|cab chahiye|gaadi chahiye/.test(
       msg,
@@ -526,6 +573,7 @@ function getBotReply(input: string): Message {
   ) {
     bookingStep = "name";
     bookingData = {};
+    phoneRetryCount = 0;
     return {
       id,
       role: "bot",
@@ -533,7 +581,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Fleet/vehicles ===
   if (
     /fleet|gaadi|vehicle|car|cab|taxi|sedan|innova|ertiga|suv|crysta|gadi|kitni gaadi/.test(
       msg,
@@ -551,7 +598,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Rates ===
   if (/rate|price|cost|kitna|charges|fare|per km|km rate|kitne ka/.test(msg)) {
     return {
       id,
@@ -567,7 +613,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === WhatsApp actions ===
   if (/whatsapp gaurav/.test(msg)) {
     window.open(
       "https://wa.me/919990104748?text=Hello%2C%20I%20want%20to%20book%20a%20taxi%20with%20Meena%20Tour%20and%20Travels.",
@@ -593,7 +638,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Destinations ===
   if (
     /destination|tour|package|trips|popular place|india tour|ghumna|yatra|places/.test(
       msg,
@@ -611,7 +655,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Contact ===
   if (
     /contact|number|phone|call|helpline|reach|address|office|location|milna/.test(
       msg,
@@ -625,7 +668,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Payment ===
   if (/pay|payment|upi|bank|transfer|advance|deposit|paise|rupee/.test(msg)) {
     return {
       id,
@@ -635,7 +677,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Toll ===
   if (/toll/.test(msg)) {
     return {
       id,
@@ -645,7 +686,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Night charges ===
   if (/night|raat/.test(msg)) {
     return {
       id,
@@ -655,7 +695,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === KM limit ===
   if (/km limit|kms limit|minimum km|limit|zyada km/.test(msg)) {
     return {
       id,
@@ -665,7 +704,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Driver details ===
   if (
     /driver|driver detail|cab detail|gaadi number|driving experience/.test(msg)
   ) {
@@ -677,7 +715,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Cancellation ===
   if (/cancel/.test(msg)) {
     return {
       id,
@@ -687,7 +724,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === FAQ menu ===
   if (/faq|common question|kya hai|help|sawaal|poochhna/.test(msg)) {
     return {
       id,
@@ -705,7 +741,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === About company ===
   if (
     /meena tour|company|about|kaun|who|business|since|founded|history|gstin|trust/.test(
       msg,
@@ -723,7 +758,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Itinerary / Trip planning ===
   if (
     /itinerary|plan|planning|day by day|schedule|agenda|kaise jaayein|route plan/.test(
       msg,
@@ -744,7 +778,6 @@ function getBotReply(input: string): Message {
     };
   }
 
-  // === Default ===
   return {
     id,
     role: "bot",
@@ -938,7 +971,6 @@ export function SevakChatbot() {
                 >
                   {renderText(msg.text)}
 
-                  {/* Route result card */}
                   {msg.routeResult && (
                     <div className="mt-2 bg-white rounded-xl border border-orange-200 p-3 shadow-sm text-gray-800">
                       <div className="font-bold text-sm text-orange-600 mb-1">
@@ -977,7 +1009,6 @@ export function SevakChatbot() {
                     </div>
                   )}
 
-                  {/* Fleet cards */}
                   {msg.cards && (
                     <div className="mt-2 space-y-2">
                       {msg.cards.map((c) => (
@@ -1011,7 +1042,6 @@ export function SevakChatbot() {
                     </div>
                   )}
 
-                  {/* Destination cards */}
                   {msg.destinations && (
                     <div className="mt-2 grid grid-cols-2 gap-1.5">
                       {msg.destinations.map((d) => (
@@ -1046,7 +1076,6 @@ export function SevakChatbot() {
                     </div>
                   )}
 
-                  {/* Quick options */}
                   {msg.options && msg.role === "bot" && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {msg.options.map((opt) => (
