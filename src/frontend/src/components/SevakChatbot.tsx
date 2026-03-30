@@ -30,6 +30,7 @@ type RouteResult = {
   time: string;
   highway: string;
   sedan: string;
+  ertiga: string;
   innova: string;
   suv: string;
 };
@@ -53,33 +54,42 @@ type BookingData = {
   vehicle?: string;
 };
 
-// Module-level booking state so it persists across renders
+// Session context — remembers last destination, vehicle, etc.
+type SessionCtx = {
+  lastDestination?: string;
+  lastVehicle?: string;
+  lastRoute?: RouteResult;
+  userName?: string;
+  angryCount: number;
+};
+
 let bookingStep: BookingStep = "idle";
 let bookingData: BookingData = {};
+let sessionCtx: SessionCtx = { angryCount: 0 };
 
 const FLEET: FleetCard[] = [
   {
     name: "Standard Sedan",
     models: "Swift Dzire, Hyundai Aura, Honda Amaze",
-    rate: "₹18–22/km",
+    rate: "\u20b918\u201322/km",
     img: "/assets/generated/sedan-fleet.dim_600x400.jpg",
   },
   {
-    name: "Ertiga",
-    models: "Maruti Ertiga 7-seater",
-    rate: "₹18–22/km",
+    name: "Ertiga 7-Seater",
+    models: "Maruti Ertiga",
+    rate: "\u20b922\u201328/km",
     img: "/assets/generated/ertiga-fleet.dim_600x400.jpg",
   },
   {
     name: "Innova Crysta",
     models: "Toyota Innova Crysta",
-    rate: "₹28–35/km",
+    rate: "\u20b928\u201335/km",
     img: "/assets/generated/innova-crysta-fleet.dim_600x400.jpg",
   },
   {
     name: "Premium SUV",
     models: "Force Gurkha, Tata Harrier, Mahindra XUV700",
-    rate: "₹40–45/km",
+    rate: "\u20b940\u201345/km",
     img: "/assets/generated/suv-fleet.dim_600x400.jpg",
   },
 ];
@@ -125,6 +135,26 @@ const DESTINATIONS: DestCard[] = [
     highlights: "Golden Temple, Wagah Border",
     img: "https://images.unsplash.com/photo-1588416936097-41850ab3d86d?w=400&q=80",
   },
+  {
+    name: "Udaipur",
+    highlights: "City Palace, Lake Pichola",
+    img: "https://images.unsplash.com/photo-1586612438957-c08efca71cf1?w=400&q=80",
+  },
+  {
+    name: "Jodhpur",
+    highlights: "Mehrangarh Fort, Blue City",
+    img: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=400&q=80",
+  },
+  {
+    name: "Varanasi",
+    highlights: "Ghats, Kashi Vishwanath",
+    img: "https://images.unsplash.com/photo-1561361058-c24cecae35ca?w=400&q=80",
+  },
+  {
+    name: "Rishikesh",
+    highlights: "Yoga Capital, Rafting",
+    img: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&q=80",
+  },
 ];
 
 const ROUTES: Record<string, { km: number; time: string; highway: string }> = {
@@ -143,38 +173,58 @@ const ROUTES: Record<string, { km: number; time: string; highway: string }> = {
   "delhi-pushkar": { km: 400, time: "7 hrs", highway: "NH48" },
   "delhi-varanasi": { km: 820, time: "13 hrs", highway: "NH19" },
   "delhi-dehradun": { km: 290, time: "5.5 hrs", highway: "NH334" },
+  "delhi-nainital": { km: 320, time: "6 hrs", highway: "NH9" },
+  "delhi-mussoorie": { km: 300, time: "6 hrs", highway: "NH334" },
+  "delhi-vrindavan": { km: 160, time: "3 hrs", highway: "NH19" },
+  "delhi-mathura": { km: 160, time: "3 hrs", highway: "NH19" },
+  "delhi-ayodhya": { km: 700, time: "12 hrs", highway: "NH27" },
+  "delhi-goa": { km: 1920, time: "32 hrs", highway: "NH48/NH66" },
+  "delhi-bikaner": { km: 480, time: "8 hrs", highway: "NH11" },
+  "delhi-jaisalmer": { km: 770, time: "13 hrs", highway: "NH11/NH62" },
+  "delhi-ranthambore": { km: 400, time: "7 hrs", highway: "NH48/NH52" },
+  "delhi-kota": { km: 480, time: "8 hrs", highway: "NH52" },
+  "delhi-ajmer": { km: 390, time: "7 hrs", highway: "NH48" },
 };
 
 function getGreeting(): string {
   const h = new Date().getHours();
-  if (h >= 5 && h < 12) return "Suprabhat! 🌅 Good Morning!";
-  if (h >= 12 && h < 17) return "Namaskar! ☀️ Good Afternoon!";
-  if (h >= 17 && h < 21) return "Shubh Sandhya! 🌆 Good Evening!";
-  return "Namaskar! 🌙";
+  if (h >= 5 && h < 12) return "Suprabhat! \uD83C\uDF05 Good Morning!";
+  if (h >= 12 && h < 17) return "Namaskar! \u2600\uFE0F Good Afternoon!";
+  if (h >= 17 && h < 21) return "Shubh Sandhya! \uD83C\uDF06 Good Evening!";
+  return "Namaskar! \uD83C\uDF19";
 }
 
-function calcFare(km: number): { sedan: string; innova: string; suv: string } {
+function calcFare(km: number): {
+  sedan: string;
+  ertiga: string;
+  innova: string;
+  suv: string;
+} {
   return {
-    sedan: `₹${(km * 18).toLocaleString("en-IN")}–₹${(km * 22).toLocaleString("en-IN")}`,
-    innova: `₹${(km * 28).toLocaleString("en-IN")}–₹${(km * 35).toLocaleString("en-IN")}`,
-    suv: `₹${(km * 40).toLocaleString("en-IN")}–₹${(km * 45).toLocaleString("en-IN")}`,
+    sedan: `\u20b9${(km * 18).toLocaleString("en-IN")}\u2013\u20b9${(km * 22).toLocaleString("en-IN")}`,
+    ertiga: `\u20b9${(km * 22).toLocaleString("en-IN")}\u2013\u20b9${(km * 28).toLocaleString("en-IN")}`,
+    innova: `\u20b9${(km * 28).toLocaleString("en-IN")}\u2013\u20b9${(km * 35).toLocaleString("en-IN")}`,
+    suv: `\u20b9${(km * 40).toLocaleString("en-IN")}\u2013\u20b9${(km * 45).toLocaleString("en-IN")}`,
   };
 }
 
 function findRoute(input: string): RouteResult | null {
   const lower = input.toLowerCase();
   for (const [key, val] of Object.entries(ROUTES)) {
-    const parts = key.split("-");
-    const dest = parts.slice(1).join(" ");
+    const dest = key.split("-").slice(1).join(" ");
     if (lower.includes(dest) || lower.includes(key)) {
       const fare = calcFare(val.km);
       return {
         from: "Delhi",
-        to: dest.charAt(0).toUpperCase() + dest.slice(1),
+        to: dest
+          .split(" ")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" "),
         km: val.km,
         time: val.time,
         highway: val.highway,
         sedan: fare.sedan,
+        ertiga: fare.ertiga,
         innova: fare.innova,
         suv: fare.suv,
       };
@@ -183,16 +233,38 @@ function findRoute(input: string): RouteResult | null {
   return null;
 }
 
+// Detect if user is writing in Hindi/Hinglish or English
+function detectLanguage(input: string): "hindi" | "english" {
+  const hindiPatterns =
+    /kya|kitna|kaise|kab|kahan|chahiye|batao|hain|hai|mujhe|mera|aapka|aap|bhai|ji|nahi|haan|tha|thi|the|kar|gaya|jaana|book|pehle|baad|sath|liye|wala|wali|dena|lena|zyada|thoda|aur|ya|par|pe|se|ko|ka|ki|ke/;
+  return hindiPatterns.test(input.toLowerCase()) ? "hindi" : "english";
+}
+
+// Detect anger/frustration
+function isAngry(input: string): boolean {
+  return /bakwaas|bekar|bura|ganda|fraud|cheat|thug|ghatiya|problem|complaint|issue|late|delay|garmi|kharab|worst|bad service|angry|frustrated|terrible|horrible|useless|stupid/.test(
+    input.toLowerCase(),
+  );
+}
+
+// Detect discount / bargaining request
+function isAskingDiscount(input: string): boolean {
+  return /discount|kam karo|kam kar do|thoda kam|reduce|negotiat|bargain|cheap|sasta|price cut|offer|deal|less rate|less price|zyada lag raha|mehnga|mahnga|afford|budget|concess/.test(
+    input.toLowerCase(),
+  );
+}
+
 function handleBookingStep(input: string): Message {
   const id = Date.now();
 
   if (bookingStep === "name") {
     bookingData.name = input;
+    sessionCtx.userName = input.split(" ")[0];
     bookingStep = "phone";
     return {
       id,
       role: "bot",
-      text: `Shukriya ${input} ji! 🙏\n\nAb aapka **phone number** batayein taaki Gaurav ji ya Shyam Lal ji trip se pehle confirm kar sakein:`,
+      text: `Shukriya ${input} ji! \uD83D\uDE4F\n\nAb aapka **phone number** batayein taaki Gaurav ji ya Shyam Lal ji aapse trip confirm kar sakein:`,
     };
   }
 
@@ -202,7 +274,7 @@ function handleBookingStep(input: string): Message {
     return {
       id,
       role: "bot",
-      text: "Perfect! 📞\n\nAapko **kahan se** pickup chahiye? (Jaise: Delhi, Noida, Gurgaon...)",
+      text: "Perfect! \uD83D\uDCDE\n\nAapko **kahan se** pickup chahiye? (Jaise: Delhi, Noida, Gurgaon, Faridabad...)",
     };
   }
 
@@ -212,27 +284,25 @@ function handleBookingStep(input: string): Message {
     return {
       id,
       role: "bot",
-      text: "Aur **kahan jaana hai**? (Destination city batayein 📍)",
+      text: `Achha! **${input}** se. \u2705\n\nAur **kahan jaana hai**? Destination batayein \uD83D\uDCCD`,
     };
   }
 
   if (bookingStep === "to") {
     bookingData.to = input;
+    sessionCtx.lastDestination = input;
     bookingStep = "date";
-
-    // Check if route known
     const routeKey = `delhi-${input.toLowerCase().trim()}`;
     const route = ROUTES[routeKey];
     let extra = "";
     if (route) {
       const fare = calcFare(route.km);
-      extra = `\n\n📊 **Route Info:**\n📍 ~${route.km} km | ⏱ ${route.time} | 🛣 ${route.highway}\n🚗 Sedan: ${fare.sedan} | 🚙 Innova: ${fare.innova}`;
+      extra = `\n\n\uD83D\uDCCA **Route Info:**\n\uD83D\uDCCD ~${route.km} km | \u23F1 ${route.time} | \uD83D\uDEE3 ${route.highway}\n\uD83D\uDE97 Sedan: ${fare.sedan} | \uD83D\uDE99 Ertiga: ${fare.ertiga} | \uD83D\uDE99 Innova: ${fare.innova}`;
     }
-
     return {
       id,
       role: "bot",
-      text: `Bahut achha! ${input} — ek popular destination hai hamare customers mein. 😊${extra}\n\n**Kab jaana chahte hain?** Travel date batayein (DD/MM/YYYY ya jaise "25 April"):`,
+      text: `${input} \u2014 bahut achha destination hai! \uD83D\uDE04${extra}\n\n**Kab jaana chahte hain?** Travel date batayein (DD/MM/YYYY ya jaise \u201825 April\u2019):`,
     };
   }
 
@@ -242,37 +312,44 @@ function handleBookingStep(input: string): Message {
     return {
       id,
       role: "bot",
-      text: `${input} — note kar liya! 📅\n\nAb **gaadi ka type** chunein:`,
+      text: `${input} \u2014 note kar liya! \uD83D\uDCC5\n\nAb **gaadi ka type** chunein:`,
       options: [
-        "🚗 Sedan (₹18–22/km)",
-        "🚐 Ertiga 7-seater (₹22–28/km)",
-        "🚙 Innova Crysta (₹28–35/km)",
-        "🛻 Premium SUV (₹40–45/km)",
+        "\uD83D\uDE97 Sedan \u20b918\u201322/km",
+        "\uD83D\uDE90 Ertiga 7-seater \u20b922\u201328/km",
+        "\uD83D\uDE99 Innova Crysta \u20b928\u201335/km",
+        "\uD83D\uDE9B Premium SUV \u20b940\u201345/km",
       ],
     };
   }
 
   if (bookingStep === "vehicle") {
-    bookingData.vehicle = input.replace(/^[🚗🚐🚙🛻]\s*/u, "");
+    bookingData.vehicle = input.replace(
+      /^[\uD83D\uDE97\uD83D\uDE90\uD83D\uDE99\uD83D\uDE9B]\s*/u,
+      "",
+    );
+    sessionCtx.lastVehicle = bookingData.vehicle;
     bookingStep = "confirm";
     return {
       id,
       role: "bot",
-      text: `Bahut badhiya choice! 👌\n\n📋 **Booking Summary:**\n👤 Name: ${bookingData.name}\n📞 Phone: ${bookingData.phone}\n📍 From: ${bookingData.from}\n📍 To: ${bookingData.to}\n📅 Date: ${bookingData.date}\n🚗 Vehicle: ${bookingData.vehicle}\n\nKya yeh sab sahi hai? Confirm karein toh hum Gaurav ji ko WhatsApp bhej denge! ✅`,
-      options: ["✅ Haan, Confirm Karein", "✏️ Nahi, Badlaav Karna Hai"],
+      text: `Bahut badhiya! \uD83D\uDC4C\n\n\uD83D\uDCCB **Booking Summary:**\n\uD83D\uDC64 Name: ${bookingData.name}\n\uD83D\uDCDE Phone: ${bookingData.phone}\n\uD83D\uDCCD From: ${bookingData.from}\n\uD83D\uDCCD To: ${bookingData.to}\n\uD83D\uDCC5 Date: ${bookingData.date}\n\uD83D\uDE97 Vehicle: ${bookingData.vehicle}\n\n*Toll, state taxes & night charges (\u20b9300/night) extra as per actuals.*\n\nKya yeh sab sahi hai? Confirm karein! \u2705`,
+      options: [
+        "\u2705 Haan, Confirm Karein",
+        "\u270F\uFE0F Badlaav Karna Hai",
+      ],
     };
   }
 
   if (bookingStep === "confirm") {
-    if (/haan|confirm|yes|✅/.test(input.toLowerCase())) {
-      const msg = `Namaskar ji 🙏%0A%0AMain ek taxi book karna chahta/chahti hun:%0A%0A👤 Name: ${encodeURIComponent(bookingData.name || "")}%0A📞 Phone: ${encodeURIComponent(bookingData.phone || "")}%0A📍 From: ${encodeURIComponent(bookingData.from || "")}%0A📍 To: ${encodeURIComponent(bookingData.to || "")}%0A📅 Date: ${encodeURIComponent(bookingData.date || "")}%0A🚗 Vehicle: ${encodeURIComponent(bookingData.vehicle || "")}%0A%0AKripya confirm karein. Shukriya!`;
+    if (/haan|confirm|yes|\u2705/.test(input.toLowerCase())) {
+      const msg = `Namaskar ji \uD83D\uDE4F%0A%0AMain ek taxi book karna chahta\/chahti hun:%0A%0A\uD83D\uDC64 Name: ${encodeURIComponent(bookingData.name || "")}%0A\uD83D\uDCDE Phone: ${encodeURIComponent(bookingData.phone || "")}%0A\uD83D\uDCCD From: ${encodeURIComponent(bookingData.from || "")}%0A\uD83D\uDCCD To: ${encodeURIComponent(bookingData.to || "")}%0A\uD83D\uDCC5 Date: ${encodeURIComponent(bookingData.date || "")}%0A\uD83D\uDE97 Vehicle: ${encodeURIComponent(bookingData.vehicle || "")}%0A%0AKripya confirm karein. Shukriya!`;
       window.open(`https://wa.me/919990104748?text=${msg}`, "_blank");
       bookingStep = "idle";
       bookingData = {};
       return {
         id,
         role: "bot",
-        text: "Shukriya! 🎉 WhatsApp khul raha hai — aapki booking details Gaurav ji ke paas pahunch jaayengi.\n\nWoh jald hi aapko call ya WhatsApp karenge trip confirm karne ke liye. Shubh Yatra! 🚗✨",
+        text: `Shukriya${sessionCtx.userName ? ` ${sessionCtx.userName} ji` : ""}! \uD83C\uDF89 WhatsApp khul raha hai \u2014 aapki booking details Gaurav ji ke paas pahunch jaayengi.\n\nWoh jald hi call ya WhatsApp karenge trip confirm karne ke liye. **Shubh Yatra!** \uD83D\uDE97\u2728`,
         options: ["Kuch aur poochhna hai", "Rates jaannein"],
       };
     }
@@ -281,11 +358,10 @@ function handleBookingStep(input: string): Message {
     return {
       id,
       role: "bot",
-      text: "Koi baat nahi! Chaliye dobara shuru karte hain. 😊\n\nPehle aapka **naam** batayein:",
+      text: "Koi baat nahi! Chaliye dobara shuru karte hain. \uD83D\uDE0A\n\nPehle aapka **naam** batayein:",
     };
   }
 
-  // Fallback
   bookingStep = "idle";
   return getBotReply(input);
 }
@@ -293,18 +369,56 @@ function handleBookingStep(input: string): Message {
 function getBotReply(input: string): Message {
   const msg = input.toLowerCase().trim();
   const id = Date.now();
+  const lang = detectLanguage(input);
 
-  // If in booking flow, handle it
-  if (bookingStep !== "idle" && bookingStep !== "confirm") {
-    return handleBookingStep(input);
-  }
-  if (bookingStep === "confirm") {
+  // Booking flow active
+  if (bookingStep !== "idle") {
     return handleBookingStep(input);
   }
 
-  // Greetings
+  // === GUARDRAIL: Discount / Bargaining ===
+  if (isAskingDiscount(msg)) {
+    return {
+      id,
+      role: "bot",
+      text:
+        lang === "hindi"
+          ? `Sir/Ma'am, hamare rates already market mein best hain. Hum top-notch service provide karte hain \u2014 experienced drivers, brand new gaadiyan, aur 24/7 support. Isliye rates mein aur discount dena hamare liye possible nahi hai.\n\nFir bhi, agar aap booking karein toh hamare saath ek perfect trip guaranteed hai. \uD83D\uDE4F`
+          : "Our rates are already competitive and reflect the premium quality we deliver \u2014 experienced drivers, company-owned vehicles, and 24/7 support. We\u2019re unable to offer further discounts, but we assure you won\u2019t be disappointed! \uD83D\uDE4F",
+      options: [
+        "\uD83D\uDCC5 Booking Karna Hai",
+        "\uD83D\uDCB0 Rates Dekhein",
+        "\uD83D\uDE97 Fleet Dekhein",
+      ],
+    };
+  }
+
+  // === GUARDRAIL: Angry customer ===
+  if (isAngry(msg)) {
+    sessionCtx.angryCount += 1;
+    if (sessionCtx.angryCount >= 2) {
+      return {
+        id,
+        role: "bot",
+        text: "Main samajh sakta hun aap pareshan hain. Gaurav ji se seedha baat karein \u2014 woh personally iska hal karenge.\n\n\uD83D\uDCDE **Gaurav ji:** 9990104748\n\uD83D\uDCDE **Shyam Lal ji:** 9868901253",
+        options: ["WhatsApp Gaurav ji", "WhatsApp Shyam Lal ji"],
+      };
+    }
+    return {
+      id,
+      role: "bot",
+      text: "Maafi chahta hun agar aapko koi takleef hui. Hamare liye har customer bahut khaas hai. \uD83D\uDE4F\n\nKya aap apni problem share karenge? Main poori koshish karunga iska solution dhundhne mein.",
+      options: [
+        "Problem batayein",
+        "\uD83D\uDCDE Directly Call Karein",
+        "WhatsApp Karein",
+      ],
+    };
+  }
+
+  // === Greetings ===
   if (
-    /^(hi|hello|helo|namaste|namaskar|hey|hii|hiii|good morning|good evening|good afternoon|suprabhat|shubh)/.test(
+    /^(hi|hello|helo|namaste|namaskar|hey|hii|good morning|good evening|good afternoon|suprabhat|shubh|jai|ram ram)/.test(
       msg,
     )
   ) {
@@ -312,21 +426,101 @@ function getBotReply(input: string): Message {
     return {
       id,
       role: "bot",
-      text: `${greeting}\n\nMain **Sevak** hun — Meena Tour & Travels ka 24/7 assistant. 🙏\n\nKya aap koi trip plan kar rahe hain? Booking, rates, destinations — sab mein madad karunga. Bas batayein! 😊`,
+      text: `${greeting}\n\nMain **Sevak** hun \u2014 Meena Tour & Travels ka 24/7 assistant. \uD83D\uDE4F\n\nKya aap koi trip plan kar rahe hain? Booking, rates, destinations \u2014 sab mein madad karunga!`,
       options: [
-        "🚗 Vehicles dekhne hain",
-        "💰 Rates jaanne hain",
-        "🗺 Destinations/Tours",
-        "📅 Booking karna hai",
-        "❓ FAQ",
-        "📞 Contact karein",
+        "\uD83D\uDE97 Vehicles Dekhein",
+        "\uD83D\uDCB0 Rates Jaannein",
+        "\uD83D\uDDFA Destinations/Tours",
+        "\uD83D\uDCC5 Booking Karna Hai",
+        "\u2753 FAQ",
+        "\uD83D\uDCDE Contact Karein",
       ],
     };
   }
 
-  // Booking start
+  // === Multi-part question: rate + toll ===
   if (
-    /book|booking|reserve|trip confirm|confirm karna|book karna|trip karna/.test(
+    /rate|price|cost|kitna|fare|km|charges|estimate|kitne ka/.test(msg) &&
+    /toll/.test(msg)
+  ) {
+    const routeResult = findRoute(msg);
+    const baseText = routeResult
+      ? `**${routeResult.from} \u2192 ${routeResult.to}:**\n\uD83D\uDE97 Sedan: ${routeResult.sedan}\n\uD83D\uDE90 Ertiga: ${routeResult.ertiga}\n\uD83D\uDE99 Innova: ${routeResult.innova}\n\uD83D\uDE9B SUV: ${routeResult.suv}\n\n\uD83D\uDCCD ~${routeResult.km} km | \u23F1 ${routeResult.time} | \uD83D\uDEE3 ${routeResult.highway}`
+      : "**Per km rates:**\n\uD83D\uDE97 Sedan: \u20b918\u201322/km\n\uD83D\uDE90 Ertiga: \u20b922\u201328/km\n\uD83D\uDE99 Innova: \u20b928\u201335/km\n\uD83D\uDE9B SUV: \u20b940\u201345/km";
+    return {
+      id,
+      role: "bot",
+      text: `${baseText}\n\n**Toll ke baare mein:** Toll tax alag se charge hota hai \u2014 actual amount trip ke hisaab se hogi. Driver toll receipts rakhte hain aur final bill mein add ki jaati hai.`,
+      options: ["\uD83D\uDCC5 Book Karna Hai", "\uD83D\uDE97 Fleet Dekhein"],
+    };
+  }
+
+  // === Route-specific fare query ===
+  const routeResult = findRoute(msg);
+  if (
+    routeResult &&
+    /rate|price|cost|kitna|fare|km|charges|estimate|kitne ka/.test(msg)
+  ) {
+    sessionCtx.lastRoute = routeResult;
+    sessionCtx.lastDestination = routeResult.to;
+    return {
+      id,
+      role: "bot",
+      text: `**${routeResult.from} \u2192 ${routeResult.to}** ka estimated fare:`,
+      routeResult,
+      options: [
+        "\uD83D\uDCC5 Book This Trip",
+        "\uD83D\uDE97 Other Vehicles",
+        "\uD83D\uDDFA More Routes",
+      ],
+    };
+  }
+
+  // === Destination mention without rate query ===
+  if (routeResult) {
+    sessionCtx.lastRoute = routeResult;
+    sessionCtx.lastDestination = routeResult.to;
+    return {
+      id,
+      role: "bot",
+      text: `${routeResult.to} ek amazing destination hai! Yahan route aur fare details hain:`,
+      routeResult,
+      options: [
+        "\uD83D\uDCC5 Book Karna Hai",
+        "\uD83D\uDCB0 Rates Jaannein",
+        "\uD83D\uDDFA Aur Destinations",
+      ],
+    };
+  }
+
+  // === Context-aware follow-up ("wahan ka toll kitna hai") ===
+  if (
+    /wahan|us route|is route|same route|uska|unka|iske|uske|ye route/.test(
+      msg,
+    ) &&
+    sessionCtx.lastDestination
+  ) {
+    if (/toll/.test(msg)) {
+      return {
+        id,
+        role: "bot",
+        text: `${sessionCtx.lastDestination} route pe toll actual charges ke hisaab se extra lagta hai ji. Driver receipt rakhte hain \u2014 final bill mein clearly add hoti hai. Koi surprise charge nahi hoga.`,
+        options: ["\uD83D\uDCC5 Book Karna Hai", "\uD83D\uDCB0 Per-km Rates"],
+      };
+    }
+    if (/driver|gaadi|cab/.test(msg)) {
+      return {
+        id,
+        role: "bot",
+        text: `${sessionCtx.lastDestination} ke liye trip se **ek din pehle** aapko driver ka naam, number aur gaadi number WhatsApp pe bhej diya jaayega. Saare drivers **10\u201315+ saal** ke experienced professionals hain. \uD83D\uDC4D`,
+        options: ["\uD83D\uDCC5 Booking Karna Hai"],
+      };
+    }
+  }
+
+  // === Booking start ===
+  if (
+    /book|booking|reserve|trip confirm|book karna|trip karna|cab chahiye|gaadi chahiye/.test(
       msg,
     )
   ) {
@@ -335,71 +529,45 @@ function getBotReply(input: string): Message {
     return {
       id,
       role: "bot",
-      text: "Bilkul! Aapki booking main khud manage karunga. 😊\n\nPehle aapka **naam** batayein ji:",
+      text: "Bilkul! Aapki booking personally manage karunga. \uD83D\uDE0A\n\nPehle aapka **naam** batayein ji:",
     };
   }
 
-  // Route-specific fare query
-  const routeResult = findRoute(msg);
+  // === Fleet/vehicles ===
   if (
-    routeResult &&
-    /rate|price|cost|kitna|fare|km|charges|estimate|kitne ka/.test(msg)
-  ) {
-    return {
-      id,
-      role: "bot",
-      text: `Delhi → ${routeResult.to} ka estimated fare:`,
-      routeResult,
-      options: [
-        "📅 Book This Trip",
-        "🚗 Other Vehicles Dekhein",
-        "🗺 More Routes",
-      ],
-    };
-  }
-
-  // General destination mention — show route if known
-  if (routeResult) {
-    return {
-      id,
-      role: "bot",
-      text: `${routeResult.to} ek amazing destination hai! Yahan hai route info:`,
-      routeResult,
-      options: ["📅 Book Karna Hai", "💰 Rates Jaannein", "🗺 Aur Destinations"],
-    };
-  }
-
-  // Fleet/vehicles
-  if (
-    /fleet|gaadi|vehicle|car|cab|taxi|sedan|innova|ertiga|suv|crysta|gadi/.test(
+    /fleet|gaadi|vehicle|car|cab|taxi|sedan|innova|ertiga|suv|crysta|gadi|kitni gaadi/.test(
       msg,
     )
   ) {
     return {
       id,
       role: "bot",
-      text: "Meena Tour & Travels ki available fleet — sab company-owned, brand new gaadiyaan: 🚗",
+      text: "Meena Tour & Travels ki available fleet \u2014 sab company-owned, brand new gaadiyan: \uD83D\uDE97",
       cards: FLEET,
-      options: ["📅 Book Karna Hai", "💰 Rates Poochhna Hai"],
-    };
-  }
-
-  // Rates
-  if (/rate|price|cost|kitna|charges|fare|per km|km rate|kitne ka/.test(msg)) {
-    return {
-      id,
-      role: "bot",
-      text: "Hamare standard per-km rates ji:\n\n🚗 **Sedan** (Dzire, Aura, Amaze): ₹18–22/km\n🚐 **Ertiga** (7-seater): ₹22–28/km\n🚙 **Innova Crysta**: ₹28–35/km\n🛻 **Premium SUV**: ₹40–45/km\n\n⚠️ State taxes, tolls, aur driver night charges (₹300/night) actuals ke hisaab se extra hain.\n\nKisi specific route ka estimate chahiye? Origin → Destination batayein.",
       options: [
-        "Delhi to Jaipur rate?",
-        "Delhi to Manali rate?",
-        "Delhi to Agra rate?",
-        "📅 Book Karna Hai",
+        "\uD83D\uDCC5 Book Karna Hai",
+        "\uD83D\uDCB0 Rates Poochhna Hai",
       ],
     };
   }
 
-  // WhatsApp actions
+  // === Rates ===
+  if (/rate|price|cost|kitna|charges|fare|per km|km rate|kitne ka/.test(msg)) {
+    return {
+      id,
+      role: "bot",
+      text: "Hamare standard per-km rates ji:\n\n\uD83D\uDE97 **Sedan** (Dzire, Aura, Amaze): \u20b918\u201322/km\n\uD83D\uDE90 **Ertiga** (7-seater): \u20b922\u201328/km\n\uD83D\uDE99 **Innova Crysta**: \u20b928\u201335/km\n\uD83D\uDE9B **Premium SUV**: \u20b940\u201345/km\n\n\u26A0\uFE0F State taxes, tolls, aur driver night charges (\u20b9300/night) actual ke hisaab se extra hain.\n\nKisi specific route ka estimate chahiye? Bas origin \u2192 destination batayein!",
+      options: [
+        "Delhi to Jaipur rate?",
+        "Delhi to Manali rate?",
+        "Delhi to Agra rate?",
+        "Delhi to Shimla rate?",
+        "\uD83D\uDCC5 Book Karna Hai",
+      ],
+    };
+  }
+
+  // === WhatsApp actions ===
   if (/whatsapp gaurav/.test(msg)) {
     window.open(
       "https://wa.me/919990104748?text=Hello%2C%20I%20want%20to%20book%20a%20taxi%20with%20Meena%20Tour%20and%20Travels.",
@@ -408,7 +576,7 @@ function getBotReply(input: string): Message {
     return {
       id,
       role: "bot",
-      text: "WhatsApp khul raha hai — Gaurav ji (9990104748) se seedha baat karein. 👍",
+      text: "WhatsApp khul raha hai \u2014 Gaurav ji (9990104748) se seedha baat karein. \uD83D\uDC4D",
       options: ["Kuch aur poochhna hai"],
     };
   }
@@ -420,104 +588,111 @@ function getBotReply(input: string): Message {
     return {
       id,
       role: "bot",
-      text: "WhatsApp khul raha hai — Shyam Lal ji (9868901253) se seedha baat karein. 👍",
+      text: "WhatsApp khul raha hai \u2014 Shyam Lal ji (9868901253) se seedha baat karein. \uD83D\uDC4D",
       options: ["Kuch aur poochhna hai"],
     };
   }
 
-  // Destinations
+  // === Destinations ===
   if (
-    /destination|tour|package|trips|popular place|india tour|ghumna|yatra/.test(
+    /destination|tour|package|trips|popular place|india tour|ghumna|yatra|places/.test(
       msg,
     )
   ) {
     return {
       id,
       role: "bot",
-      text: "Yeh hain hamare popular destinations! Kisi pe click karein aur booking shuru karte hain: 🗺",
+      text: "Hamare popular destinations \u2014 click karein booking shuru karne ke liye: \uD83D\uDDFA",
       destinations: DESTINATIONS,
-      options: ["📅 Booking Karna Hai", "💰 Rates Jaannein"],
+      options: [
+        "\uD83D\uDCC5 Booking Karna Hai",
+        "\uD83D\uDCB0 Rates Jaannein",
+      ],
     };
   }
 
-  // Contact
+  // === Contact ===
   if (
-    /contact|number|phone|call|helpline|reach|address|office|location/.test(msg)
+    /contact|number|phone|call|helpline|reach|address|office|location|milna/.test(
+      msg,
+    )
   ) {
     return {
       id,
       role: "bot",
-      text: "**Meena Tour & Travels — Contact:**\n\n📞 Gaurav ji (MD): **9990104748**\n📞 Shyam Lal ji (Corporate): **9868901253**\n📧 meenagaurav4748@gmail.com\n\n📍 C-41, UGF, Khirki Ext, Panchsheel Vihar, Malviya Nagar, New Delhi – 110017\n\n🕐 Mon–Sat: 9AM–7PM | Sunday: 10AM–5PM",
+      text: "**Meena Tour & Travels \u2014 Contact:**\n\n\uD83D\uDCDE Gaurav ji (MD): **9990104748**\n\uD83D\uDCDE Shyam Lal ji (Corporate): **9868901253**\n\uD83D\uDCE7 meenagaurav4748@gmail.com\n\n\uD83D\uDCCD C-41, UGF, Khirki Ext, Panchsheel Vihar, Malviya Nagar, New Delhi \u2013 110017\n\n\uD83D\uDD50 Mon\u2013Sat: 9AM\u20137PM | Sunday: 10AM\u20135PM",
       options: ["WhatsApp Gaurav ji", "WhatsApp Shyam Lal ji"],
     };
   }
 
-  // Payment
-  if (/pay|payment|upi|bank|transfer|advance|deposit|paise/.test(msg)) {
+  // === Payment ===
+  if (/pay|payment|upi|bank|transfer|advance|deposit|paise|rupee/.test(msg)) {
     return {
       id,
       role: "bot",
-      text: "**Payment Options ji:**\n\n📲 **UPI:** shyamlalmeena4151@ibl (GPay, PhonePe, Paytm)\n🏦 **Bank Transfer:** A/C: 51112853125 | SBI | IFSC: SBIN0031580 | Branch: Mandir Marg, Saket (Name: GAURAV)\n💵 **Cash:** Pickup pe de sakte hain\n\nBooking confirm karne ke liye advance zaruri hai.",
-      options: ["📅 Book Karna Hai", "📞 Contact Karein"],
+      text: "**Payment Options ji:**\n\n\uD83D\uDCF2 **UPI:** shyamlalmeena4151@ibl (GPay, PhonePe, Paytm)\n\uD83C\uDFE6 **Bank Transfer:** A/C: 51112853125 | SBI | IFSC: SBIN0031580 | Branch: Mandir Marg, Saket (Name: GAURAV)\n\uD83D\uDCB5 **Cash:** Pickup pe de sakte hain\n\nBooking confirm karne ke liye advance zaruri hai.",
+      options: ["\uD83D\uDCC5 Book Karna Hai", "\uD83D\uDCDE Contact Karein"],
     };
   }
 
-  // Toll
+  // === Toll ===
   if (/toll/.test(msg)) {
     return {
       id,
       role: "bot",
-      text: "Toll tax alag se charge hota hai ji — actual charges ke hisaab se. Hamare per-km rates mein toll included nahi hai. Trip ke baad actual toll ka bill provide kiya jaata hai.",
-      options: ["Kuch aur poochhna hai", "📅 Booking Karna Hai"],
+      text: "Toll tax alag se charge hota hai ji \u2014 actual charges ke hisaab se. Hamare per-km rates mein toll included nahi hai. Trip ke baad actual toll ka receipt provide kiya jaata hai. Koi hidden charge nahi hoga.",
+      options: ["Kuch aur poochhna hai", "\uD83D\uDCC5 Booking Karna Hai"],
     };
   }
 
-  // Night charges
-  if (/night/.test(msg)) {
+  // === Night charges ===
+  if (/night|raat/.test(msg)) {
     return {
       id,
       role: "bot",
-      text: "Driver ke liye night charges **₹300 per night** hain ji. Yeh actual ke hisaab se final bill mein add hote hain.",
-      options: ["Kuch aur poochhna hai", "📅 Booking Karna Hai"],
+      text: "Driver ke liye night charges **\u20b9300 per night** hain ji. Yeh actual ke hisaab se final bill mein add hote hain \u2014 agar trip mein raat ka ruk-na ho tabhi lagta hai.",
+      options: ["Kuch aur poochhna hai", "\uD83D\uDCC5 Booking Karna Hai"],
     };
   }
 
-  // KM limit
-  if (/km limit|kms limit|minimum km/.test(msg)) {
+  // === KM limit ===
+  if (/km limit|kms limit|minimum km|limit|zyada km/.test(msg)) {
     return {
       id,
       role: "bot",
-      text: "Outstation trips mein minimum **250–300 km per day** hota hai ji. Isse zyada km pe per-km rate lagta hai — bilkul transparent billing.",
-      options: ["Kuch aur poochhna hai", "📅 Booking Karna Hai"],
+      text: "Outstation trips mein minimum **250\u2013300 km per day** ka charge hota hai ji. Agar aap isse zyada chalate hain, toh per-km rate hi lagega \u2014 bilkul transparent billing.",
+      options: ["Kuch aur poochhna hai", "\uD83D\uDCC5 Booking Karna Hai"],
     };
   }
 
-  // Driver details
-  if (/driver|driver detail|cab detail/.test(msg)) {
+  // === Driver details ===
+  if (
+    /driver|driver detail|cab detail|gaadi number|driving experience/.test(msg)
+  ) {
     return {
       id,
       role: "bot",
-      text: "Trip se **ek din pehle** aapko WhatsApp pe driver ka naam, phone number, aur gaadi ka number automatically bhej diya jaata hai. 📱\n\nHamare saare drivers **10–15+ saal** ke experienced professionals hain.",
-      options: ["📅 Booking Karna Hai", "Kuch aur poochhna hai"],
+      text: "Trip se **ek din pehle** aapko WhatsApp pe driver ka naam, phone number, aur gaadi ka number bhej diya jaata hai. \uD83D\uDCF1\n\nHamare saare drivers **10\u201315+ saal** ke experienced professionals hain \u2014 safe aur reliable travel guaranteed!",
+      options: ["\uD83D\uDCC5 Booking Karna Hai", "Kuch aur poochhna hai"],
     };
   }
 
-  // Cancellation
+  // === Cancellation ===
   if (/cancel/.test(msg)) {
     return {
       id,
       role: "bot",
-      text: "Cancellation ke liye seedha Gaurav ji ya Shyam Lal ji se baat karein ji:\n📞 9990104748 (Gaurav) | 9868901253 (Shyam Lal ji)",
+      text: "Cancellation ke liye seedha Gaurav ji ya Shyam Lal ji se baat karein ji:\n\uD83D\uDCDE 9990104748 (Gaurav) | 9868901253 (Shyam Lal ji)\n\nWoh personally aapka maamla handle karenge.",
       options: ["WhatsApp Gaurav ji", "WhatsApp Shyam Lal ji"],
     };
   }
 
-  // FAQ menu
-  if (/faq|common question|kya hai/.test(msg)) {
+  // === FAQ menu ===
+  if (/faq|common question|kya hai|help|sawaal|poochhna/.test(msg)) {
     return {
       id,
       role: "bot",
-      text: "Yeh hain common sawaal ji — koi bhi chunein:",
+      text: "Yeh hain common sawaal \u2014 koi bhi chunein:",
       options: [
         "KMs limit kya hai?",
         "Toll tax included hai ya extra?",
@@ -525,36 +700,65 @@ function getBotReply(input: string): Message {
         "Driver details kab milegi?",
         "Payment kaise karein?",
         "Cancellation policy?",
+        "Company ke baare mein batao",
       ],
     };
   }
 
-  // About company
+  // === About company ===
   if (
-    /meena tour|company|about|kaun|who|business|since|founded|history|gstin/.test(
+    /meena tour|company|about|kaun|who|business|since|founded|history|gstin|trust/.test(
       msg,
     )
   ) {
     return {
       id,
       role: "bot",
-      text: "**Meena Tour & Travels** — Delhi ki trusted travel agency, 2011 se service de rahi hai. 🙏\n\n✅ GSTIN Registered: 07BQXPG8115J1ZB\n✅ All India Tourist Permit\n✅ 15,000+ satisfied passengers\n✅ 1000+ destinations covered\n✅ Reliance Industries — 8 saal se client\n✅ Mangal Singh Lodha ji — 7 saal se client\n\nCo-founders: **GAURAV** (MD) & **Shyam Lal Meena** (Director, Corporate Relations)",
-      options: ["🚗 Fleet Dekhein", "💰 Rates Jaannein", "📞 Contact Karein"],
+      text: "**Meena Tour & Travels** \u2014 Delhi ki trusted travel agency, 2011 se service de rahi hai. \uD83D\uDE4F\n\n\u2705 GSTIN Registered: 07BQXPG8115J1ZB\n\u2705 All India Tourist Permit\n\u2705 15,000+ satisfied passengers\n\u2705 1000+ destinations covered\n\u2705 Reliance Industries \u2014 8 saal se client\n\u2705 Mangal Singh Lodha ji \u2014 7 saal se client\n\nCo-founders: **GAURAV** (MD) & **Shyam Lal Meena** (Director, Corporate Relations)",
+      options: [
+        "\uD83D\uDE97 Fleet Dekhein",
+        "\uD83D\uDCB0 Rates Jaannein",
+        "\uD83D\uDCDE Contact Karein",
+      ],
     };
   }
 
-  // Default
+  // === Itinerary / Trip planning ===
+  if (
+    /itinerary|plan|planning|day by day|schedule|agenda|kaise jaayein|route plan/.test(
+      msg,
+    )
+  ) {
+    const dest = sessionCtx.lastDestination;
+    return {
+      id,
+      role: "bot",
+      text: dest
+        ? `${dest} ke liye trip planning mein madad kar sakta hun! Kitne din ka trip plan kar rahe hain?\n\n**Ek quick suggestion:**\n\uD83D\uDCC5 Day 1: Delhi se ${dest} drive (early morning best)\n\uD83C\uDFE8 Reach hotel, settle in\n\uD83D\uDDFA Day 2+ onwards: Local sightseeing with our driver\n\nExact itinerary ke liye Gaurav ji ya Shyam Lal ji se personally baat karein \u2014 woh best advice denge.`
+        : "Trip planning mein zaroor madad kar sakta hun! Pehle destination batayein \u2014 phir I can give you a quick overview of the journey.",
+      options: [
+        "\uD83D\uDCC5 Trip Book Karna Hai",
+        "\uD83D\uDDFA Destinations Dekhein",
+        "\uD83D\uDCDE Expert se Baat Karein",
+      ],
+    };
+  }
+
+  // === Default ===
   return {
     id,
     role: "bot",
-    text: "Samajh gaya ji! Neeche se koi option chunein ya apna sawaal seedha likhein — main haazir hun. 😊\n\nYa direct baat karein:\n📞 Gaurav ji: 9990104748 | 📞 Shyam Lal ji: 9868901253",
+    text:
+      lang === "hindi"
+        ? "Samajh gaya ji! Neeche se koi option chunein ya apna sawaal seedha likhein \u2014 main haazir hun. \uD83D\uDE0A\n\nYa direct baat karein:\n\uD83D\uDCDE Gaurav ji: 9990104748 | Shyam Lal ji: 9868901253"
+        : "I\u2019m here to help! Please choose from the options below or type your question directly. \uD83D\uDE0A\n\nOr call directly:\n\uD83D\uDCDE Gaurav: 9990104748 | Shyam Lal: 9868901253",
     options: [
-      "🚗 Vehicles Dekhein",
-      "💰 Rates Jaannein",
-      "🗺 Destinations",
-      "📅 Booking Karna Hai",
-      "❓ FAQ",
-      "📞 Contact Karein",
+      "\uD83D\uDE97 Vehicles Dekhein",
+      "\uD83D\uDCB0 Rates Jaannein",
+      "\uD83D\uDDFA Destinations",
+      "\uD83D\uDCC5 Booking Karna Hai",
+      "\u2753 FAQ",
+      "\uD83D\uDCDE Contact Karein",
     ],
   };
 }
@@ -566,14 +770,14 @@ export function SevakChatbot() {
     {
       id: 0,
       role: "bot",
-      text: `${greeting}\n\nMain **Sevak** hun — Meena Tour & Travels ka 24/7 assistant. 🙏\n\nKya aap koi trip plan kar rahe hain? Booking, rates, destinations — sab mein madad karunga. Bas batayein! 😊`,
+      text: `${greeting}\n\nMain **Sevak** hun \u2014 Meena Tour & Travels ka 24/7 assistant. \uD83D\uDE4F\n\nTrip planning, rates, destinations, booking \u2014 sab mein madad karunga. Bas batayein!`,
       options: [
-        "🚗 Vehicles Dekhein",
-        "💰 Rates Jaannein",
-        "🗺 Destinations/Tours",
-        "📅 Booking Karna Hai",
-        "❓ FAQ",
-        "📞 Contact Karein",
+        "\uD83D\uDE97 Vehicles Dekhein",
+        "\uD83D\uDCB0 Rates Jaannein",
+        "\uD83D\uDDFA Destinations/Tours",
+        "\uD83D\uDCC5 Booking Karna Hai",
+        "\u2753 FAQ",
+        "\uD83D\uDCDE Contact Karein",
       ],
     },
   ]);
@@ -592,7 +796,7 @@ export function SevakChatbot() {
     }
   }, [open]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: open intentionally excluded to only fire on message count change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: open intentionally excluded
   useEffect(() => {
     if (!open && messages.length > 1) {
       setUnread((prev) => prev + 1);
@@ -647,7 +851,7 @@ export function SevakChatbot() {
 
   return (
     <>
-      {/* Sevak toggle button — bottom LEFT so it doesn't overlap floating right bar */}
+      {/* Sevak toggle button — bottom LEFT */}
       <button
         type="button"
         data-ocid="sevak.open_modal_button"
@@ -664,7 +868,7 @@ export function SevakChatbot() {
             role="img"
             aria-label="robot"
           >
-            🤖
+            \uD83E\uDD16
           </span>
         ) : (
           <svg
@@ -685,7 +889,7 @@ export function SevakChatbot() {
       {/* Sevak label */}
       {!open && (
         <span className="fixed bottom-8 left-[72px] z-[60] bg-gray-900/85 text-white text-xs px-2.5 py-1 rounded-lg pointer-events-none select-none backdrop-blur-sm">
-          Sevak 🤖
+          Sevak \uD83E\uDD16
         </span>
       )}
 
@@ -694,12 +898,12 @@ export function SevakChatbot() {
         <div
           data-ocid="sevak.dialog"
           className="fixed bottom-24 left-5 z-[60] w-[340px] max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-2xl border border-orange-200 flex flex-col"
-          style={{ maxHeight: "540px" }}
+          style={{ maxHeight: "560px" }}
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-t-2xl px-4 py-3 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 text-xl">
-              🤖
+              \uD83E\uDD16
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-white font-bold text-sm leading-tight">
@@ -718,14 +922,12 @@ export function SevakChatbot() {
           {/* Messages */}
           <div
             className="flex-1 overflow-y-auto p-3 space-y-3"
-            style={{ minHeight: 0, maxHeight: "360px" }}
+            style={{ minHeight: 0, maxHeight: "380px" }}
           >
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${
-                  msg.role === "user" ? "justify-end" : "justify-start"
-                }`}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
                   className={`max-w-[88%] ${
@@ -740,23 +942,33 @@ export function SevakChatbot() {
                   {msg.routeResult && (
                     <div className="mt-2 bg-white rounded-xl border border-orange-200 p-3 shadow-sm text-gray-800">
                       <div className="font-bold text-sm text-orange-600 mb-1">
-                        {msg.routeResult.from} → {msg.routeResult.to}
+                        {msg.routeResult.from} \u2192 {msg.routeResult.to}
                       </div>
                       <div className="text-[11px] text-gray-600 space-y-0.5">
-                        <div>📍 Distance: ~{msg.routeResult.km} km</div>
-                        <div>⏱ Travel Time: ~{msg.routeResult.time}</div>
-                        <div>🛣 Highway: {msg.routeResult.highway}</div>
+                        <div>
+                          \uD83D\uDCCD Distance: ~{msg.routeResult.km} km
+                        </div>
+                        <div>\u23F1 Travel Time: ~{msg.routeResult.time}</div>
+                        <div>
+                          \uD83D\uDEE3 Highway: {msg.routeResult.highway}
+                        </div>
                       </div>
                       <div className="mt-2 pt-2 border-t border-orange-100 space-y-0.5">
                         <div className="text-[11px]">
-                          🚗 <strong>Sedan/Ertiga:</strong>{" "}
+                          \uD83D\uDE97 <strong>Sedan:</strong>{" "}
                           {msg.routeResult.sedan}
                         </div>
                         <div className="text-[11px]">
-                          🚙 <strong>Innova:</strong> {msg.routeResult.innova}
+                          \uD83D\uDE90 <strong>Ertiga:</strong>{" "}
+                          {msg.routeResult.ertiga}
                         </div>
                         <div className="text-[11px]">
-                          🛻 <strong>Premium SUV:</strong> {msg.routeResult.suv}
+                          \uD83D\uDE99 <strong>Innova:</strong>{" "}
+                          {msg.routeResult.innova}
+                        </div>
+                        <div className="text-[11px]">
+                          \uD83D\uDE9B <strong>Premium SUV:</strong>{" "}
+                          {msg.routeResult.suv}
                         </div>
                       </div>
                       <div className="text-[9px] text-gray-400 mt-1">
