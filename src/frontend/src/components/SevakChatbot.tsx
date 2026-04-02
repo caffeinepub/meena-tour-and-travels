@@ -901,7 +901,7 @@ export function SevakChatbot() {
             role="img"
             aria-label="robot"
           >
-            \uD83E\uDD16
+            🤖
           </span>
         ) : (
           <svg
@@ -922,7 +922,7 @@ export function SevakChatbot() {
       {/* Sevak label */}
       {!open && (
         <span className="fixed bottom-8 left-[72px] z-[60] bg-gray-900/85 text-white text-xs px-2.5 py-1 rounded-lg pointer-events-none select-none backdrop-blur-sm">
-          Sevak \uD83E\uDD16
+          Sevak 🤖
         </span>
       )}
 
@@ -936,7 +936,7 @@ export function SevakChatbot() {
           {/* Header */}
           <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-t-2xl px-4 py-3 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 text-xl">
-              \uD83E\uDD16
+              🤖
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-white font-bold text-sm leading-tight">
