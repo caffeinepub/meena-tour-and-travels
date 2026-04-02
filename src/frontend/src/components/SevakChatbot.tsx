@@ -852,9 +852,9 @@ function getBotReply(input: string): Message {
       id,
       role: "bot",
       text: pick([
-        `${greeting}\n\nArey! Swagat hai Meena Tour & Travels mein! 😊 Main **Sevak** hun — aapka travel assistant. Kahan jaana hai aaj? 🚗`,
-        `${greeting}\n\nNamaskar${nameJi()}! Meena Tour & Travels mein aapka swagat hai. Main **Sevak** — trip planning se lekar booking tak, sab handle karta hun. Batayein, kya madad chahiye? 🙏`,
-        `${greeting}\n\nHello${nameJi()}! Aap bilkul sahi jagah aaye hain. Main **Sevak** hun — aapka 24/7 travel dost! 😄 Rates, destinations, booking — sab mein haazir hun.`,
+        `${greeting}\n\nArey! Swagat hai Meena Tour & Travels mein! 😊 Main **Trip Pilot** hun — aapka travel assistant. Kahan jaana hai aaj? 🚗`,
+        `${greeting}\n\nNamaskar${nameJi()}! Meena Tour & Travels mein aapka swagat hai. Main **Trip Pilot** — trip planning se lekar booking tak, sab handle karta hun. Batayein, kya madad chahiye? 🙏`,
+        `${greeting}\n\nHello${nameJi()}! Aap bilkul sahi jagah aaye hain. Main **Trip Pilot** hun — aapka 24/7 travel dost! 😄 Rates, destinations, booking — sab mein haazir hun.`,
       ]),
       options: [
         "🚗 Vehicles Dekhein",
@@ -1232,9 +1232,9 @@ export function SevakChatbot() {
       id: 0,
       role: "bot",
       text: pick([
-        `${greeting}\n\nMain **Sevak** hun — Meena Tour & Travels ka 24/7 assistant. 🙏\n\nTrip planning, rates, destinations, booking — sab mein madad karunga. Bas batayein!`,
-        `${greeting}\n\nArey! Swagat hai! Main **Sevak** hun — aapka travel dost. 😊 Kahan jaana hai? Rates, booking, routes — sab ready hun!`,
-        `${greeting}\n\nNamaskar ji! Main **Sevak** — Meena Tour & Travels ka assistant. Trip ka plan ban raha hai kya? Batayein, sab handle ho jaayega! 🚗`,
+        `${greeting}\n\nMain **Trip Pilot** hun — Meena Tour & Travels ka 24/7 assistant. 🙏\n\nTrip planning, rates, destinations, booking — sab mein madad karunga. Bas batayein!`,
+        `${greeting}\n\nArey! Swagat hai! Main **Trip Pilot** hun — aapka travel dost. 😊 Kahan jaana hai? Rates, booking, routes — sab ready hun!`,
+        `${greeting}\n\nNamaskar ji! Main **Trip Pilot** — Meena Tour & Travels ka assistant. Trip ka plan ban raha hai kya? Batayein, sab handle ho jaayega! 🚗`,
       ]),
       options: [
         "🚗 Vehicles Dekhein",
@@ -1325,7 +1325,7 @@ export function SevakChatbot() {
           setUnread(0);
         }}
         className="fixed bottom-6 left-5 z-[60] w-14 h-14 rounded-full shadow-2xl flex items-center justify-center bg-gradient-to-br from-orange-500 to-amber-600 hover:scale-110 active:scale-95 transition-transform border-2 border-white"
-        aria-label="Sevak Chatbot"
+        aria-label="Trip Pilot Chatbot"
       >
         {!open ? (
           <span
@@ -1354,7 +1354,7 @@ export function SevakChatbot() {
       {/* Sevak label */}
       {!open && (
         <span className="fixed bottom-8 left-[72px] z-[60] bg-gray-900/85 text-white text-xs px-2.5 py-1 rounded-lg pointer-events-none select-none backdrop-blur-sm">
-          Sevak 🤖
+          Trip Pilot 🤖
         </span>
       )}
 
@@ -1372,7 +1372,7 @@ export function SevakChatbot() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-white font-bold text-sm leading-tight">
-                Sevak
+                Trip Pilot
               </div>
               <div className="text-white/80 text-[11px]">
                 Meena Tour & Travels Assistant
